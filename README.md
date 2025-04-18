@@ -17,8 +17,9 @@ As we develop the product more, we will add more guidance on code location and s
 
 ## Contributors 
 
-Contributors are listed in alphabetical order:
+Contributors are listed, with no significance to the order of names:
 
 | Who      | What      |
 | ------------- | ------------- |
 | Michael Rosenbaum | Design / Frontend & Project Management |
+| Arkadeep Bandyopadhyay | Backend / Frontend engineering & Chief Architect |
