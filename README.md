@@ -15,7 +15,7 @@ Our current folder structure uses the basic geoDjango template. Backend features
 
 As we develop the product more, we will add more guidance on code location and specific features.
 
-## Contributors 
+## Contributors
 
 Contributors are listed, with no significance to the order of names:
 
