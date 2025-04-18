@@ -1,3 +1,3 @@
-# from django.test import TestCase
-
-# Create your tests here.
+def test_dry_run():
+    """A super simple test to verify our workflow runs."""
+    assert True
