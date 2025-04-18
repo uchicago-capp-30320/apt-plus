@@ -11,7 +11,9 @@ As of April 18, 2025, Apartments Plus is currently in an early development stage
 
 ## Folder structure
 
-TBD
+Our current folder structure uses the basic geoDjango template. Backend features will be in the `/app_app` and `/app_proj` directories, where frontend views will be in the `/apt_app/templates/` directory.
+
+As we develop the product more, we will add more guidance on code location and specific features.
 
 ## Contributors 
 
