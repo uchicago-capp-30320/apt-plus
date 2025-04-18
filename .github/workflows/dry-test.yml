@@ -21,10 +21,16 @@ jobs:
 
     - name: Install dependencies
       run: |
+        # Create and activate virtual environment
+        uv venv .venv
+        source .venv/bin/activate
+
+        # Install dependencies
         uv pip install --upgrade pip
-        uv pip install django pytest
+        uv pip install django
 
     - name: Run tests
       run: |
-        # Use Django's test runner
+        # Activate the virtual environment again
+        source .venv/bin/activate
         python manage.py test apt_app
