@@ -27,3 +27,4 @@ Contributors are listed, with no significance to the order of names:
 | Zewei (Whiskey) Liao | Lead QA Engineer, Backend Engineer |
 | Rodrigo Rivarola | Front & Backend GIS Specialist |
 | Magdalena Barros | Frontend Lead |
+| Fuyuki Tani | Data Engineer |
