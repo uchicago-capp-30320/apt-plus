@@ -24,3 +24,4 @@ Contributors are listed, with no significance to the order of names:
 | Michael Rosenbaum | Design / Frontend & Project Management |
 | Arkadeep Bandyopadhyay | Backend / Frontend engineering & Chief Architect |
 | Miguel Perez | Backend / GIS specialist & Backend / Data engineer |
+| Zewei (Whiskey) Liao | Lead QA Engineer, Backend Engineer |
