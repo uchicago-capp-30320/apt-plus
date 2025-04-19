@@ -26,3 +26,4 @@ Contributors are listed, with no significance to the order of names:
 | Miguel Perez | Backend / GIS specialist & Backend / Data engineer |
 | Zewei (Whiskey) Liao | Lead QA Engineer, Backend Engineer |
 | Rodrigo Rivarola | Front & Backend GIS Specialist |
+| Magdalena Barros | Frontend Lead |
