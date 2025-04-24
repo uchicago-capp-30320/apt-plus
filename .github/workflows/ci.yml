@@ -29,6 +29,8 @@ jobs:
         # Install dependencies
         uv pip install --upgrade pip
         uv pip install django pytest pytest-django ruff
+        uv pip install -r pyproject.toml
+
 
         # Run tests and linter
         pytest apt_app/tests.py -v
