@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -29,9 +28,7 @@ class Migration(migrations.Migration):
                 ("password", models.CharField(max_length=128, verbose_name="password")),
                 (
                     "last_login",
-                    models.DateTimeField(
-                        blank=True, null=True, verbose_name="last login"
-                    ),
+                    models.DateTimeField(blank=True, null=True, verbose_name="last login"),
                 ),
                 (
                     "is_superuser",
@@ -53,9 +50,7 @@ class Migration(migrations.Migration):
                 ("username", models.CharField(default="", max_length=255, unique=True)),
                 (
                     "full_name",
-                    models.CharField(
-                        blank=True, max_length=150, verbose_name="full name"
-                    ),
+                    models.CharField(blank=True, max_length=150, verbose_name="full name"),
                 ),
                 (
                     "is_staff",
