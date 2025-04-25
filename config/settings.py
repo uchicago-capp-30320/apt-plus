@@ -29,7 +29,7 @@ env.read_env(BASE_DIR / ".env")
 #  (a local SQLite DB, unsafe secret key, and console logged email)
 # but in production all of these should be made explicit.
 DEBUG = env.bool("DEBUG", False)
-DEBUG = True
+
 if DEBUG:
     SECRET_KEY = env.str("SECRET_KEY", "needs-to-be-set-in-prod")
     _DEFAULT_DB = env.db(default="sqlite:///" + str(BASE_DIR / "db.sqlite3"))

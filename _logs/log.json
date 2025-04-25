@@ -1,0 +1,2 @@
+{"request": "GET /", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36", "event": "request_started", "request_id": "8fd81f18-ffdb-49ad-b6c3-85ebe5169918", "timestamp": "2025-04-25T01:32:52.918836Z", "logger": "django_structlog.middlewares.request", "level": "info"}
+{"code": 200, "request": "GET /", "event": "request_finished", "request_id": "8fd81f18-ffdb-49ad-b6c3-85ebe5169918", "timestamp": "2025-04-25T01:32:52.921542Z", "logger": "django_structlog.middlewares.request", "level": "info"}
