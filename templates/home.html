@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Home | apt-plus{% endblock %}
+
+{% block content %}
+
+<div style="position: relative;">
+  
+  {% include "map.html" %}
+
+  <div style="position: absolute; top: 20%; left: 10%; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <h1 class="title is-3">Hello apt-plus</h1>
+  </div>
+
+</div>
+
+{% endblock %}
