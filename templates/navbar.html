@@ -1,0 +1,20 @@
+{% load static %}
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="{% url 'home' %}">
+            <img src="{% static 'images/logo_color.svg' %}" alt="Apartments Plus logo">
+        </a>
+    </div>
+
+    <div class="navbar-end">
+        <div class="navbar-item">
+            <a class="navbar-item" href="temp">
+                <strong>About</strong>
+            </a>
+            <a class="navbar-item" href="temp">
+                <strong>Sign in</strong>
+            </a>
+        </div>
+    </div>
+</nav>
