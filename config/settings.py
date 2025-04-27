@@ -32,7 +32,8 @@ DEBUG = env.bool("DEBUG", False)
 
 if DEBUG:
     SECRET_KEY = env.str("SECRET_KEY", "needs-to-be-set-in-prod")
-    _DEFAULT_DB = env.db(default="sqlite:///" + str(BASE_DIR / "db.sqlite3"))
+    _DEFAULT_DB = env.db("_DEFAULT_DB")
+    # default="sqlite:///" + str(BASE_DIR / "db.sqlite3"))
     EMAIL_CONFIG = env.email(default="consolemail://")
 else:
     SECRET_KEY = env.str("SECRET_KEY")
