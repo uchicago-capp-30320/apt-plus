@@ -2,7 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,osx,django,jupyternotebooks
 
 ### Django ###
-_logs/log.json
+_logs/
 *.log
 *.pot
 *.pyc
