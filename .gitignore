@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,osx,django,jupyternotebooks
 
 /data
+.idea/
 
 ### Django ###
 _logs/
