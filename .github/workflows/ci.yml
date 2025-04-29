@@ -28,4 +28,4 @@ jobs:
 
         # Run tests and linter
         uv run pytest apt_app/tests.py -v
-        ruff check .
+        uv run ruff check .
