@@ -7,31 +7,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout the repo
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Install uv and activate a virtual environment
+      uses: astral-sh/setup-uv@v6
+      with:
+        # Install the specific version of uv that we currently use
+        version: "0.6.14"
+        enable-cache: true
+        activate-environment: true
+
+    - name: Set up Python  # this is said to be faster than uv python install
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version-file: ".python-version"
 
-    - name: Install uv
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
+    - name: Install the project
+      run: uv sync --locked --all-extras --dev
 
     - name: Setup and run tests
       shell: bash
       run: |
         # Create and activate virtual environment
-        uv venv .venv
-        source .venv/bin/activate
+        # uv venv .venv
+        # source .venv/bin/activate
 
         # Install dependencies
-        uv pip install --upgrade pip
-        uv pip install django pytest pytest-django ruff
-        uv pip install -r pyproject.toml
-
+        # uv pip install --upgrade pip
+        # uv pip install django pytest pytest-django ruff
 
         # Run tests and linter
-        pytest apt_app/tests.py -v
-        ruff check .
+        uv run pytest apt_app/tests.py -v
+        # uvx ruff check .
