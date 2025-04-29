@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,osx,django,jupyternotebooks
 
 ### Django ###
+_logs/
 *.log
 *.pot
 *.pyc
@@ -215,5 +216,6 @@ poetry.toml
 
 # LSP config files
 pyrightconfig.json
+
 
 # End of https://www.toptal.com/developers/gitignore/api/python,osx,django,jupyternotebooks

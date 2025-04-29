@@ -21,15 +21,11 @@ jobs:
 
     - name: Setup and run tests
       shell: bash
+      env:
+        DEBUG: ${{ secrets.DEBUG }}
+        _DEFAULT_DB: ${{ secrets._DEFAULT_DB }}
       run: |
-        # Create and activate virtual environment
-        uv venv .venv
-        source .venv/bin/activate
-
-        # Install dependencies
-        uv pip install --upgrade pip
-        uv pip install django pytest pytest-django ruff
 
         # Run tests and linter
-        pytest apt_app/tests.py -v
-        ruff check .
+        uv run pytest apt_app/tests.py -v
+        uv run ruff check .
