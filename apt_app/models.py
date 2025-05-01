@@ -9,6 +9,9 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.gis.db import models as gis_models
+from django.contrib.postgres.indexes import GistIndex
+from .mixins import LocationMixin
 
 USERNAME_REQUIRED = settings.DJOK_USER_TYPE == "username"
 EMAIL_REQUIRED = settings.DJOK_USER_TYPE.startswith("email")
@@ -82,3 +85,148 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+
+# --- Custom models ---
+
+
+class FavoriteProperty(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="favorite_properties")
+    property = models.ForeignKey("Property", on_delete=models.CASCADE)
+    custom_name = models.CharField(max_length=255, null=True, blank=True)
+    date_saved = models.DateTimeField(auto_now_add=True)
+
+
+class Property(LocationMixin, models.Model):
+    id = models.AutoField(primary_key=True)
+    address = models.CharField(max_length=255)
+    location = gis_models.PointField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [GistIndex(fields=["location"])]
+
+
+class Inspection(models.Model):
+    inspection_id = models.AutoField(primary_key=True)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+    date = models.DateField()
+    result = models.CharField(max_length=50)
+    notes = models.TextField()
+
+
+class CrimeType(models.TextChoices):
+    OFFENSE_INVOLVING_CHILDREN = "OFFENSE INVOLVING CHILDREN", "Offense Involving Children"
+    NARCOTICS = "NARCOTICS", "Narcotics"
+    CRIM_SEXUAL_ASSAULT = "CRIM SEXUAL ASSAULT", "Crim Sexual Assault"
+    CRIMINAL_DAMAGE = "CRIMINAL DAMAGE", "Criminal Damage"
+    THEFT = "THEFT", "Theft"
+    BURGLARY = "BURGLARY", "Burglary"
+    SEX_OFFENSE = "SEX OFFENSE", "Sex Offense"
+    ROBBERY = "ROBBERY", "Robbery"
+    MOTOR_VEHICLE_THEFT = "MOTOR VEHICLE THEFT", "Motor Vehicle Theft"
+    BATTERY = "BATTERY", "Battery"
+    HOMICIDE = "HOMICIDE", "Homicide"
+    CRIMINAL_SEXUAL_ASSAULT = "CRIMINAL SEXUAL ASSAULT", "Criminal Sexual Assault"
+    OTHER_OFFENSE = "OTHER OFFENSE", "Other Offense"
+    WEAPONS_VIOLATION = "WEAPONS VIOLATION", "Weapons Violation"
+    DECEPTIVE_PRACTICE = "DECEPTIVE PRACTICE", "Deceptive Practice"
+    STALKING = "STALKING", "Stalking"
+    CRIMINAL_TRESPASS = "CRIMINAL TRESPASS", "Criminal Trespass"
+    ASSAULT = "ASSAULT", "Assault"
+    PROSTITUTION = "PROSTITUTION", "Prostitution"
+    KIDNAPPING = "KIDNAPPING", "Kidnapping"
+    ARSON = "ARSON", "Arson"
+    CONCEALED_CARRY_LICENSE_VIOLATION = (
+        "CONCEALED CARRY LICENSE VIOLATION",
+        "Concealed Carry License Violation",
+    )
+    INTERFERENCE_WITH_PUBLIC_OFFICER = (
+        "INTERFERENCE WITH PUBLIC OFFICER",
+        "Interference with Public Officer",
+    )
+    PUBLIC_PEACE_VIOLATION = "PUBLIC PEACE VIOLATION", "Public Peace Violation"
+    LIQUOR_LAW_VIOLATION = "LIQUOR LAW VIOLATION", "Liquor Law Violation"
+    INTIMIDATION = "INTIMIDATION", "Intimidation"
+    HUMAN_TRAFFICKING = "HUMAN TRAFFICKING", "Human Trafficking"
+    GAMBLING = "GAMBLING", "Gambling"
+    OBSCENITY = "OBSCENITY", "Obscenity"
+    PUBLIC_INDECENCY = "PUBLIC INDECENCY", "Public Indecency"
+    NON_CRIMINAL = "NON-CRIMINAL", "Non-Criminal"
+    OTHER_NARCOTIC_VIOLATION = "OTHER NARCOTIC VIOLATION", "Other Narcotic Violation"
+    RITUALISM = "RITUALISM", "Ritualism"
+    DOMESTIC_VIOLENCE = "DOMESTIC VIOLENCE", "Domestic Violence"
+    NON_CRIMINAL_SUBJECT_SPECIFIED = (
+        "NON-CRIMINAL (SUBJECT SPECIFIED)",
+        "Non-Criminal (Subject Specified)",
+    )
+    NON_CRIMINAL_ALT = "NON - CRIMINAL", "Non - Criminal"
+
+
+class Crime(LocationMixin, models.Model):
+    id = models.AutoField(primary_key=True)
+    location = gis_models.PointField()
+    date = models.DateTimeField()
+    type = models.CharField(
+        max_length=50, choices=CrimeType.choices, default=CrimeType.NON_CRIMINAL_ALT
+    )
+    description = models.TextField()
+
+    class Meta:
+        indexes = [GistIndex(fields=["location"])]
+
+
+# --- Abstract base class ---
+class LocationBasedFacilities(LocationMixin, models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    location = gis_models.PointField()
+
+    class Meta:
+        abstract = True
+        indexes = [GistIndex(fields=["location"])]
+
+
+class AmenityType(models.TextChoices):
+    GROCERY = "grocery", "Grocery Store"
+    PHARMACY = "pharmacy", "Pharmacy"
+    RESTAURANT = "restaurant", "Restaurant"
+    CAFE = "cafe", "Cafe"
+    BAR = "bar", "Bar"
+    HOSPITAL = "hospital", "Hospital"
+    OTHER = "other", "Other"
+
+
+class Amenity(LocationBasedFacilities):
+    type = models.CharField(max_length=50, choices=AmenityType.choices, default=AmenityType.OTHER)
+
+
+class TransitType(models.TextChoices):
+    CTA = "cta", "CTA"
+    METRA = "metra", "Metra"
+    SHUTTLE = "shuttle", "UChicago Shuttle"
+    DIVVY = "divvy", "Divvy Bike"
+    OTHER = "other", "Other"
+
+
+class TransitStop(LocationBasedFacilities):
+    type = models.CharField(max_length=50, choices=TransitType.choices, default=TransitType.OTHER)
+
+
+class TransitRoute(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    type = models.CharField(max_length=50, choices=TransitType.choices, default=TransitType.OTHER)
+    geometry = gis_models.LineStringField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    stops = models.ManyToManyField(TransitStop, related_name="routes")
+
+    class Meta:
+        indexes = [
+            GistIndex(fields=["geometry"]),
+        ]
+
+    def __str__(self):
+        return self.name
