@@ -15,6 +15,11 @@ jobs:
       with:
         python-version: '3.10'
 
+    - name: Install GDAL dependencies for GeoDjango
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev
+
     - name: Install uv
       run: |
         curl -LsSf https://astral.sh/uv/install.sh | sh
