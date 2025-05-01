@@ -5,13 +5,79 @@
 {% block content %}
 
 <div style="position: relative;">
-  
-  {% include "map.html" %}
 
-  <div style="position: absolute; top: 20%; left: 10%; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-    <h1 class="title is-3">Hello apt-plus</h1>
+  <!-- Map container -->
+  <div style="width: 100%; height: 100vh;">
+    {% include "map.html" %}
   </div>
 
-</div>
+  <div class="columns is-mobile is-multiline" style="position: absolute; top: 8rem; left: 0; right: 0; z-index: 2;">
+    <div class="column is-3 is-offset-2">
+      <div class="box has-background-light">
+  
+        <!-- Title -->
+        <h1 class="title is-size-3-mobile is-size-2-tablet is-size-1-desktop">
+            Where are you thinking about living?
+          </h1>
+          
+  
+        <!-- search bar -->
+        <div class="field" style="position: relative;">
+            <div class="control has-icons-right">
+              <input class="input" type="text" placeholder="Enter an address">
+              <span class="icon is-small is-right" style="pointer-events: auto; cursor: pointer; color: #363636;">
+                <i class="fas fa-search"></i>
+              </span>
+            </div>
+          </div>
+          
+  
+        <!-- Bullets -->
+        <div class="mt-5">
+          <!-- Check it -->
+          <div class="media mb-4">
+            <div class="media-left">
+                <span class="icon" style="color: #0B8ADB;">
+                <i class="fas fa-map-marker-alt fa-lg"></i>
+              </span>
+            </div>
+            <div class="media-content">
+              <p><strong>Check it</strong></p>
+              <p>We provide you information on transit, nearby amenities, housing code violations, and more.</p>
+            </div>
+          </div>
+  
+          <!-- Confirm it -->
+          <div class="media mb-4">
+            <div class="media-left">
+               <span class="icon" style="color: #DB0B0B;">
+                <i class="fas fa-filter fa-lg"></i>
+              </span>
+            </div>
+            <div class="media-content">
+              <p><strong>Confirm it</strong></p>
+              <p>Set up custom filters for each address to make sure that the apartment you’re looking at is one you actually want to live in.</p>
+            </div>
+          </div>
+  
+          <!-- Save it -->
+          <div class="media">
+            <div class="media-left">
+               <span class="icon" style="color: #DBD80B;">
+                <i class="fas fa-bookmark fa-lg"></i>
+              </span>
+            </div>
+            <div class="media-content">
+              <p><strong>Save it</strong></p>
+              <p>Save the apartments you like for later, even if you found them on different websites.</p>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+  
 
 {% endblock %}
+
