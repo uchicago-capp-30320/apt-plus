@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from django.core.exceptions import ValidationError
 from dotenv import load_dotenv
 import pytz
+from dateutil import tz
 
 # Load environment variables
 load_dotenv()
@@ -31,7 +32,10 @@ def create_crime_from_row(row):
     local_time = pd.to_datetime(row.get("Date", ""), errors="coerce")
     if pd.isna(local_time):
         raise ValueError("Invalid or missing date")
-    crime.date = local_time.tz_localize("America/Chicago", ambiguous="NaT").tz_convert("UTC")
+
+    central = tz.gettz("America/Chicago")
+    local_time = local_time.replace(tzinfo=central)
+    crime.date = local_time.astimezone(pytz.UTC)
 
     # Crime type
     raw_type = row.get("Primary Type", "").strip().upper()
