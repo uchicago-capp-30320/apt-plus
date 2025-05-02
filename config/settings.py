@@ -39,6 +39,7 @@ else:
     SECRET_KEY = env.str("SECRET_KEY")
     _DEFAULT_DB = env.db()
     EMAIL_CONFIG = env.email()
+_DEFAULT_DB["ENGINE"] = "django.contrib.gis.db.backends.postgis" # Added engine for PostGIS
 DATABASES = {"default": _DEFAULT_DB}
 vars().update(EMAIL_CONFIG)
 
@@ -63,6 +64,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "django.contrib.gis", # Added for GeoDjango
     "allauth",
     "allauth.account",
     # Uncomment for MFA/Webauthn
