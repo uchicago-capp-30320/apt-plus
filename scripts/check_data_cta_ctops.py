@@ -5,6 +5,9 @@ import time
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
 import django
 from dotenv import load_dotenv
+from django.contrib.gis.geos import Point
+from django.contrib.gis.measure import Distance as DistanceRatio
+from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 
 # Load environment variables
 load_dotenv()
@@ -15,9 +18,6 @@ django.setup()
 
 # Import model
 from apt_app.models import TransitStop  # must be after django.setup()
-from django.contrib.gis.geos import Point
-from django.contrib.gis.measure import Distance as DistanceRatio
-from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 
 
 # Function to check data in the Django dataset
@@ -52,7 +52,8 @@ def stops_near_a_point(latitude_input, longitude_input, walking_time_input):
     # Start time
     start_time = time.perf_counter()
     print(
-        f"Stops within {walking_time_input} minutes of coordinates {latitude_input}N, {longitude_input}W"
+        f"Stops within {walking_time_input} minutes of coordinates"
+        + f"{latitude_input:.5f} N, {longitude_input:.5f} W"
     )
 
     # Distance in meters, GoogleMaps has a walking time of 4.2 km per hour.
@@ -83,7 +84,8 @@ def stops_near_a_point(latitude_input, longitude_input, walking_time_input):
     # print results
     for stop in near_stops:
         print(
-            f"Stop ID: {stop.id}, Name: {stop.name}, Type: {stop.type}, Location: {stop.location}, Distance (meters): {stop.distance.m}"
+            f"ID: {stop.id}, Name: {stop.name}, Type: {stop.type}, "
+            + f"Location: {stop.location}, Distance (meters): {stop.distance.m:.1f}"
         )
 
     # Time running time
