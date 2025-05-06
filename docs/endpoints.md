@@ -2,7 +2,7 @@ The endpoints are listed below in the order they might be triggered during the u
 
 ## `/fetch_all_data`
 
-- **Method: POST**
+- Method: GET
 - Description: Loads the results page for the provided address.
     - Results are displayed if and only if the following conditions are satisfied:
         - `usaddress` or `postal` is able to successfully parse the address to produce a cleaned address
@@ -44,12 +44,12 @@ Frontend behavior:
 Backend behavior:
 
 - In addition to returning the template, geocoding and cleaned address string, this endpoint also marks the beginning of our caching strategy. The endpoint will also return a `property_id`.
-    - Once we have validated the user’s address, we will store the address and geocoding in our `properties` table. The primary key for this table will serve as the `property_id`.
+    - Once we have validated the user's address, we will store the address and geocoding in our `properties` table. The primary key for this table will serve as the `property_id`.
         - Validation means that we were able to generate a clean address string and the geocoding lies within the boundaries of Hyde Park.
 
 ## `/fetch_inspections`
 
-- Method: POST
+- Method: GET
 - Description: Fetches building inspection records for a given address or location.
 - Response Format: JSON
 - Query Parameters:
@@ -85,8 +85,8 @@ On the backend this endpoint will also update the `properties` table, which serv
 
 ## `/fetch_groceries`
 
-- Method: POST
-- Description: Returns a list of nearby grocery stores within a specified walking distance from the user’s address.
+- Method: GET
+- Description: Returns a list of nearby grocery stores within a specified walking distance from the user's address.
 - Response format: GEOJSON
 - Query Parameters:
     - `geocode`: Geocoding (coordinates) of the apartment being searched
@@ -139,7 +139,7 @@ On the backend this endpoint will also update the `properties` table, which serv
 
 ## `/fetch_bus_stops`
 
-- Method: POST
+- Method: GET
 - Description: Returns bus stops within walking distance of the provided address.
 - Response Format: GEOJSON
 - Query Parameters:
@@ -184,7 +184,7 @@ Note: the backend will only return the nearest stop within the walking distance 
 ## `/save_property`
 
 - Method: POST
-- Description: Saves a property and user-provided remarks to the database
+- Description: Saves a property and user-provided remarks from the user favorites table.
 - Response Format: HTML or JSON (TBD)
 - Query Parameters:
     - `user_id`: The user ID
@@ -204,8 +204,8 @@ Note that this endpoint is only accessible when the user is logged in.
 
 ## `/delete_property`
 
-- Method: POST
-- Description: Saves a property and user-provided remarks to the database
+- Method: DELETE
+- Description: Deletes a property and user-provided remarks froom the user favorites table.
 - Response Format: HTML or JSON (TBD)
 - Query Parameters:
     - `user_id`: The user ID
@@ -219,7 +219,7 @@ Note that this endpoint is only accessible when the user is logged in.
 }
 ```
 
-Note that this endpoint is only accessible when the user is logged in. 
+Note that this endpoint is only accessible when the user is logged in. It will delete the favorited property from the `favorite_properties` table.
 
 ## `/saved_properties`
 
