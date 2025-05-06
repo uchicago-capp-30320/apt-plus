@@ -10,8 +10,6 @@ from django.core.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-
 # Load environment variables
 load_dotenv()
 
