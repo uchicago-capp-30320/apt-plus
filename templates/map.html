@@ -1,6 +1,25 @@
 {% load static %}
 
 <!-- Map container -->
+<div id="test-data" data-response='{"cleaned_address": "Testing Address - to Display",    
+      "property_id": "Add0001",
+      "address_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [41.80267967125594, -87.58626497875387]
+            },
+            "properties": {
+              "label": "Testing Address - Label"
+            }
+          }
+        ]
+      }
+    }'>
+</div>
 <div id="map" style="width: 100vw; height: 100vh;"></div>
 
 <script>
@@ -15,7 +34,6 @@
 
   var currentMarker = null; // To store the marker
 
-  // Function to search and move map
   async function placeAddress(response) {
     /**
     * Places the submitted address on the map.
@@ -55,26 +73,36 @@
       .addTo(map);
   }
 
+  function extractResponse(id, attr) {
+    /**
+     * Shallow function to parse and grab a response format so that the content
+     * can placed in the map. Currently assumes that the response is stored as
+     * a tag in a div.
+     * 
+     * @param {id} - id of the object with the data.
+     * @param {attr} - name of the attribute with the response tag
+     * @returns {json} - address response stored as JSON.
+    */
+
+    elem = document.getElementById(`${id}`);
+    if (!elem) {
+      console.error(`Cannot find element ${id}`);
+      return {}; // Empty JSON
+    }
+
+    const attrValue = elem.getAttribute(attr);
+    // Enforce returning something JSON formatted: 
+    // Ref: https://stackoverflow.com/a/27690825
+    try {
+      return attrValue;
+    } catch (e) {
+      console.error(`Failed to parse JSON from attribute ${attr}:`, e);
+      return {};
+    }
+  }
+
   // To-do determine if necessary
-  const response = `{
-      "cleaned_address": "Testing Address - to Display",    
-      "property_id": "Add0001",
-      "address_geojson": {
-        "type": "FeatureCollection",
-        "features": [
-          {
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [41.80267967125594, -87.58626497875387]
-            },
-            "properties": {
-              "label": "Testing Address - Label"
-            }
-          }
-        ]
-      }
-    }`;
+  const response = extractResponse("test-data", "data-response")
   placeAddress(response);
 </script>
 
