@@ -4,14 +4,19 @@ Tenants struggle to navigate scattered information when searching for a new apar
 Apartments Plus aggregates broad data with a focus on those that mainstream rental sites do not display, such as building defects and landlord reputations. Apartments Plus is currently focused on tenants in a university neighborhood like Hyde Park which welcomes a steady influx of new tenants every year but neighborhood-specific information such as university transportation routes that are not available on major rental sites.
 
 ## Installation
-As of April 18, 2025, Apartments Plus is currently in an early development stage. To contribute:
+As of May 6, 2025, Apartments Plus is currently in an early development stage. To contribute:
 
 - Clone the repo
 - Run `uv install` to set up the relevant Python environment
+- Install [GDAL](https://gdal.org/en/stable/index.html), an open source geodata library, to run the server locally.
 
 ### For Mac Users: GDAL Setup
 
 If you're using a Mac, follow these steps:
+
+This ensures Django can locate the required GDAL and GEOS libraries for geospatial functionality.
+
+Reference: [Django Documentation: GeoDjango Installation](https://docs.djangoproject.com/en/5.2/ref/contrib/gis/install/)
 
 1. **Install Homebrew** (if you don't have it yet):
 
@@ -34,9 +39,15 @@ GEOS_LIBRARY_PATH=/opt/homebrew/lib/libgeos_c.dylib
 DYLD_LIBRARY_PATH=/opt/homebrew/lib
 ```
 
-This ensures Django can locate the required GDAL and GEOS libraries for geospatial functionality.
+### For Windows Users: GDAL Setup
 
-Reference: [Django Documentation: GeoDjango Installation](https://docs.djangoproject.com/en/5.2/ref/contrib/gis/install/)
+1. **Install GDAL**
+
+[OSGeo4W](https://www.osgeo.org/projects/osgeo4w/)'s default installation for Windows will include the relevant packages. 
+
+2. **Add GDAL to your PATH variable**
+
+Then, your computer will need to be able to reference GDAL's functionality. To do so, you should [add the file folder](https://www.c-sharpcorner.com/article/how-to-addedit-path-environment-variable-in-windows-11/) to your PATH variable. If you let OSGeo4W install it, that will be "C:\OSGeo4W\bin" on most computers.
 
 ## Folder structure
 
