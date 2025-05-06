@@ -30,7 +30,7 @@
               <input class="input is-rounded" type="text" placeholder="Enter an address">
             </div>
             <div class="control">
-              <button class="button is-rounded">
+              <button class="button is-rounded" onclick="hideRentSmarterBox()">
                 <span class="icon has-text-dark">
                   <i class="fas fa-search"></i>
                 </span>
@@ -89,7 +89,7 @@
   <!-- Rent Smarter -->
   <div class="columns is-mobile is-multiline" style="position: absolute; top: 12rem; left: 0; right: 0; z-index: 1;">
     <div class="column is-3 is-offset-6">
-      <div class="box">
+      <div class="box" id="rent-smarter-box">
 
         <p><strong>Rent Smarter</strong></p>
 
@@ -104,7 +104,16 @@
   </div>
 
 </div>
-  
+
+<script>
+  function hideRentSmarterBox() {
+    const box = document.getElementById("rent-smarter-box");
+    if (box) {
+      box.style.display = "none";
+    }
+  }
+</script>
+
 
 {% endblock %}
 
