@@ -1,111 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+{% load static %}
 
-  <!-- MapLibre GL JS and CSS -->
-  <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
-  <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
-
-<!-- To be modified -->
-  <style>
-    #map {
-      width: 100%;
-      height: 600px;
-    }
-
-    #placeholder {
-      position: absolute;
-      top: 5%;
-      left: 10%;
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
-      z-index: 2;
-    }
-
-    body, html {
-      margin: 0;
-      padding: 0;
-    }
-  </style>
-</head>
-
-<body>
-
-<div style="position: relative;">
-
-  <!-- Map container -->
-  <div id="map"></div>
-
-  <!-- Floating address input -->
-  <div id="placeholder">
-    <input id="address" type="text" placeholder="Enter address..." style="padding:5px;">
-    <button id="submit-address" style="padding:5px;">Search</button>
-  </div>
-
-</div>
+<!-- Map container -->
+<div id="map" style="width: 100vw; height: 100vh;"></div>
 
 <script>
-    // Initialize MapLibre map (STATIC at first)
-    var map = new maplibregl.Map({
-      container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [-87.5995, 41.7925],
-      zoom: 13.6, // Change depending on the final map size (see style)
-      interactive: false // Starts as static, until user types the address
+  // Initialize MapLibre map (STATIC at first)
+  var map = new maplibregl.Map({
+    container: 'map',
+    style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+    center: [-87.5995, 41.7925],
+    zoom: 13.6, // Change depending on the final map size (see style)
+    interactive: false // Starts as static, until user types the address
+  });
+
+  var currentMarker = null; // To store the marker
+
+  // Function to search and move map
+  async function placeAddress(response) {
+    /**
+    * Places the submitted address on the map.
+    * 
+    * @param {response} - JSON response from `/fetch_all_data` with lat, lon
+    * @returns {void} - Modifies the map in place by adding a marker 
+    */
+    // Input error handling
+    if (!response) return;
+
+    // Parse data from input - TODO: check if await is needed
+    const data = JSON.parse(response);
+    const coords = data["address_geojson"]["features"][0]["geometry"]["coordinates"];
+
+    const lat = parseFloat(coords[0]);
+    const lon = parseFloat(coords[1]);
+
+    console.log(`Found: ${lat}, ${lon}`);
+
+    // Enable map interaction
+    map.dragPan.enable();
+    map.scrollZoom.enable();
+    map.boxZoom.enable();
+    map.keyboard.enable();
+    map.doubleClickZoom.enable();
+    map.touchZoomRotate.enable();
+
+    // Move to the address
+    map.flyTo({
+      center: [lon, lat],
+      zoom: 15
     });
-  
-    var currentMarker = null; // To store the marker
-  
-    // Function to search and move map
-    async function searchAddress(address) {
-      if (!address) return;
-  
-      // Geocode address using OpenStreetMap Nominatim
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
-  
-      const response = await fetch(url);
-      const data = await response.json();
-  
-      if (data.length === 0) {
-        alert("Address not found. Try another one.");
-        return;
+
+    // Add marker
+    currentMarker = new maplibregl.Marker({ color: 'yellow' })
+      .setLngLat([lon, lat])
+      .addTo(map);
+  }
+
+  // To-do determine if necessary
+  const response = `{
+      "cleaned_address": "Testing Address - to Display",    
+      "property_id": "Add0001",
+      "address_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [41.80267967125594, -87.58626497875387]
+            },
+            "properties": {
+              "label": "Testing Address - Label"
+            }
+          }
+        ]
       }
-  
-      const lat = parseFloat(data[0].lat);
-      const lon = parseFloat(data[0].lon);
-  
-      console.log(`Found: ${lat}, ${lon}`);
-  
-      // Enable map interaction
-      map.dragPan.enable();
-      map.scrollZoom.enable();
-      map.boxZoom.enable();
-      map.keyboard.enable();
-      map.doubleClickZoom.enable();
-      map.touchZoomRotate.enable();
-  
-      // Move to the address
-      map.flyTo({
-        center: [lon, lat],
-        zoom: 15
-      });
-  
-      // Add marker
-      currentMarker = new maplibregl.Marker({ color: 'yellow' })
-        .setLngLat([lon, lat])
-        .addTo(map);
-    }
-  
-    // Search button
-    document.getElementById('submit-address').addEventListener('click', function() {
-      const address = document.getElementById('address').value.trim();
-      searchAddress(address);
-    });
-  </script>  
+    }`;
+  placeAddress(response);
+</script>
 
 </body>
+
 </html>
