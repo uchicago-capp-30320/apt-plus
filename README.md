@@ -9,6 +9,35 @@ As of April 18, 2025, Apartments Plus is currently in an early development stage
 - Clone the repo
 - Run `uv install` to set up the relevant Python environment
 
+### For Mac Users: GDAL Setup
+
+If you're using a Mac, follow these steps:
+
+1. **Install Homebrew** (if you don't have it yet):
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+2. **Install GDAL using Homebrew:**
+
+```bash
+brew install gdal
+```
+
+3. **Add the following to your `.env` file:**
+
+```env
+# GDAL/GEOS Settings
+GDAL_LIBRARY_PATH=/opt/homebrew/lib/libgdal.dylib
+GEOS_LIBRARY_PATH=/opt/homebrew/lib/libgeos_c.dylib
+DYLD_LIBRARY_PATH=/opt/homebrew/lib
+```
+
+This ensures Django can locate the required GDAL and GEOS libraries for geospatial functionality.
+
+Reference: [Django Documentation: GeoDjango Installation](https://docs.djangoproject.com/en/5.2/ref/contrib/gis/install/)
+
 ## Folder structure
 
 Our current folder structure uses the basic geoDjango template. Backend features will be in the `/app_app` and `/app_proj` directories, where frontend views will be in the `/apt_app/templates/` directory.
