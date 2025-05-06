@@ -27,10 +27,10 @@
         <!-- search bar -->
         <div class="field has-addons mt-4">
             <div class="control is-expanded">
-              <input class="input is-rounded" type="text" placeholder="Enter an address">
+              <input id="addressInput" class="input is-rounded" type="text" placeholder="Enter an address">
             </div>
             <div class="control">
-              <button class="button is-rounded">
+              <button id="searchButton" class="button is-rounded">
                 <span class="icon has-text-dark">
                   <i class="fas fa-search"></i>
                 </span>
@@ -104,6 +104,43 @@
   </div>
 
 </div>
+
+<!-- todo: The user should be allowed to search even if they press enter, not just mouse click -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchButton = document.getElementById('searchButton');
+  
+    searchButton.addEventListener('click', function () {
+      const address = document.getElementById('addressInput').value;
+  
+      if (!address) {
+        alert('Please enter an address.');
+        return;
+      }
+  
+      const url = new URL('/fetch_all_data/', window.location.origin);
+      url.searchParams.append('address', address);
+  
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => {
+          if (!response.ok) throw new Error('Network error');
+          return response.json();
+        })
+        .then(data => {
+          placeAddress(data);
+        })
+        .catch(error => {
+          console.error('Error during fetch:', error);
+        });
+    });
+  });
+  </script>
+  
   
 
 {% endblock %}

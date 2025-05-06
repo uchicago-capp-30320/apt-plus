@@ -45,11 +45,22 @@
     if (!response) return;
 
     // Parse data from input - TODO: check if await is needed
-    const data = JSON.parse(response);
-    const coords = data["address_geojson"]["features"][0]["geometry"]["coordinates"];
 
-    const lat = parseFloat(coords[0]);
-    const lon = parseFloat(coords[1]);
+    // Handle both string and object inputs
+    const data = typeof response === 'string' ? JSON.parse(response) : response;
+
+    // Check for different possible formats
+    let coords;
+    if (data.address_geojson && data.address_geojson.features) {
+      // Format for test data
+      coords = data.address_geojson.features[0].geometry.coordinates;
+    } else if (data.features && data.features.length > 0) {
+      // Format for GeoJSON from endpoint
+      coords = data.features[0].geometry.coordinates;
+    }
+
+    const lat = parseFloat(coords[1]);
+    const lon = parseFloat(coords[0]);
 
     console.log(`Found: ${lat}, ${lon}`);
 
@@ -103,7 +114,8 @@
 
   // To-do determine if necessary
   const response = extractResponse("test-data", "data-response")
-  placeAddress(response);
+  // No longer needed, but kept for reference
+  // placeAddress(response);
 </script>
 
 </body>
