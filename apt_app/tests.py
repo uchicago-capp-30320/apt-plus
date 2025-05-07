@@ -11,3 +11,13 @@ def test_server_available():
     response = client.get("/")
 
     assert response.status_code == 200
+
+
+def test_about_available():
+    """Test that the static about page ('/about') responds with HTTP 200."""
+    from django.test import Client
+
+    client = Client()
+    response = client.get("/about")
+
+    assert response.status_code == 200
