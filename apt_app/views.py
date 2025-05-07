@@ -7,6 +7,10 @@ def home(request):
     return render(request, "home.html")
 
 
+def about(request):
+    return render(request, "about.html")
+
+
 def fetch_all_data(request):
     address = request.GET.get("address", "")
 
