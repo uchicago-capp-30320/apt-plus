@@ -1,25 +1,5 @@
 {% load static %}
 
-<!-- Map container -->
-<div id="test-data" data-response='{"cleaned_address": "Testing Address - to Display",    
-      "property_id": "Add0001",
-      "address_geojson": {
-        "type": "FeatureCollection",
-        "features": [
-          {
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [41.80267967125594, -87.58626497875387]
-            },
-            "properties": {
-              "label": "Testing Address - Label"
-            }
-          }
-        ]
-      }
-    }'>
-</div>
 <div id="map" style="width: 100vw; height: 100vh;"></div>
 
 <script>
@@ -28,8 +8,8 @@
     container: 'map',
     style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
     center: [-87.5995, 41.7925],
-    zoom: 13.6, // Change depending on the final map size (see style)
-    interactive: false // Starts as static, until user types the address
+    zoom: 13.6,
+    interactive: false
   });
 
   var currentMarker = null; // To store the marker
@@ -43,8 +23,6 @@
     */
     // Input error handling
     if (!response) return;
-
-    // Parse data from input - TODO: check if await is needed
 
     // Handle both string and object inputs
     const data = typeof response === 'string' ? JSON.parse(response) : response;
@@ -65,12 +43,7 @@
     console.log(`Found: ${lat}, ${lon}`);
 
     // Enable map interaction
-    map.dragPan.enable();
-    map.scrollZoom.enable();
-    map.boxZoom.enable();
-    map.keyboard.enable();
-    map.doubleClickZoom.enable();
-    map.touchZoomRotate.enable();
+    enableMapInteraction(map);
 
     // Move to the address
     map.flyTo({
@@ -84,40 +57,20 @@
       .addTo(map);
   }
 
-  function extractResponse(id, attr) {
+  function enableMapInteraction(map) {
     /**
-     * Shallow function to parse and grab a response format so that the content
-     * can placed in the map. Currently assumes that the response is stored as
-     * a tag in a div.
-     * 
-     * @param {id} - id of the object with the data.
-     * @param {attr} - name of the attribute with the response tag
-     * @returns {json} - address response stored as JSON.
+      * Helper function to enable map interaction on a delay.
+      * 
+      * @param {map} - map object to enable interactions
+      * @returns {void}, no return
     */
-
-    elem = document.getElementById(`${id}`);
-    if (!elem) {
-      console.error(`Cannot find element ${id}`);
-      return {}; // Empty JSON
-    }
-
-    const attrValue = elem.getAttribute(attr);
-    // Enforce returning something JSON formatted: 
-    // Ref: https://stackoverflow.com/a/27690825
-    try {
-      return attrValue;
-    } catch (e) {
-      console.error(`Failed to parse JSON from attribute ${attr}:`, e);
-      return {};
-    }
+    if (!map.dragPan.isEnabled()) map.dragPan.enable();
+    if (!map.scrollZoom.isEnabled()) map.scrollZoom.enable();
+    if (!map.boxZoom.isEnabled()) map.boxZoom.enable();
+    if (!map.keyboard.isEnabled()) map.keyboard.enable();
+    if (!map.doubleClickZoom.isEnabled()) map.doubleClickZoom.enable();
+    if (!map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
+    map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
   }
 
-  // To-do determine if necessary
-  const response = extractResponse("test-data", "data-response")
-  // No longer needed, but kept for reference
-  // placeAddress(response);
 </script>
-
-</body>
-
-</html>
