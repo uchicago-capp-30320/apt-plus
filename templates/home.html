@@ -109,38 +109,51 @@
 
 <!-- todo: The user should be allowed to search even if they press enter, not just mouse click -->
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const searchButton = document.getElementById('searchButton');
+  // Attach search event listener
+  const searchButton = document.getElementById('searchButton');
+  searchButton.addEventListener('click', getApartment)
 
-    searchButton.addEventListener('click', function () {
-      const address = document.getElementById('addressInput').value;
+  function getApartment() {
+    /**
+      * Makes a GET request for the apartment and then updates the DOM to 
+      * prepare for loading the data.
+      * 
+      * @param {void} - 
+      * @returns {void} - Sends the request 
+    */
 
-      if (!address) {
-        alert('Please enter an address.');
-        return;
+    // Need this inside getApartment since we need this on submit
+    const address = document.getElementById('addressInput').value;
+
+    // Data validation
+    if (!address) {
+      alert('Please enter an address.');
+      return;
+    }
+
+    // Construct GET request
+    const url = new URL('/fetch_all_data/', window.location.origin);
+    url.searchParams.append('address', address);
+
+    // Make request
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
       }
-
-      const url = new URL('/fetch_all_data/', window.location.origin);
-      url.searchParams.append('address', address);
-
-      fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+    })
+      .then(response => {
+        if (!response.ok) throw new Error('Network error');
+        return response.json();
       })
-        .then(response => {
-          if (!response.ok) throw new Error('Network error');
-          return response.json();
-        })
-        .then(data => {
-          placeAddress(data);
-        })
-        .catch(error => {
-          console.error('Error during fetch:', error);
-        });
-    });
-  });
+      .then(data => {
+        placeAddress(data);
+      })
+      .catch(error => {
+        console.error('Error during fetch:', error);
+      });
+  }
+
 </script>
 
 
