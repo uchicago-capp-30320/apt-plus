@@ -25,6 +25,7 @@ dependencies = [
 
 [tool.ruff]
 line-length = 100
+extend-exclude = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = [
