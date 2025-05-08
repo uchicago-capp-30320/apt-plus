@@ -59,23 +59,59 @@ Backend behavior:
 
 ```python
 {
-	"inspections": [
+// new 
+{
+	"address": String,
+	"summary": String,
+	"note": String,
+	"total_violations_count": Integer,
+	"total_inspections_count": Integer,
+	"cut_off_date": Date,
+	"summarized_issues": [
 		{
-			"inspection_id": String,  # Unique identifier for each inspection record
-			"inspection_date": Date,  # Date of the inspection
-			"inspection_type": String,  # Type of inspection 
-			"status": String,  # Status of the inspection 
-			"violations": [
+			"date": Date,
+			"issues": [
 				{
-					"violation_id": String,  # Unique identifier for each violation
-					"description": String,  # Description of the violation
-					"severity": String,  # Severity of the violation (e.g., Critical, Minor, etc.)
+					"emoji": String,
+					"description": String
 				}
-			],
-			"notes": String,  # Any additional notes
+			]
 		}
-	],
-	"total_inspections_count": Integer  # Total number of inspections for the given address
+	]}
+	
+// example
+{
+	"address": "5514 S BLACKSTONE AVE"
+  "summary": "This building has received complaints about heating issues, hot water problems, and maintenance concerns in the past 5 years.",
+  "note": "Unauthorized uses and cases where inspectors were denied entry were omitted.",
+	"total_violations_count": 12,
+	"total_inspections_count": 2,
+	"start_date": 2020-01-01,
+  "summarized_issues": [
+      {
+          "date": "Jan 2024",
+          "issues": [
+              {
+                  "emoji": "\ud83c\udf21\ufe0f",
+                  "description": "Inadequate heating and drafty windows with air seepage in Units 102, 103, and 104"
+              },
+              {
+                  "emoji": "\ud83d\udebf",
+                  "description": "Hot water issues with low temperature (45-59\u00b0F) and low pressure in Units 102, 103, 104, and 205"
+              }
+          ]
+      },
+      {
+          "date": "Oct 2023",
+          "issues": [
+              {
+                  "emoji": "\ud83d\uddd1\ufe0f",
+                  "description": "Overfilled trash cans and bags on the ground at west elevation"
+              }
+          ]
+	    }
+    ]
+}
 }
 ```
 
