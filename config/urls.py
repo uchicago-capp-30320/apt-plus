@@ -17,7 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from apt_app.views import home
+from apt_app.views import home, fetch_bus_stops
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
 
@@ -25,6 +25,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", home, name="home"),
     path("accounts/", include("allauth.urls")),
+    path("fetch_bus_stops/", fetch_bus_stops, name="fetch_bus_stops"),
 ]
 
 if settings.DEBUG and not settings.IS_TESTING:

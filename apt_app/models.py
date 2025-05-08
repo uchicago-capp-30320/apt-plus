@@ -103,6 +103,7 @@ class Property(LocationMixin, models.Model):
     address = models.CharField(max_length=255)
     location = gis_models.PointField()
     created_at = models.DateTimeField(auto_now_add=True)
+    bus_stops = models.JSONField(null=True, blank=True)
 
     class Meta:
         indexes = [GistIndex(fields=["location"])]
