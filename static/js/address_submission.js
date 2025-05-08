@@ -1,4 +1,5 @@
- async function getApartment() {
+
+async function getApartment() {
   /**
     * Makes a GET request for the apartment and then updates the DOM to 
     * prepare for loading the data.
@@ -19,6 +20,7 @@
     const response = await sendRequest(address);
 
     // Placeholder for DOM modification
+    hideRentSmarterBox()
 
     // Check response 
     if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
