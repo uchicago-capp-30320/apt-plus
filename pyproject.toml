@@ -19,6 +19,7 @@ dependencies = [
     "whitenoise>=6.9.0,<7",
     "censusgeocode>=0.5.2",
     "requests-toolbelt>=0.10.1",
+    "urllib3<2",
 ]
 
 [tool.ruff]
