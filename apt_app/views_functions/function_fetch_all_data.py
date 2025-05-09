@@ -18,7 +18,7 @@ django.setup()
 from django.core.exceptions import ValidationError  # noqa: E402
 from django.http import JsonResponse  # noqa: E402
 
-# Import model
+# Import model Property
 from apt_app.models import Property  # noqa: E402
 
 
