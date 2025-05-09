@@ -31,6 +31,9 @@ jobs:
         _DEFAULT_DB: ${{ secrets._DEFAULT_DB }}
       run: |
 
+        # Collect static files
+        uv run manage.py collectstatic --noinput
+
         # Run tests and linter
         uv run pytest apt_app/tests.py -v
         uv run ruff check .

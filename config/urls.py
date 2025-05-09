@@ -17,16 +17,18 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from apt_app.views import home, fetch_all_data
+from apt_app.views import home, about, fetch_all_data
+from apt_app.views_v2.groceries import fetch_groceries
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
     path("", home, name="home"),
+    path("about", about, name="about"),
     path("accounts/", include("allauth.urls")),
-    path("fetch_all_data", fetch_all_data, name="fetch_all_data"),
-]
+    path("admin/", admin.site.urls),
+    path("fetch_all_data/", fetch_all_data, name="fetch_all_data"),
+  path("fetch_groceries/", fetch_groceries, name="fetch_groceries"),]
 
 if settings.DEBUG and not settings.IS_TESTING:
     urlpatterns += debug_toolbar_urls()

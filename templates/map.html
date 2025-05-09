@@ -1,0 +1,76 @@
+{% load static %}
+
+<div id="map" style="width: 100vw; height: 100vh;"></div>
+
+<script>
+  // Initialize MapLibre map (STATIC at first)
+  var map = new maplibregl.Map({
+    container: 'map',
+    style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+    center: [-87.5995, 41.7925],
+    zoom: 13.6,
+    interactive: false
+  });
+
+  var currentMarker = null; // To store the marker
+
+  async function placeAddress(response) {
+    /**
+    * Places the submitted address on the map.
+    * 
+    * @param {response} - JSON response from `/fetch_all_data` with lat, lon
+    * @returns {void} - Modifies the map in place by adding a marker 
+    */
+    // Input error handling
+    if (!response) return;
+
+    // Handle both string and object inputs
+    const data = typeof response === 'string' ? JSON.parse(response) : response;
+
+    // Check for different possible formats
+    let coords;
+    if (data.address_geojson && data.address_geojson.features) {
+      // Format for test data
+      coords = data.address_geojson.features[0].geometry.coordinates;
+    } else if (data.features && data.features.length > 0) {
+      // Format for GeoJSON from endpoint
+      coords = data.features[0].geometry.coordinates;
+    }
+
+    const lat = parseFloat(coords[1]);
+    const lon = parseFloat(coords[0]);
+
+    console.log(`Found: ${lat}, ${lon}`);
+
+    // Enable map interaction
+    enableMapInteraction(map);
+
+    // Move to the address
+    map.flyTo({
+      center: [lon, lat],
+      zoom: 15
+    });
+
+    // Add marker
+    currentMarker = new maplibregl.Marker({ color: 'yellow' })
+      .setLngLat([lon, lat])
+      .addTo(map);
+  }
+
+  function enableMapInteraction(map) {
+    /**
+      * Helper function to enable map interaction on a delay.
+      * 
+      * @param {map} - map object to enable interactions
+      * @returns {void}, no return
+    */
+    if (!map.dragPan.isEnabled()) map.dragPan.enable();
+    if (!map.scrollZoom.isEnabled()) map.scrollZoom.enable();
+    if (!map.boxZoom.isEnabled()) map.boxZoom.enable();
+    if (!map.keyboard.isEnabled()) map.keyboard.enable();
+    if (!map.doubleClickZoom.isEnabled()) map.doubleClickZoom.enable();
+    if (!map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
+    map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+  }
+
+</script>

@@ -1,17 +1,35 @@
 {% load static %}
 <!doctype html>
 <html lang="en">
+
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light dark">
-    <link rel="stylesheet" href="{% static 'css/pico.min.css' %}">
+    <!-- metadata -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <title>{% block title %}{% endblock %}</title>
+    <!-- Stylesheet info-->
+    <link rel="stylesheet" href="{% static 'css/bulma.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- mapLibre info-->
+    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   </head>
+
   <body>
-    <main class="container">
+
+    <!-- Navbar -->
+    {% include "navbar.html" %}
+
+    <!-- home page -->
     {% block content %}
     {% endblock %}
-    </main>
+
+    <!-- Footer -->
+    {% include "footer.html" %}
+
   </body>
+
 </html>
