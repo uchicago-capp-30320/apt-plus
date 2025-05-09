@@ -20,6 +20,7 @@ dependencies = [
     "censusgeocode>=0.5.2",
     "requests-toolbelt>=0.10.1",
     "urllib3<2",
+    "python-dotenv>=1.1.0",
 ]
 
 [tool.ruff]
