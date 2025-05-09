@@ -1,6 +1,8 @@
 import json
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from apt_app.views_functions.function_fetch_all_data import fetching_all_data
 
 
 def home(request):
@@ -11,7 +13,7 @@ def about(request):
     return render(request, "about.html")
 
 
-def fetch_all_data(request):
+def fetch_all_data_mock(request):
     address = request.GET.get("address", "")
 
     print(address)
@@ -30,3 +32,10 @@ def fetch_all_data(request):
     }
     # Convert the dictionary to a JSON string before returning
     return HttpResponse(json.dumps(geojson), content_type="application/json")
+
+
+@csrf_exempt
+def fetch_all_data(request):
+    address = request.POST.get("address")
+    json_response = fetching_all_data(address)
+    return json_response
