@@ -1,53 +1,55 @@
-import sys
 import os
+import sys
+import censusgeocode as cg
+import json
+from dotenv import load_dotenv
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
-
-import censusgeocode as cg
-import django
-from dotenv import load_dotenv
-from django.core.exceptions import ValidationError
-from rest_framework.response import Response
-from rest_framework import status
 
 # Load environment variables
 load_dotenv()
 
 # Setup Django environment
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+import django  # noqa: E402
+
 django.setup()
 
+from django.core.exceptions import ValidationError  # noqa: E402
+from django.http import JsonResponse  # noqa: E402
+
 # Import model
-from apt_app.models import Property  # must be after django.setup()
+from apt_app.models import Property  # noqa: E402
 
 
-def fetch_all_data(user_address):
+def fetching_all_data(user_address):
     """
-    Auxiliar function that takes the user_address string, and do the following:
-    (i) Check that is matched with an address from censusgeocode
-    (ii) Get the coordinates and check that the address is inside Hyde Park
+    Function that takes the user_address string, and does the following:
+    (i) Check that user_address is matched with an address from censusgeocode
+    (ii) Get its coordinates and check that the address is inside Hyde Park
     (iii) Add the address to the Django database if it didn't exist previously
-    (iv) Returns multiple stuff
+    (iv) Returns Response with JSON with cleaned_address, property_id, coordinates,
+    and original user_address
     """
     # See if some address was provided by the user
     if not user_address or not isinstance(user_address, str):
-        return Response({"Error": "Address is required."}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({"Error": "Address is required."}, status=400)
 
     # Try to match the address using censusgeocode
     try:
         result = cg.address(user_address, city="Chicago", state="IL")
     except Exception as e:
-        return Response(
+        return JsonResponse(
             {"Error": f"Censusgeocode service error: {e}"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status=500,
         )
 
     # Check if address is matched to any address
     ## NOTE: Censusgeocode returns an empty list when the address is not matched
     if result == []:
-        return Response(
+        return JsonResponse(
             {"Error": "No matched address found in the database."},
-            status=status.HTTP_400_BAD_REQUEST,
+            status=400,
         )
 
     # Address was matched, get the matched address and its coordinates
@@ -63,16 +65,16 @@ def fetch_all_data(user_address):
     if not (east_limit_longitude <= longitude <= west_limit_longitude) or not (
         south_limit_latitude <= latitude <= north_limit_latitude
     ):
-        return Response(
+        return JsonResponse(
             {"Error": "Address is not inside the area defined for the project."},
-            status=status.HTTP_400_BAD_REQUEST,
+            status=400,
         )
 
     # Save address in django (if necessary) and get its id
     property_id = save_property_in_django(matched_address, latitude, longitude)
 
     # 3. Return result
-    return Response(
+    return JsonResponse(
         {
             "cleaned_address": matched_address,
             "property_id": property_id,
@@ -95,7 +97,7 @@ def fetch_all_data(user_address):
                 ],
             },
         },
-        status=status.HTTP_200_OK,
+        status=200,
     )
 
 
@@ -113,7 +115,6 @@ def save_property_in_django(address_input, latitude, longitude):
 
     # if exists, return the id and don't continue with function
     if property_exists:
-        print(f"Property already in database, ID: {property_exists.id}")
         return property_exists.id
 
     # Name
@@ -128,7 +129,6 @@ def save_property_in_django(address_input, latitude, longitude):
     # Save it in django
     try:
         property.save()
-        print(f"Property saved with ID: {property.id}")
     except Exception as e:
         raise ValueError(f"{property.address} could not be uploaded: {e}")
 
@@ -138,6 +138,8 @@ def save_property_in_django(address_input, latitude, longitude):
 if __name__ == "__main__":
     # Trial with example of user address, with prints to check that it is working
     user_address_example = "5496 S Hyde Park Blvd"
-    response_example = fetch_all_data(user_address_example)
+    response_example = fetching_all_data(user_address_example)
     print(f"Status Code: {response_example.status_code}")
-    print(f"Response Data: {response_example.data}")
+    body_dict = json.loads(response_example.content.decode())
+    print(f"Response Data: {body_dict}")
+    print(f"Cleaned Address: {body_dict['cleaned_address']}")
