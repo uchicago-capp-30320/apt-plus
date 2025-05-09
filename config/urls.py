@@ -29,7 +29,8 @@ urlpatterns = [
   path("admin/", admin.site.urls),
     path("fetch_bus_stops/", fetch_bus_stops, name="fetch_bus_stops"),
     path("fetch_all_data/", fetch_all_data, name="fetch_all_data"),
-  path("fetch_groceries/", fetch_groceries, name="fetch_groceries"),]
+    path("fetch_groceries/", fetch_groceries, name="fetch_groceries"),
+]
 
 if settings.DEBUG and not settings.IS_TESTING:
     urlpatterns += debug_toolbar_urls()

@@ -5,9 +5,10 @@ from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import Distance as DistanceRatio
 from apt_app.models import TransitStop, Property
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
+from django.views.decorators.csrf import csrf_exempt
+from apt_app.views_functions.function_fetch_all_data import fetching_all_data
 
 WALKING_SPEED_PER_MINUTE = 70
-
 
 def home(request):
     return render(request, "home.html")
@@ -91,7 +92,7 @@ def about(request):
     return render(request, "about.html")
 
 
-def fetch_all_data(request):
+def fetch_all_data_mock(request):
     address = request.GET.get("address", "")
 
     print(address)
@@ -110,4 +111,11 @@ def fetch_all_data(request):
     }
     # Convert the dictionary to a JSON string before returning
     return HttpResponse(json.dumps(geojson), content_type="application/json")
+
+
+@csrf_exempt
+def fetch_all_data(request):
+    address = request.POST.get("address")
+    json_response = fetching_all_data(address)
+    return json_response
 
