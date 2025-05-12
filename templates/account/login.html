@@ -50,6 +50,9 @@
         {% endelement %}
     {% endif %}
     {% if SOCIALACCOUNT_ENABLED %}
+        <!-- AB: The following include comes from allauth, it is not present in our templates
+     I am not sure what implication that has with regards to our application
+     I suppose we could always switch it out with our own template -->
         {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
     {% endif %}
 {% endblock content %}

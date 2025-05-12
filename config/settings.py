@@ -44,7 +44,7 @@ DATABASES = {"default": _DEFAULT_DB}
 vars().update(EMAIL_CONFIG)
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 INTERNAL_IPS = ["127.0.0.1"]
 
 # Debug Toolbar
@@ -67,6 +67,9 @@ INSTALLED_APPS = [
     "django.contrib.gis", # Added for GeoDjango
     "allauth",
     "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "django.contrib.sites",
     # Uncomment for MFA/Webauthn
     # "allauth.mfa",
     "django_structlog",
@@ -118,6 +121,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+SITE_ID = 1
 
 # Authentication -----
 
@@ -190,6 +194,25 @@ if DJOK_USER_TYPE in ("email", "email+username"):
 # MFA_PASSKEY_SIGNUP_ENABLED = True
 # if DEBUG:
 #     MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = True
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+
+LOGIN_REDIRECT_URL = '/'
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = None  
+SOCIALACCOUNT_EMAIL_REQUIRED = True
 
 
 # Logging Config ---------

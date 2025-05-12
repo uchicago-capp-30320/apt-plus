@@ -6,6 +6,8 @@ from apt_app.views_functions.function_fetch_all_data import fetching_all_data
 
 
 def home(request):
+    # todo
+    print(request.user)
     return render(request, "home.html")
 
 
