@@ -36,6 +36,23 @@
             </button>
           </div>
         </div>
+        
+
+        <!-- Error popups -->
+        <div id="hydeParkWarning" class="notification is-warning is-light is-hidden">
+          <button class="delete" onclick="hideNotification('hydeParkWarning')"></button>
+          The address is outside the Hyde Park area. Please try another location within the project boundaries.
+        </div>
+
+        <div id="noMatchError" class="notification is-danger is-light is-hidden">
+          <button class="delete" onclick="hideNotification('noMatchError')"></button>
+          We couldn’t find a match for that address. Please check the spelling or try a different one.
+        </div>
+
+        <div id="serverError" class="notification is-danger is-light is-hidden">
+          <button class="delete" onclick="hideNotification('serverError')"></button>
+          The address matching service is temporarily unavailable. Please try again later.
+        </div>
 
         <!-- Bullets -->
         <div class="mt-5">
@@ -270,6 +287,7 @@
   to-do: refactor to combine both of thes script blocks with the DOM updates
   Referenced by //Attach search event listener script, so must be first
 -->
+<script src="{% static 'js/error_popups.js' %}"></script>
 <script src="{% static 'js/address_submission.js' %}"></script>
 <script>
   // Attach search event listener
