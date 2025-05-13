@@ -5,12 +5,13 @@ from django.views.decorators.http import require_GET
 
 
 def parse_address(in_address):
-    # get the part of address that is before "Chicago IL 60XXX"
+    """get the part of address that is before "Chicago IL 60XXX"""
     return in_address.split(",")[0].strip()
 
 
 @require_GET
 def fetch_inspection_summaries(request: HttpRequest) -> JsonResponse:
+    # TODO: need to add more error handling, but currently blocked by updating the backend data
     try:
         in_address = request.GET.get("address", "")
 
@@ -34,7 +35,8 @@ def fetch_inspection_summaries(request: HttpRequest) -> JsonResponse:
         summary_json["total_violations_count"] = total_violations_count
         summary_json["total_inspections_count"] = total_inspections_count
         summary_json["cut_off_date"] = cut_off_date
-    except Exception:
+    except Exception as e:
+        print(e)
         summary_json = {}
 
     return JsonResponse(summary_json)
