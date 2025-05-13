@@ -10,8 +10,10 @@ from apt_app.views_functions.function_fetch_all_data import fetching_all_data
 
 WALKING_SPEED_PER_MINUTE = 70
 
+
 def home(request):
     return render(request, "home.html")
+
 
 def fetch_bus_stops(request):
     """Take property location and desired walking distance,
@@ -88,6 +90,7 @@ def fetch_bus_stops(request):
 
     return JsonResponse(response)
 
+
 def about(request):
     return render(request, "about.html")
 
@@ -115,7 +118,6 @@ def fetch_all_data_mock(request):
 
 @csrf_exempt
 def fetch_all_data(request):
-    address = request.POST.get("address")
+    address = request.GET.get("address")
     json_response = fetching_all_data(address)
     return json_response
-
