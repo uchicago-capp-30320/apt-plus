@@ -30,19 +30,51 @@ env.read_env(BASE_DIR / ".env")
 # but in production all of these should be made explicit.
 DEBUG = env.bool("DEBUG", False)
 
+# if DEBUG:
+#     SECRET_KEY = env.str("SECRET_KEY", "needs-to-be-set-in-prod")
+#     _DEFAULT_DB = env.db("_DEFAULT_DB")
+#     # default="sqlite:///" + str(BASE_DIR / "db.sqlite3"))
+#     EMAIL_CONFIG = env.email(default="consolemail://")
+# else:
+#     SECRET_KEY = env.str("SECRET_KEY")
+#     _DEFAULT_DB = env.db()
+#     EMAIL_CONFIG = env.email()
+
+# Set up email configuration to always use Brevo SMTP for testing (even in DEBUG mode)
+EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+EMAIL_HOST = env.str('EMAIL_HOST', default='smtp-relay.brevo.com')
+EMAIL_PORT = env.int('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
+EMAIL_HOST_USER = env.str('EMAIL_HOST_USER')  # This is the username for the Brevo SMTP service
+EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD')  # This is the password (API key)
+DEFAULT_FROM_EMAIL = env.str('DEFAULT_FROM_EMAIL', default='arkadeep.b@gmail.com')
+
+# If DEBUG is true, you might want to see the emails being sent in the console too (for testing)
 if DEBUG:
     SECRET_KEY = env.str("SECRET_KEY", "needs-to-be-set-in-prod")
+    EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+    print("DEBUG MODE: Sending emails via Brevo API")
     _DEFAULT_DB = env.db("_DEFAULT_DB")
-    # default="sqlite:///" + str(BASE_DIR / "db.sqlite3"))
-    EMAIL_CONFIG = env.email(default="consolemail://")
+
 else:
     SECRET_KEY = env.str("SECRET_KEY")
+    # In production, use the same SMTP settings
+    print("PRODUCTION MODE: Emails will be sent via Brevo API")
     _DEFAULT_DB = env.db()
-    EMAIL_CONFIG = env.email()
+
+
 _DEFAULT_DB["ENGINE"] = "django.contrib.gis.db.backends.postgis" # Added engine for PostGIS
 DATABASES = {"default": _DEFAULT_DB}
-vars().update(EMAIL_CONFIG)
+# vars().update(EMAIL_CONFIG)
 
+ANYMAIL = {
+    "BREVO_API_KEY": env.str("EMAIL_HOST_PASSWORD"),  # Your Brevo API key
+    'SENDINBLUE_API_KEY': env.str("EMAIL_HOST_PASSWORD")
+}
+
+BREVO_API_URL = "https://api.brevo.com/v3/"
+
+SENDINBLUE_API_KEY = env.str("EMAIL_HOST_PASSWORD")
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 INTERNAL_IPS = ["127.0.0.1"]
@@ -66,6 +98,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.gis", # Added for GeoDjango
     "allauth",
+    "anymail",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
@@ -180,6 +213,7 @@ if DJOK_USER_TYPE in ("email", "email+username"):
     ACCOUNT_LOGIN_METHODS = {"email"}
     ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
     ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
     ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = True
     if DJOK_USER_TYPE == "email":
         ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -211,7 +245,7 @@ SOCIALACCOUNT_PROVIDERS = {
 LOGIN_REDIRECT_URL = '/'
 
 SOCIALACCOUNT_AUTO_SIGNUP = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = None  
+SOCIALACCOUNT_EMAIL_VERIFICATION = None
 SOCIALACCOUNT_EMAIL_REQUIRED = True
 
 
