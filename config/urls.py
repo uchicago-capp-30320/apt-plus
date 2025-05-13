@@ -17,11 +17,11 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from apt_app.views import home, about, fetch_all_data
-from apt_app.views_v2.groceries import fetch_groceries
+from apt_app.views.views import home, about, fetch_all_data
+from apt_app.views import inspections
+from apt_app.views.groceries import fetch_groceries
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
-from apt_app import views, inspections
 
 urlpatterns = [
     path("", home, name="home"),
