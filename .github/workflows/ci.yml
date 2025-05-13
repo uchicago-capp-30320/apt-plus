@@ -43,5 +43,5 @@ jobs:
         uv run manage.py collectstatic --noinput
 
         # Run tests and linter
-        uv run pytest apt_app/tests.py -v
+        uv run pytest tests/ci.py
         uv run ruff check .
