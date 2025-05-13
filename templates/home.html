@@ -129,7 +129,7 @@
         <!-- Search Bar -->
         <div class="field has-addons mt-4">
           <div class="control is-expanded">
-            <input class="input is-rounded" type="text" placeholder="Enter an address">
+            <input class="input is-rounded" id="addressInput" type="text" placeholder="Enter an address">
           </div>
           <div class="control">
             <button class="button is-rounded" id="searchButton">
@@ -260,6 +260,9 @@
 
         </div>
       `;
+
+       //Reconnect searchButton after replacing the HTML
+      document.getElementById("searchButton").addEventListener("click", getApartment);
     }
   }
 </script>
