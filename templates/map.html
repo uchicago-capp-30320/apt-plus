@@ -117,11 +117,26 @@
 
     var features = data.grocery_geojson.features;
 
-    for (var i = 0; i < features.length; i++) {
-      var coords = features[i].geometry.coordinates;
-      var marker = new maplibregl.Marker({ color: 'green' })
+    for (let i = 0; i < features.length; i++) {
+      let coords = features[i].geometry.coordinates;
+      let props = features[i].properties;
+
+      // SHow name and address
+      let popup = new maplibregl.Popup({ offset: 25 }).setHTML(
+      `<strong>${props.name}</strong><br>${props.address}`
+      );
+
+      let marker = new maplibregl.Marker({ color: 'green' })
         .setLngLat(coords)
         .addTo(map);
+
+      marker.getElement().addEventListener('mouseenter', function () {
+      popup.setLngLat(coords).addTo(map);
+    });
+
+    marker.getElement().addEventListener('mouseleave', function () {
+      popup.remove();
+    });
       groceryMarkers.push(marker);
     }
   }
