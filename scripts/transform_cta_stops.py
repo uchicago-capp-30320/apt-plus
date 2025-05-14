@@ -7,6 +7,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from django.core.exceptions import ValidationError
 from dotenv import load_dotenv
+from tqdm import tqdm
 
 # Load environment variables
 load_dotenv()
@@ -16,7 +17,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 # Import model
-from apt_app.models import TransitStop  # must be after django.setup()
+from apt_app.models import TransitStop  # noqa: E402
 
 
 def create_cta_stop_from_row(row):
@@ -40,27 +41,25 @@ def create_cta_stop_from_row(row):
     return cta_stop
 
 
-def run_import(df):
+def run_bulk_import(df, batch_size=1000):
     """
-    Save each row. Returns (success_count, failure_count).
+    Build and insert TransitStop objects in bulk to Django .
     """
-    success, failed = 0, 0
-    total = len(df)
-    print(f"Importing {total} rows...")
+    # Delete previous data
+    TransitStop.objects.all().delete()
 
-    for i, (_, row) in enumerate(df.iterrows(), 1):
-        try:
-            cta_stop = create_cta_stop_from_row(row)
-            cta_stop.save()
-            success += 1
-        except Exception as e:
-            print(f"[Row {i}] Skipped due to error: {e}")
-            failed += 1
+    # Add new data
+    print(f"Building objects for {len(df)} rows...")
+    cta_stops = []
 
-        if i % 100 == 0 or i == total:
-            print(f"[{i}/{total}] Processed...")
+    for _, row in tqdm(df.iterrows(), total=len(df)):
+        single_stop = create_cta_stop_from_row(row)
+        if single_stop:
+            cta_stops.append(single_stop)
 
-    return success, failed
+    print(f"Inserting {len(cta_stops)} rows in bulk...")
+    TransitStop.objects.bulk_create(cta_stops, batch_size=batch_size)
+    print("Done.")
 
 
 if __name__ == "__main__":
@@ -72,5 +71,4 @@ if __name__ == "__main__":
     df = pd.read_sql("SELECT * FROM apt_app_cta_stops", engine)
 
     # Import into Django model
-    success, failed = run_import(df)
-    print(f"{success} rows imported successfully, {failed} failed.")
+    run_bulk_import(df)
