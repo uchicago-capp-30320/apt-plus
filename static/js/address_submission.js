@@ -20,7 +20,7 @@ async function getApartment() {
     const response = await sendRequest(address);
 
     // Clean up the front page
-    switchSearchView()
+    switchSearchViewLoading()
 
     // Check response 
     if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
@@ -50,7 +50,7 @@ async function sendRequest(address) {
 }
 
 
-function switchSearchView() {
+function switchSearchViewLoading() {
   /**
     * Modifies the main page view with placeholder information after a request 
     * is sent to the fetch_all_data endpoint.
@@ -69,61 +69,37 @@ function switchSearchView() {
   if (searchBox) {
 
     // Replace title
-    const Title = document.getElementById("search-box-title");
-    Title.textContent = "#### LongStreetName Type"; // Placeholder text for wrapping
-    Title.classList.add("is-skeleton","is-size-6-mobile","is-size-5-tablet","is-size-4-desktop");
-    Title.classList.remove("is-size-3-mobile","is-size-2-tablet","is-size-1-desktop"); // TODO refactor to utility function
+    const title = document.getElementById("search-box-title");
+    title.textContent = "#### LongStreetName Type"; // Placeholder text for wrapping
+    title.classList.add("is-skeleton","is-size-6-mobile","is-size-5-tablet","is-size-4-desktop");
+    title.classList.remove("is-size-3-mobile","is-size-2-tablet","is-size-1-desktop"); // TODO refactor to utility function
 
     // Remove content below search bar
     const Content = document.getElementById('search-box-content')
     Content.remove()
 
-    // Add button to search
-    const saveButtonContainer = document.createElement('div');
-    saveButtonContainer.classList.add('mb-4');
-    searchBox.appendChild(saveButtonContainer);
-
-    const saveButton = document.createElement('button');
-    saveButton.classList.add('button', 'is-rounded','has-text-white','has-background-black');
+    // Add control elements
+    const saveButtonContainer = createElement('div', searchBox, ['mb-4']);
+    const saveButton = createElement('button', saveButtonContainer, ['button', 'is-rounded', 'has-text-white', 'has-background-black']);
     saveButton.textContent = 'Save';
-    saveButtonContainer.appendChild(saveButton);
-
-    // Add filters panel
-    const Filters = document.createElement('div');
-    const filtersTemplate = document.getElementById("filters-template").innerHTML; // loaded from Django templates in main.html
-    Filters.classList.add("media", "mb-4"); // TODO: Should this be a media element?
-    Filters.innerHTML = filtersTemplate;
-    searchBox.appendChild(Filters);
-
-    // Update content with inspections
-    // To-do: 
-    //    - remove content
-    //    - add box with scroll bar, but skeleton-lines text
-    const Violations = document.createElement('div');
-    Violations.classList.add("media");
-    searchBox.appendChild(Violations);
-
-    const ViolationsIcon = document.createElement('div');
-    ViolationsIcon.classList.add("media-left");
-    ViolationsIcon.innerHTML = `<span class="icon" style="color: #DB0B0B;"><i class="fas fa-exclamation-triangle fa-lg"></i></span>`
-    Violations.appendChild(ViolationsIcon)
-
-    const ViolationsDesc = document.createElement('div');
-    ViolationsDesc.classList.add("media-content");
-    Violations.appendChild(ViolationsDesc)
-
-    const ViolationsTitle = document.createElement('p');
-    ViolationsTitle.classList.add('has-text-weight-bold', 'mb-2');
-    ViolationsTitle.textContent = "Code Violations";
-    ViolationsDesc.appendChild(ViolationsTitle);
-
-    // Violations
-    const ViolationsSummary = document.createElement('div');
-    ViolationsSummary.classList.add('has-text-justified', 'is-size-7', 'skeleton-lines', 'mb-2');
-    ViolationsSummary.setAttribute('id', 'violations-summary');
-    ViolationsDesc.appendChild(ViolationsSummary);
+    const filtersTemplate = document.getElementById("filters-template").innerHTML;
+    const filters = createElement('div', searchBox, ['media', 'mb-4']);
+    filters.innerHTML = filtersTemplate;
     
-    // Fill with five skeleton lines to update based on API call
+    // Update content with inspections
+    const violations = createElement('div', searchBox, ['media']);
+    const violationsIcon = createElement('div', violations, ['media-left']);
+    const violationsIconSpan = createElement('span', violationsIcon, ['icon']);
+    const violationsIconFa = createElement('i', violationsIconSpan, ['fas','fa-exclamation-triangle','fa-lg'])
+    const violationsDesc = createElement('div', violations, ['media-content']);
+    const violationsTitle = createElement('p', violationsDesc, ['has-text-weight-bold', 'mb-2']);
+    violationsTitle.textContent = "Code Violations";
+    
+    // Summary containers
+    const violationsSummary = createElement('div', violationsDesc, ['has-text-justified', 'is-size-7', 'skeleton-lines', 'mb-2'], 'violations-summary');
+    const violationsIssues = createElement('div', violationsDesc, ['box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines'], 'violations-summary');
+   
+    // Fill summary containers with named and anonymous lines
     const violationsIds = [
       'violationsSummary',
       'violationsNote',
@@ -131,24 +107,29 @@ function switchSearchView() {
       'violationsInspections',
       'violationsStartDate'
     ];
-
-    // Create and append each div
-    for (const id of violationsIds) {
-      const div = document.createElement('div');
-      div.setAttribute('id', id);
-      ViolationsSummary.appendChild(div);
-    }
-
-    // Violations
-    const ViolationsIssues = document.createElement('div');
-    ViolationsIssues.classList.add('box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines');
-    ViolationsIssues.setAttribute('id', 'violations-summary');
-    ViolationsDesc.appendChild(ViolationsIssues);
-  
-    // Final
+    violationsIds.forEach(id => {
+      createElement('div', violationsSummary, [], id);
+    }); 
     for (let i = 0; i < 10; i++) {
-      const line = document.createElement('div');
-      ViolationsIssues.appendChild(line);
-    } 
+      createElement('div', violationsIssues);
+    }
   }
+}
+
+function createElement(type, parent, classes = [], id = null) {
+  /** 
+   * Utility function to create an element with styling and append it to a parent lement
+   * @param {str} type - type of HTML element to create
+   * @param {str} parent - parent element to append the newly created element to
+   * @param {list} classes - list of classes to apply to elemenet
+   * @param {str} id - OPTIONAL id attribute to apply
+   * @returns {Element} - completed element returned to modify
+  */
+  const elem = document.createElement(type);
+
+  // Option
+  if (Array.isArray(classes)) elem.classList.add(...classes);
+  if (id) elem.setAttribute('id', id);
+  if (parent) parent.appendChild(elem);
+  return elem;
 }
