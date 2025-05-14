@@ -163,10 +163,10 @@
                   <div class="field has-addons">
                     <div class="control">
                       <div class="select is-rounded is-small">
-                        <select>
-                          <option>5</option>
-                          <option>10</option>
-                          <option>15</option>
+                        <select id="distanceFilter">
+                          <option value="5" selected>5</option>
+                          <option value="10">10</option>
+                          <option value="15">15</option>
                         </select>
                       </div>
                     </div>
@@ -180,11 +180,11 @@
                 <div class="column is-half-desktop is-full-mobile">
                   <p class="is-size-7 has-text-weight-semibold mb-2">Amenities</p>
                   <div class="buttons are-small">
-                    <button class="button is-rounded">
+                    <button class="button is-rounded" id="groceriesButton">
                       <span class="icon is-small"><i class="fas fa-shopping-cart"></i></span>
                       <span>Groceries</span>
                     </button>
-                    <button class="button is-rounded">
+                    <button class="button is-rounded" id="busStopsButton">
                       <span class="icon is-small"><i class="fas fa-bus"></i></span> 
                       <span>Bus Stop</span>
                     </button>
@@ -261,8 +261,10 @@
         </div>
       `;
 
-       //Reconnect searchButton after replacing the HTML
+       //Reconnect buttons replacing the HTML
       document.getElementById("searchButton").addEventListener("click", getApartment);
+      document.getElementById("groceriesButton").addEventListener("click", displayGroceries);
+      document.getElementById("busStopsButton").addEventListener("click", displayBusStops);
     }
   }
 </script>
