@@ -81,6 +81,15 @@
   var groceryMarkers = [];
 
   function displayGroceries() {
+
+    // Get distance filter
+    let filterSelect = document.getElementById("distanceFilter");
+    let distanceMin = filterSelect ? parseInt(filterSelect.value) : 5;
+
+    // Clear grocery markers (otherwise they keep overlaying)
+    groceryMarkers.forEach(m => m.remove());
+    groceryMarkers = [];
+
     var data = {
       "address": "123 Main St",
       "walking_time": 5,
@@ -121,6 +130,9 @@
       let coords = features[i].geometry.coordinates;
       let props = features[i].properties;
 
+      // Apply filter
+      if (props.distance_min > distanceMin) continue;
+
       // SHow name and address
       let popup = new maplibregl.Popup({ offset: 25 }).setHTML(
       `<strong>${props.name}</strong><br>${props.address}`
@@ -137,7 +149,8 @@
     marker.getElement().addEventListener('mouseleave', function () {
       popup.remove();
     });
-      groceryMarkers.push(marker);
+    
+    groceryMarkers.push(marker);
     }
   }
 
