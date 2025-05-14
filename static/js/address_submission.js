@@ -17,10 +17,10 @@ async function getApartment() {
   }
 
   try {
-    const response = await sendRequest(address);
-
-    // Clean up the front page
-    switchSearchViewLoading()
+    // Clean up the front page, while making the request
+    const responsePromise = sendRequest(address);
+    switchSearchViewLoading();
+    const response = await responsePromise;
 
     // Check response 
     if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
