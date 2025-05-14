@@ -76,9 +76,10 @@
 </script>
 
 
-<!-- Amenities and filtering -->
+<!-- Groceries -->
 <script>
   var groceryMarkers = [];
+  var busStopMarkers = [];
 
   function displayGroceries() {
 
@@ -149,10 +150,80 @@
     marker.getElement().addEventListener('mouseleave', function () {
       popup.remove();
     });
-    
+
     groceryMarkers.push(marker);
-    }
+    }  
   }
+
+
+// Bus stops
+  function displayBusStops() {
+
+  // Get distance filter
+  let filterSelect = document.getElementById("distanceFilter");
+  let distanceMin = filterSelect ? parseInt(filterSelect.value) : 5;
+  
+  // Clear bus stops markers (otherwise they keep overlaying)
+  busStopMarkers.forEach(m => m.remove());
+  busStopMarkers = [];
+
+  var data = {
+    "address": "123 Main St",
+    "walking_time": 5,
+    "bus_stops_geojson": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": { "type": "Point", "coordinates": [-87.5960, 41.7942] },
+          "properties": {
+            "stop_name": "Lake Park & 56th",
+            "distance_min": 13,
+            "routes": ["2", "6", "28"],
+            "stop_id": "BUS12345"
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": { "type": "Point", "coordinates": [-87.5911, 41.8005] },
+          "properties": {
+            "stop_name": "Hyde Park & 53rd",
+            "distance_min": 4,
+            "routes": ["15", "55"],
+            "stop_id": "BUS67890"
+          }
+        }
+      ]
+    }
+  };
+
+  var features = data.bus_stops_geojson.features;
+
+  for (let i = 0; i < features.length; i++) {
+    let coords = features[i].geometry.coordinates;
+    let props = features[i].properties;
+
+    if (props.distance_min > distanceMin) continue;
+
+    let popup = new maplibregl.Popup({ offset: 25 }).setHTML(
+      `<strong>${props.stop_name}</strong><br>Routes: ${props.routes.join(", ")}`
+    );
+
+    let marker = new maplibregl.Marker({ color: 'blue' })
+      .setLngLat(coords)
+      .addTo(map);
+
+    marker.getElement().addEventListener('mouseenter', function () {
+      popup.setLngLat(coords).addTo(map);
+    });
+
+    marker.getElement().addEventListener('mouseleave', function () {
+      popup.remove();
+    });
+
+    busStopMarkers.push(marker);
+  }
+}
 
 </script>
 
@@ -161,6 +232,15 @@
     if (event.target && event.target.id === 'groceriesButton') {
       console.log("Groceries button clicked");
       displayGroceries();
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener('click', function(event) {
+    if (event.target && event.target.id === 'busStopsButton') {
+      console.log("Bus Stops button clicked");
+      displayBusStops();
     }
   });
 </script>
