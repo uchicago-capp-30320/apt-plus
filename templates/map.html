@@ -74,3 +74,65 @@
   }
 
 </script>
+
+
+<!-- Amenities and filtering -->
+<script>
+  var groceryMarkers = [];
+
+  function displayGroceries() {
+    var data = {
+      "address": "123 Main St",
+      "walking_time": 5,
+      "grocery_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-87.587851, 41.801710]
+            },
+            "properties": {
+              "name": "Whole Foods",
+              "distance_min": 4,
+              "address": "1521 E Hyde Park Blvd"
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-87.588746, 41.796868]
+            },
+            "properties": {
+              "name": "Trader Joe's",
+              "distance_min": 6,
+              "address": "55th & Lake Park"
+            }
+          }
+        ]
+      }
+    };
+
+    var features = data.grocery_geojson.features;
+
+    for (var i = 0; i < features.length; i++) {
+      var coords = features[i].geometry.coordinates;
+      var marker = new maplibregl.Marker({ color: 'green' })
+        .setLngLat(coords)
+        .addTo(map);
+      groceryMarkers.push(marker);
+    }
+  }
+
+</script>
+
+<script>
+  document.addEventListener('click', function(event) {
+    if (event.target && event.target.id === 'groceriesButton') {
+      console.log("Groceries button clicked");
+      displayGroceries();
+    }
+  });
+</script>
