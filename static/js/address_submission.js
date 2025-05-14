@@ -52,8 +52,8 @@ async function sendRequest(address) {
 
 function switchSearchView() {
   /**
-    * Modifies the main page view after the GET request is sent with
-    * placeholder information.
+    * Modifies the main page view with placeholder information after a request 
+    * is sent to the fetch_all_data endpoint.
     * @param {void}  
     * @returns {void} 
   */
@@ -67,98 +67,88 @@ function switchSearchView() {
   // Modifies the left panel
   const searchBox = document.getElementById("search-address-box");
   if (searchBox) {
+
     // Replace title
-    const searchBoxTitle = document.getElementById("search-box-title");
-    searchBoxTitle.textContent = "#### LongStreetName Type"; // Placeholder text for wrapping
-    searchBoxTitle.classList.add("is-skeleton","is-size-6-mobile","is-size-5-tablet","is-size-4-desktop");
-    searchBoxTitle.classList.remove("is-size-3-mobile","is-size-2-tablet","is-size-1-desktop"); // TODO refactor to utility function
+    const Title = document.getElementById("search-box-title");
+    Title.textContent = "#### LongStreetName Type"; // Placeholder text for wrapping
+    Title.classList.add("is-skeleton","is-size-6-mobile","is-size-5-tablet","is-size-4-desktop");
+    Title.classList.remove("is-size-3-mobile","is-size-2-tablet","is-size-1-desktop"); // TODO refactor to utility function
+
+    // Remove content below search bar
+    const Content = document.getElementById('search-box-content')
+    Content.remove()
 
     // Add button to search
     const saveButtonContainer = document.createElement('div');
+    saveButtonContainer.classList.add('mb-4');
+    searchBox.appendChild(saveButtonContainer);
+
     const saveButton = document.createElement('button');
-    saveButtonContainer.className = 'mb-4';
-    saveButton.className = 'button is-rounded has-text-white has-background-black';
+    saveButton.classList.add('button', 'is-rounded','has-text-white','has-background-black');
     saveButton.textContent = 'Save';
     saveButtonContainer.appendChild(saveButton);
 
-    const searchBoxContent = document.getElementById("search-box-content"); // location
-    searchBox.insertBefore(saveButtonContainer, searchBoxContent);
-
     // Add filters panel
-    const searchBoxFilters = document.createElement('div');
+    const Filters = document.createElement('div');
     const filtersTemplate = document.getElementById("filters-template").innerHTML; // loaded from Django templates in main.html
-    searchBoxFilters.classList.add("media", "mb-4");
-    searchBoxFilters.innerHTML = filtersTemplate;
-    searchBox.insertBefore(searchBoxFilters, searchBoxContent);
+    Filters.classList.add("media", "mb-4"); // TODO: Should this be a media element?
+    Filters.innerHTML = filtersTemplate;
+    searchBox.appendChild(Filters);
 
     // Update content with inspections
     // To-do: 
     //    - remove content
     //    - add box with scroll bar, but skeleton-lines text
-    searchBoxContent.innerHTML = `
-    <!-- Code Violations Section -->
-    <div class="media">
-      <div class="media-left">
-        <span class="icon" style="color: #DB0B0B;">
-          <i class="fas fa-exclamation-triangle fa-lg"></i>
-        </span>
-      </div>
-      <div class="media-content">
-        <p><strong>Code Violations</strong></p>
-        <br>
-        <!-- JSON Key:"Summary" -->
-          <p class="has-text-justified"><small>This building has received complaints about heating issues, hot water problems, and maintenance concerns in the past 5 years.</small></p>
+    const Violations = document.createElement('div');
+    Violations.classList.add("media");
+    searchBox.appendChild(Violations);
 
-          <!-- Json Key:"Note" -->
-          <p class="has-text-justified mt-2 is-size-7"><em>*Note:</em> Unauthorized uses and cases where inspectors were denied entry were omitted.</p>
+    const ViolationsIcon = document.createElement('div');
+    ViolationsIcon.classList.add("media-left");
+    ViolationsIcon.innerHTML = `<span class="icon" style="color: #DB0B0B;"><i class="fas fa-exclamation-triangle fa-lg"></i></span>`
+    Violations.appendChild(ViolationsIcon)
 
-          <!-- Stats -->
-          <p class="mt-2 mb-2">
-            <small>
-              <!-- JSON key:"total_violations_count" -->
-              <strong>Total Violations:</strong> 12 |
-                <!-- JSON key:"total_inspections_count" -->
-              <strong>Total Inspections:</strong> 2 |
-                <!-- JSON key:"start_date" -->
-              <strong>Since:</strong> Jan 2020
-            </small>
-          </p>
+    const ViolationsDesc = document.createElement('div');
+    ViolationsDesc.classList.add("media-content");
+    Violations.appendChild(ViolationsDesc)
 
-          <!-- JSON key: "summarized_issues" -->
-          <div class="box has-background-light p-3" style="max-height: 150px; overflow-y: auto;">
+    const ViolationsTitle = document.createElement('p');
+    ViolationsTitle.classList.add('has-text-weight-bold', 'mb-2');
+    ViolationsTitle.textContent = "Code Violations";
+    ViolationsDesc.appendChild(ViolationsTitle);
 
-            <!-- JSON key:"date" -->
-            <p class="has-text-weight-semibold is-size-7">Jan 2024</p>
-            <ul class="ml-4 mb-3 is-size-7">
-              <!-- JSON key:"issues" -->
-              <!-- JSON key:"emoji" and key:"description" -->
-              <li>🌡️ Inadequate heating and drafty windows with air seepage in Units 102, 103, and 104</li>
-              <li>🚿 Hot water issues with low temperature (45-59°F) and low pressure in Units 102, 103, 104, and 205</li>
-            </ul>
+    // Violations
+    const ViolationsSummary = document.createElement('div');
+    ViolationsSummary.classList.add('has-text-justified', 'is-size-7', 'skeleton-lines', 'mb-2');
+    ViolationsSummary.setAttribute('id', 'violations-summary');
+    ViolationsDesc.appendChild(ViolationsSummary);
+    
+    // Fill with five skeleton lines to update based on API call
+    const violationsIds = [
+      'violationsSummary',
+      'violationsNote',
+      'violationsTotal',
+      'violationsInspections',
+      'violationsStartDate'
+    ];
 
-            
-            <p class="has-text-weight-semibold is-size-7">Oct 2023</p>
-            <ul class="ml-4 is-size-7">
-              <li>🗑️ Overfilled trash cans and bags on the ground at west elevation</li>
-            </ul>
+    // Create and append each div
+    for (const id of violationsIds) {
+      const div = document.createElement('div');
+      div.setAttribute('id', id);
+      ViolationsSummary.appendChild(div);
+    }
 
-              
-            <p class="has-text-weight-semibold is-size-7">Jan 2024</p>
-            <ul class="ml-4 mb-3 is-size-7">
-              <li>🌡️ Inadequate heating and drafty windows with air seepage in Units 102, 103, and 104</li>
-              <li>🚿 Hot water issues with low temperature (45-59°F) and low pressure in Units 102, 103, 104, and 205</li>
-            </ul>
-
-            
-            <p class="has-text-weight-semibold is-size-7">Oct 2023</p>
-            <ul class="ml-4 is-size-7">
-              <li>🗑️ Overfilled trash cans and bags on the ground at west elevation</li>
-            </ul>
-
-    </div>
-  `;
-
-      //Reconnect searchButton after replacing the HTML
-    document.getElementById("searchButton").addEventListener("click", getApartment);
+    // Violations
+    const ViolationsIssues = document.createElement('div');
+    ViolationsIssues.classList.add('box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines');
+    ViolationsIssues.setAttribute('id', 'violations-summary');
+    ViolationsDesc.appendChild(ViolationsIssues);
+  
+    // Final
+    for (let i = 0; i < 10; i++) {
+      const line = document.createElement('div');
+      ViolationsIssues.appendChild(line);
+    } 
   }
 }
