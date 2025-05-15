@@ -1,5 +1,5 @@
 import pytest
-from apt_app.views.inspections import parse_address, fetch_inspection_summaries
+from apt_app.views.fetch_inspections import parse_address, _fetch_inspection_summaries
 
 
 def test_address_parsing():

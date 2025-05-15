@@ -18,7 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from apt_app.views.views import home, about, fetch_all_data
-from apt_app.views import inspections
+from apt_app.views import fetch_inspections
 from apt_app.views.groceries import fetch_groceries
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
@@ -32,7 +32,7 @@ urlpatterns = [
     path("fetch_groceries/", fetch_groceries, name="fetch_groceries"),
     path(
         "fetch_inspections/",
-        inspections.fetch_inspection_summaries,
+        fetch_inspections._fetch_inspection_summaries,
         name="fetch_inspection_summaries",
     ),
 ]
