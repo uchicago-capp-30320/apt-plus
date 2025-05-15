@@ -10,6 +10,12 @@ async function getApartment() {
   // Need this inside getApartment since we need this on submit
   const address = document.getElementById('addressInput').value.trim();
 
+  // Clear notifications before starting
+  hideNotification("hydeParkWarning");
+  hideNotification("noMatchError");
+  hideNotification("serverError");
+
+
   // Data validation
   if (!address) {
     alert('Please enter an address.');
@@ -19,14 +25,29 @@ async function getApartment() {
   try {
     const response = await sendRequest(address);
 
-    // Placeholder for DOM modification
-    hideRentSmarterBox()
+    // After receiving the response, handle different error and show popups
+    if (!response.ok) {
+      const data = await response.json();
+    
+      if (data.Error.includes("Address is not inside the area")) {
+        showNotification("hydeParkWarning");
+      } else if (data.Error.includes("No matched address")) {
+        showNotification("noMatchError");
+      } else if (data.Error.includes("Censusgeocode service error")) {
+        showNotification("serverError");
+      } else {
+        alert(data.Error); 
+      }
+      return;
+    }
 
     // Check response 
-    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+    // if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
 
     // Parse data and place on map, assuming appropriate format from endpoint
     const data = await response.json();
+    // Placeholder for DOM modification
+    hideRentSmarterBox()
     placeAddress(data);
   } catch (err) {
     console.error('Address request could not be resolved by Server:', err.message);
