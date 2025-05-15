@@ -6,6 +6,7 @@ import django
 import pandas as pd
 from sqlalchemy import create_engine
 from django.core.exceptions import ValidationError
+from django.contrib.gis.geos import GEOSGeometry, MultiLineString
 from dotenv import load_dotenv
 from tqdm import tqdm
 
@@ -18,19 +19,20 @@ django.setup()
 
 # Import model
 from apt_app.models import TransitStop  # noqa: E402
+from apt_app.models import TransitRoute  # noqa: E402
 
 
 def create_cta_stop_from_row(row):
     """
-    Convert a row from SQL database apt_app_cta_stops into a TransitStop instance (not saved yet).
+    Convert a row from SQL database apt_app_cta_stops into a TransitStop
+    instance (not saved yet).
     """
     cta_stop = TransitStop()
 
-    # Name
-    cta_stop.name = row.get("name", "")
-
-    # Type
+    # Name, type, and id
+    cta_stop.name = row.get("stop_name", "")
     cta_stop.type = row.get("type", "")
+    cta_stop.id = row.get("stop_id", "")
 
     # Location
     try:
@@ -41,24 +43,50 @@ def create_cta_stop_from_row(row):
     return cta_stop
 
 
-def run_bulk_import(df, batch_size=1000):
+def create_cta_route_from_row(row):
     """
-    Build and insert TransitStop objects in bulk to Django .
+    Convert a row from SQL database apt_app_cta_routes into a TransitRoute
+    instance (not saved yet).
     """
-    # Delete previous data
-    TransitStop.objects.all().delete()
+    cta_route = TransitRoute()
 
+    # Name, type, and id
+    cta_route.name = row.get("route_name", "")
+    cta_route.type = row.get("type", "")
+    cta_route.id = row.get("route_id", "")
+
+    # Geometry
+    geom = GEOSGeometry(row.get("geometry", ""))
+    if geom.geom_type == "LineString":
+        cta_route.geometry = MultiLineString(geom)
+    elif geom.geom_type == "MultiLineString":
+        cta_route.geometry = geom
+
+    return cta_route
+
+
+def run_bulk_import(df, function_to_use, batch_size=1000):
+    """
+    Build and insert TransitStop or TransitRoutes objects in bulk to Django.
+    For TransitStop, use the function "create_cta_stop_from_row".
+    For TransitRoute, use the function "create_cta_route_from_row".
+    """
     # Add new data
     print(f"Building objects for {len(df)} rows...")
-    cta_stops = []
+    appended_rows = []
 
     for _, row in tqdm(df.iterrows(), total=len(df)):
-        single_stop = create_cta_stop_from_row(row)
-        if single_stop:
-            cta_stops.append(single_stop)
+        single_row = function_to_use(row)
+        if single_row:
+            appended_rows.append(single_row)
 
-    print(f"Inserting {len(cta_stops)} rows in bulk...")
-    TransitStop.objects.bulk_create(cta_stops, batch_size=batch_size)
+    print(f"Inserting {len(appended_rows)} rows in bulk...")
+    if function_to_use == create_cta_stop_from_row:
+        # Ignore conflicts activated because stops are duplicated in this dataset,
+        # because this dataset also has the relationship between stops and route
+        TransitStop.objects.bulk_create(appended_rows, batch_size=batch_size, ignore_conflicts=True)
+    elif function_to_use == create_cta_route_from_row:
+        TransitRoute.objects.bulk_create(appended_rows, batch_size=batch_size)
     print("Done.")
 
 
@@ -67,8 +95,18 @@ if __name__ == "__main__":
     db_url = os.getenv("DATABASE_URL")
     engine = create_engine(db_url)
 
-    # Read raw data from PostgreSQL table
-    df = pd.read_sql("SELECT * FROM apt_app_cta_stops", engine)
+    # Delete previous data
+    TransitStop.objects.all().delete()
+    TransitRoute.objects.all().delete()
 
-    # Import into Django model
-    run_bulk_import(df)
+    # Stops - Read raw data from PostgreSQL table
+    df_stops = pd.read_sql("SELECT * FROM apt_app_cta_stops", engine)
+
+    # Import stops into Django model
+    run_bulk_import(df_stops, create_cta_stop_from_row)
+
+    # Routes - Read raw data from PostgreSQL table
+    df_routes = pd.read_sql("SELECT * FROM apt_app_cta_routes", engine)
+
+    # Import routes into Django model
+    run_bulk_import(df_routes, create_cta_route_from_row)
