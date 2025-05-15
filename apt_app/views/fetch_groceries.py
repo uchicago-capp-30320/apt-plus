@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.views.decorators.csrf import csrf_exempt
@@ -11,13 +11,10 @@ WALKING_METERS_PER_MIN = CONSTANTS["WALKING_METERS_PER_MIN"]
 
 
 @csrf_exempt
-@require_POST
-def fetch_groceries(request):
+def _fetch_groceries(geocode, walking_time=5):
     try:
-        # Extract parameters from request
-        geocode = request.POST.get("geocode")
-        walking_time = int(request.POST.get("walking_time", 5))
-        _ = request.POST.get("property_id")  # placeholder for future caching
+        # NOTE:
+        # _ = request.GET.get("property_id")  # placeholder for future caching
 
         # Convert geocode to Point
         lat_str, lng_str = geocode.split(",")

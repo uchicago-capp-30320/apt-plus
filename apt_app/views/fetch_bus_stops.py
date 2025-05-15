@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import Distance as DistanceRatio
-from django.views.decorators.http import require_POST
 from apt_app.models import TransitStop, Property
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from config import load_constants
@@ -10,17 +9,13 @@ CONSTANTS = load_constants()
 WALKING_METERS_PER_MIN = CONSTANTS["WALKING_METERS_PER_MIN"]
 
 
-@require_POST
-def fetch_bus_stops(request):
+def _fetch_bus_stops(geocode, property_id, walking_time=5):
     """Take property location and desired walking distance,
     return disticnt bus stops within the walking distance.
     Update property table with the bus stops."""
     try:
-        geocode = request.POST.get("geocode")
         lon_str, lat_str = geocode.split(",")
         lon, lat = float(lon_str), float(lat_str)
-        walking_time = int(request.POST.get("walking_time", 5))  # default 5 min
-        property_id = request.POST.get("property_id")
     except Exception as e:
         print(f"error: Failure in parsing request: {str(e)}")
         return JsonResponse({"error": f"Failure in parsing request: {str(e)}"}, status=400)

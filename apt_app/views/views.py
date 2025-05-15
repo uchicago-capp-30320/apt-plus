@@ -6,6 +6,10 @@ from django.contrib.gis.measure import Distance as DistanceRatio
 from apt_app.models import TransitStop, Property
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from django.views.decorators.csrf import csrf_exempt
+from .fetch_all_data import _fetch_all_data
+from .fetch_groceries import _fetch_groceries
+from .fetch_bus_stops import _fetch_bus_stops
+from django.views.decorators.http import require_GET
 
 
 def home(request):
@@ -16,6 +20,31 @@ def about(request):
     return render(request, "about.html")
 
 
+@csrf_exempt
+@require_GET
+def fetch_all_data(request):
+    address = request.GET.get("address")
+    return _fetch_all_data(address)
+
+
+@require_GET
+def fetch_groceries(request):
+    # extract parameters from request
+    geocode = request.GET.get("geocode")
+    walking_time = int(request.GET.get("walking_time", 5))
+    return _fetch_groceries(geocode, walking_time)
+
+
+@require_GET
+def fetch_bus_stops(request):
+    geocode = request.GET.get("geocode")
+    walking_time = int(request.GET.get("walking_time", 5))  # default 5 min
+    property_id = request.GET.get("property_id")
+    return _fetch_bus_stops(geocode, property_id, walking_time)
+
+
+# TODO: this should be moved elsewhere since it is a hard-coded mock
+# -- might be useful for testing but not sure
 def fetch_all_data_mock(request):
     address = request.GET.get("address", "")
 

@@ -27,7 +27,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 
-def fetching_all_data(user_address):
+def _fetch_all_data(user_address):
     """
     Function that takes the user_address string, and does the following:
     (i) Check that user_address is matched with an address from censusgeocode
@@ -143,7 +143,7 @@ def save_property_in_django(address_input, latitude, longitude):
 if __name__ == "__main__":
     # Trial with example of user address, with prints to check that it is working
     user_address_example = "5496 S Hyde Park Blvd"
-    response_example = fetching_all_data(user_address_example)
+    response_example = _fetch_all_data(user_address_example)
     print(f"Status Code: {response_example.status_code}")
     body_dict = json.loads(response_example.content.decode())
     print(f"Response Data: {body_dict}")

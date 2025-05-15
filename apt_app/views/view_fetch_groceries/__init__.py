@@ -1,1 +1,0 @@
-from .view_fetch_groceries import fetch_groceries
