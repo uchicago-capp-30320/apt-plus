@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,osx,django,jupyternotebooks
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,osx,django,jupyternotebooks
 
+data/
+.idea/
+
 ### Django ###
 _logs/
 *.log
