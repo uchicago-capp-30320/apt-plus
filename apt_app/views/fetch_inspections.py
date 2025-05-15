@@ -8,10 +8,10 @@ def parse_address(in_address):
     return in_address.split(",")[0].strip()
 
 
-def _fetch_inspection_summaries(parsed_address):
+def _fetch_inspection_summaries(address) -> JsonResponse:
     # TODO: need to add more error handling, but currently blocked by updating the backend data
     try:
-        parsed_address = parse_address(parsed_address)
+        parsed_address = parse_address(address)
         cut_off_date = datetime.date(2020, 1, 1)
 
         violations = (

@@ -51,7 +51,7 @@ def fetch_inspections(request):
 
 
 # TODO: this should be moved elsewhere since it is a hard-coded mock
-# -- might be useful for testing but not sure
+# -- maybe should be in tests but not sure
 def fetch_all_data_mock(request):
     address = request.GET.get("address", "")
 

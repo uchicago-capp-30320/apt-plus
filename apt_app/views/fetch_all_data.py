@@ -27,7 +27,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 
-def _fetch_all_data(user_address):
+def _fetch_all_data(user_address) -> JsonResponse:
     """
     Function that takes the user_address string, and does the following:
     (i) Check that user_address is matched with an address from censusgeocode

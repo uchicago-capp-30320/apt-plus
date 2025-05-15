@@ -10,8 +10,7 @@ CONSTANTS = load_constants()
 WALKING_METERS_PER_MIN = CONSTANTS["WALKING_METERS_PER_MIN"]
 
 
-@csrf_exempt
-def _fetch_groceries(geocode, walking_time=5):
+def _fetch_groceries(geocode, walking_time=5) -> JsonResponse:
     try:
         # NOTE:
         # _ = request.GET.get("property_id")  # placeholder for future caching
