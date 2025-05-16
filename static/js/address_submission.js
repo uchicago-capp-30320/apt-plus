@@ -146,7 +146,7 @@ function toggleLoadingWheel() {
   // First check if a loader exists, then remove if so
   const existingLoadingWheel = document.getElementById("loading-wheel");
   if (existingLoadingWheel) {
-    ERRORexistingLoadingWheel.remove();
+    existingLoadingWheel.remove();
     return;
   }
 
