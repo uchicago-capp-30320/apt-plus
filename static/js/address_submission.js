@@ -1,4 +1,3 @@
-
 async function getApartment() {
   /**
     * Makes a GET request for the apartment and then updates the DOM to 
@@ -30,6 +29,9 @@ async function getApartment() {
     // Parse data and place on map, assuming appropriate format from endpoint
     const data = await response.json();
     placeAddress(data);
+
+    // Pull in data from the response to update the overlay
+    updateSearchView(data)
   } catch (err) {
     console.error('Address request could not be resolved by Server:', err.message);
     alert('An error occurred while retrieving the apartment data.');
@@ -118,6 +120,45 @@ function switchSearchViewLoading() {
   }
 }
 
+function updateSearchView(data) {
+  /** Updates the loading 
+   *  @param {json} data - GET response object to update the search view with the 
+   *  @returns {void} - returns nothing, just updates the DOM as relevant.
+  */
+  const title = document.getElementById("search-box-title");
+  title.innerText = toTitleCase(data[
+    "cleaned_address"
+    ].split(',')[0]);
+  title.classList.remove("is-skeleton");
+}
+
+function toggleLoadingWheel() {
+  /** Add a loader to the searchBox
+    * @returns {void} - modifies the DOM directly, does not modify div
+  */
+
+  // First check if a loader exists, then remove if so
+  const existingLoadingWheel = document.getElementById("loading-wheel");
+  if (existingLoadingWheel) {
+    existingLoadingWheel.remove();
+    return;
+  }
+
+  // If no loader, create loader
+  const searchBox = document.getElementById("search-address-box");
+
+  // Create overlay and loader
+  const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel")
+  const loadingWheel = createElement("div", overlay, ["loader"]);
+
+  // Link the overlay in the center of the underlaid object
+  searchBox.appendChild(overlay);
+  return;
+}
+
+/*-----------------------------------------------------------------------------
+ Utility Functions
+------------------------------------------------------------------------------*/
 function createElement(type, parent, classes = [], id = null) {
   /** 
    * Utility function to create an element with styling and append it to a parent lement
@@ -138,26 +179,11 @@ function createElement(type, parent, classes = [], id = null) {
   return elem;
 }
 
-function toggleLoadingWheel() {
-  /** Add a loader to the searchBox
-    * @returns {void} - modifies the DOM directly, does not modify div
+function toTitleCase(str) {
+  /**
+   * Function to convert text to title case
+   * @param {string} str - string to convert to Title case
+   * Note: From: https://stackoverflow.com/a/196991
   */
-
-  // First check if a loader exists, then remove if so
-  const existingLoadingWheel = document.getElementById("loading-wheel");
-  if (existingLoadingWheel) {
-    existingLoadingWheel.remove();
-    return;
-  }
-
-  // If no loader, 
-  const searchBox = document.getElementById("search-address-box");
-
-  // Create overlay and loader
-  const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel")
-  const loadingWheel = createElement("div", overlay, ["loader"]);
-
-  // Link the overlay in the center of the underlaid object
-  searchBox.appendChild(overlay);
-  return;
+  return str.replace(/[^-\s]+/g, s => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase());
 }
