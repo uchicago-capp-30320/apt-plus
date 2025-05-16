@@ -154,12 +154,8 @@ function toggleLoadingWheel() {
   const searchBox = document.getElementById("search-address-box");
 
   // Create overlay and loader
-  const overlay = document.createElement("div");
-  overlay.className = "loader-overlay";
-  overlay.id = "loading-wheel";
-  const loadingWheel = document.createElement("div");
-  loadingWheel.className = "loader";
-  overlay.appendChild(loadingWheel);
+  const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel")
+  const loadingWheel = createElement("div", overlay, ["loader"]);
 
   // Link the overlay in the center of the underlaid object
   searchBox.appendChild(overlay);
