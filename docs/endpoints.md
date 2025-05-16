@@ -59,25 +59,24 @@ Backend behavior:
 
 ```python
 {
-	{
-		"address": String,
-		"summary": String,
-		"note": String,
-		"total_violations_count": Integer,
-		"total_inspections_count": Integer,
-		"cut_off_date": Date,
-		"summarized_issues": [
-			{
-				"date": Date,
-				"issues": [
-					{
-						"emoji": String,
-						"description": String
-					}
-				]
-			}
-		]}
-	}
+  "address": String,
+  "summary": String,
+  "note": String,
+	"total_violations_count": Int,
+	"total_inspections_count": Int,
+	"start_date": Date,
+  "summarized_issues": [
+      {
+          "date": String, // "LLM summary of Jan 2024"
+          "issues": [
+              {
+                  "emoji": Unicode,
+                  "description": String
+              }
+          ]
+      }
+    ]
+}
 ```
 
 Note that in practice, the endpoint will look something like this: `/fetch_inspections/?address=123+Main+St`. Then in Django, we will extract the address like this: `address = request.POST.get('address')` 
@@ -97,33 +96,21 @@ On the backend this endpoint will also update the `properties` table, which serv
 
 ```python
 {
-  "address": "123 Main St",  # cleaned address
-  "walking_time": 5,         # default parameter
-  "grocery_geojson": {       # geojson of grocery stores
-    "type": "FeatureCollection",
+  "address": Strng,  			 # cleaned address, e.g., "123 Main St."
+  "walking_time": Int,         	 # default parameter
+  "grocery_geojson": {       	 # geojson of grocery stores
+    "type": "FeatureCollection", # Always FeatureCOllection
     "features": [
       {
         "type": "Feature",
         "geometry": {
-          "type": "Point",
-          "coordinates": [-97.7431, 30.2672]   # [longitude, latitude]
+          "type": "Point", 			  # Always point
+          "coordinates": [Int, Int]   # [longitude, latitude]
         },
         "properties": {
-          "name": String, # ame of the retailer, e.g., "Whole Foods"
+          "name": String, # Name of the retailer, e.g., "Whole Foods"
           "distance_min": Integer, # Walking distance in minutes
           "address": String # e.g., "789 Oak St, Chicago, IL"
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-97.7448, 30.2691]
-        },
-        "properties": {
-          "name": String,
-          "distance_min": Integer,
-          "address": String 
         }
       }
     ]
@@ -151,9 +138,9 @@ On the backend this endpoint will also update the `properties` table, which serv
 
 ```python
 {
-	"address": "123 Main St",  # cleaned address
-	"walking_time": 5,         # default parameter
-	"bus_stops_geojson": {     # geojson of bus stops
+ 	"address": String,  	   # cleaned address, e.g., "123 Main St."
+  	"walking_time": Int,       # default parameter
+  	"bus_stops_geojson": {     # geojson of bus stops
 		"type": "FeatureCollection",
 		"features": [
 			{
