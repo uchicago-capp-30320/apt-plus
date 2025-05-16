@@ -1,4 +1,37 @@
+/* Overlay colors vars */
+:root {
+   --background-gray-a60: hsla(0, 0%, 100%, 0.6);
+}
+
 #violations-box {
    max-height: 150px; 
    overflow-y: auto;
 }
+
+/* CSS from: https://www.w3schools.com/howto/howto_css_loader.asp */
+.loader {
+   border: 16px solid --bulma-grey-light; 
+   border-top: 16px solid --bulma-success; 
+   border-radius: 50%;
+   width: 7.5rem;
+   height: 7.5rem;
+   animation: spin 2s linear infinite;
+ }
+
+ .loader-overlay {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background-color: var(--background-gray-a60);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   z-index: 1;
+ }
+ 
+ @keyframes spin {
+   0% { transform: rotate(0deg); }
+   100% { transform: rotate(360deg); }
+ }

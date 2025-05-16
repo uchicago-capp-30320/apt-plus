@@ -19,8 +19,10 @@ async function getApartment() {
   try {
     // Clean up the front page, while making the request
     const responsePromise = sendRequest(address);
+    toggleLoadingWheel()
     switchSearchViewLoading();
     const response = await responsePromise;
+    toggleLoadingWheel() // Turn off loading after server response
 
     // Check response 
     if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
@@ -127,9 +129,39 @@ function createElement(type, parent, classes = [], id = null) {
   */
   const elem = document.createElement(type);
 
-  // Option
-  if (Array.isArray(classes)) elem.classList.add(...classes);
-  if (id) elem.setAttribute('id', id);
+  // A couple references below for how to handle if the class Array is empty:
+  // Ref: https://matcha.fyi/javascript-optional-chaining/
+  // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
+  if (classes?.length) elem.classList.add(...classes); 
+  if (id) elem.id = id;
   if (parent) parent.appendChild(elem);
   return elem;
+}
+
+function toggleLoadingWheel() {
+  /** Add a loader to the searchBox
+    * @returns {void} - modifies the DOM directly, does not modify div
+  */
+
+  // First check if a loader exists, then remove if so
+  const existingLoadingWheel = document.getElementById("loading-wheel");
+  if (existingLoadingWheel) {
+    existingLoadingWheel.remove();
+    return;
+  }
+
+  // If no loader, 
+  const searchBox = document.getElementById("search-address-box");
+
+  // Create overlay and loader
+  const overlay = document.createElement("div");
+  overlay.className = "loader-overlay";
+  overlay.id = "loading-wheel";
+  const loadingWheel = document.createElement("div");
+  loadingWheel.className = "loader";
+  overlay.appendChild(loadingWheel);
+
+  // Link the overlay in the center of the underlaid object
+  searchBox.appendChild(overlay);
+  return;
 }
