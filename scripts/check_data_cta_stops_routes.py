@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import Distance as DistanceRatio
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
+import logging
+from django.db.models import Prefetch
 
 # Load environment variables
 load_dotenv()
@@ -19,6 +21,13 @@ django.setup()
 # Import model
 from apt_app.models import TransitStop  # noqa: E402
 from apt_app.models import TransitRoute  # noqa: E402
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+)
+logging.getLogger().setLevel(logging.WARNING)
+logger = logging.getLogger("")
 
 
 # Function to check data in the Django dataset
@@ -36,9 +45,11 @@ def check_general_data():
 
     # Check first 5 observations - Bus Stops
     first_stops = TransitStop.objects.all()[:5]
-    print("\nFirst 5 transit stops:")
+    logger.info("\nFirst 5 transit stops:")
     for stop in first_stops:
-        print(f"ID: {stop.id}, Name: {stop.name}, Type: {stop.type}, Location: ({stop.location})")
+        logger.info(
+            f"ID: {stop.id}, Name: {stop.name}, Type: {stop.type}, Location: ({stop.location})"
+        )
 
     # Count observations - Routes
     total_routes = TransitRoute.objects.count()
@@ -46,11 +57,9 @@ def check_general_data():
 
     # Check first 3 observations - Routes
     first_routes = TransitRoute.objects.all()[:3]
-    print("\nFirst 3 transit routes:")
+    logger.info("\nFirst 3 transit routes:")
     for route in first_routes:
-        print(
-            f"ID: {route.route_id}, Name: {route.name}, Type: {route.type}, Geo: ({route.geometry})"
-        )
+        logger.info(f"ID: {route.route_id}, Name: {route.name}, Type: {route.type}")
 
     # Time running time
     end_time = time.perf_counter()
@@ -64,12 +73,6 @@ def stops_near_a_point(latitude_input, longitude_input, walking_time_input):
     """
     # Start time
     start_time = time.perf_counter()
-    """
-    print(
-        f"Stops within {walking_time_input} minutes of coordinates"
-        + f"{latitude_input:.5f} N, {longitude_input:.5f} W"
-    )
-    """
 
     # Distance in meters, GoogleMaps has a walking time of 4.2 km per hour.
     ratio_in_meters = walking_time_input / 60 * 4200
@@ -90,20 +93,32 @@ def stops_near_a_point(latitude_input, longitude_input, walking_time_input):
     ## of link 1.
     ## Link 1: https://docs.djangoproject.com/en/5.2/ref/contrib/gis/functions/
     near_stops = near_stops.annotate(distance=DistanceFunction("location", reference_point))
+    print(f"Number of nearby stops: {near_stops.count()}")
 
-    # keep only closest stop for each name by using order_by and distinct
-    ## NOTE: "Order_by" sorts the bus_stops by name and distance (closest stops first),
-    ## and "distinct" keeps only the closest bus_stop by name.
-    ## Link:
-    near_stops = near_stops.order_by("name", "distance").distinct("name")
-    # print some results
-    for stop in near_stops[:5]:
-        print(
+    # get the relationship considerably faster between bus stop and route id with
+    # prefetch_related and only
+    ## NOTE: I checked the use of prefecth_related and only on Django documentation,
+    ## particularly, links 1 and 2.
+    ## Link 1: https://docs.djangoproject.com/en/5.2/ref/models/querysets/#prefetch-related
+    ## Link 2: https://docs.djangoproject.com/en/5.2/ref/models/querysets/#only
+    near_stops = near_stops.prefetch_related(
+        Prefetch(
+            "routes",
+            queryset=TransitRoute.objects.only("route_id"),
+        )
+    )
+    # print results
+    for stop in near_stops:
+        # get bus stop
+        logger.info(
             f"ID: {stop.id}, Name: {stop.name}, Type: {stop.type}, "
             + f"Location: {stop.location}, Distance (meters): {stop.distance.m:.1f}"
         )
+        # get the routes related to that stop
+        route_ids = [route.route_id for route in stop.routes.all()]
+        logger.info(f"The routes of this stop are {route_ids}")
 
-    # Time running time
+    # Total time of function
     end_time = time.perf_counter()
     print(
         f"Execution time of stops {walking_time_input} minutes near specific point: "
@@ -115,19 +130,24 @@ def stops_near_a_point(latitude_input, longitude_input, walking_time_input):
 address_references = [
     ("55th and S Hyde Park Blvd", -87.58420643801648, 41.795416711406915),
     ("55th and S Woodlawn Ave", -87.596472, 41.794889),
-    ("E Hyde Park Blvd and S Kenwood Ave", -87.593418, 41.802277),
-    ("123 S Clark St, at Chicago Downtown", -87.63045, 41.87962),
-    ("E Randolph St with N State St", -87.62784, 41.88447),
-    ("N Michigan Ave with E Ontario St", -87.62444, 41.89343),
+    # ("E Hyde Park Blvd and S Kenwood Ave", -87.593418, 41.802277),
+    # ("123 S Clark St, at Chicago Downtown", -87.63045, 41.87962),
+    # ("E Randolph St with N State St", -87.62784, 41.88447),
+    # ("N Michigan Ave with E Ontario St", -87.62444, 41.89343),
 ]
 
 # Run the code to check that is working properly
 if __name__ == "__main__":
+    # Get polyline related to a route, in this case, route 171
+    route = "171"
+    print(f"Polyline related to bus {route}")
+    print(f"{TransitRoute.objects.get(route_id=route).geometry}")
+    # Check time for general data
     check_general_data()
-    # Time for reference addresses, 20 minutes
+    # Time for reference addresses, 15 minutes
     for address, latitude, longitude in address_references:
         print(address)
-        walking_time_example = 20
+        walking_time_example = 15
         stops_near_a_point(latitude, longitude, walking_time_example)
     # Time for reference addresses, 2 minutes
     for address, latitude, longitude in address_references:
