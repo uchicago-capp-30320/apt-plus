@@ -75,172 +75,129 @@
 
 </script>
 
-
-<!-- Groceries -->
 <script>
+
+  function getDistanceFilter() {
+    let filterSelect = document.getElementById("distanceFilter");
+    return filterSelect ? parseInt(filterSelect.value) : 5;
+  }
+
   var groceryMarkers = [];
   var busStopMarkers = [];
+  var groceriesON = false;
+  var busStopsON = false;
+
+  const groceryData = {
+    type: "FeatureCollection",
+    features: [
+      {
+        geometry: { type: "Point", coordinates: [-87.587851, 41.801710] },
+        properties: { name: "Whole Foods", distance_min: 4, address: "1521 E Hyde Park Blvd" }
+      },
+      {
+        geometry: { type: "Point", coordinates: [-87.588746, 41.796868] },
+        properties: { name: "Trader Joe's", distance_min: 6, address: "55th & Lake Park" }
+      }
+    ]
+  };
+
+  const busStopData = {
+    type: "FeatureCollection",
+    features: [
+      {
+        geometry: { type: "Point", coordinates: [-87.5960, 41.7942] },
+        properties: { stop_name: "Lake Park & 56th", distance_min: 13, routes: ["2", "6", "28"], stop_id: "BUS12345" }
+      },
+      {
+        geometry: { type: "Point", coordinates: [-87.5911, 41.8005] },
+        properties: { stop_name: "Hyde Park & 53rd", distance_min: 4, routes: ["15", "55"], stop_id: "BUS67890" }
+      }
+    ]
+  };
 
   function displayGroceries() {
-
-    // Get distance filter
-    let filterSelect = document.getElementById("distanceFilter");
-    let distanceMin = filterSelect ? parseInt(filterSelect.value) : 5;
-
-    // Clear grocery markers (otherwise they keep overlaying)
+    let distanceMin = getDistanceFilter();
     groceryMarkers.forEach(m => m.remove());
     groceryMarkers = [];
 
-    var data = {
-      "address": "123 Main St",
-      "walking_time": 5,
-      "grocery_geojson": {
-        "type": "FeatureCollection",
-        "features": [
-          {
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [-87.587851, 41.801710]
-            },
-            "properties": {
-              "name": "Whole Foods",
-              "distance_min": 4,
-              "address": "1521 E Hyde Park Blvd"
-            }
-          },
-          {
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [-87.588746, 41.796868]
-            },
-            "properties": {
-              "name": "Trader Joe's",
-              "distance_min": 6,
-              "address": "55th & Lake Park"
-            }
-          }
-        ]
-      }
-    };
-
-    var features = data.grocery_geojson.features;
-
-    for (let i = 0; i < features.length; i++) {
-      let coords = features[i].geometry.coordinates;
-      let props = features[i].properties;
-
+    groceryData.features.forEach(f => {
+      // Extract properties
+      let coords = f.geometry.coordinates;
+      let props = f.properties;
       // Apply filter
-      if (props.distance_min > distanceMin) continue;
-
-      // SHow name and address
+      if (props.distance_min > distanceMin) return;
+      // Show name and address
       let popup = new maplibregl.Popup({ offset: 25 }).setHTML(
-      `<strong>${props.name}</strong><br>${props.address}`
-      );
-
-      let marker = new maplibregl.Marker({ color: 'green' })
-        .setLngLat(coords)
-        .addTo(map);
-
-      marker.getElement().addEventListener('mouseenter', function () {
-      popup.setLngLat(coords).addTo(map);
+        `<strong>${props.name}</strong><br>${props.address}`);
+      let marker = new maplibregl.Marker({ color: 'green' }).setLngLat(coords).addTo(map);
+      marker.getElement().addEventListener('mouseenter', () => popup.setLngLat(coords).addTo(map));
+      marker.getElement().addEventListener('mouseleave', () => popup.remove());
+      groceryMarkers.push(marker);
     });
-
-    marker.getElement().addEventListener('mouseleave', function () {
-      popup.remove();
-    });
-
-    groceryMarkers.push(marker);
-    }  
   }
 
-
-// Bus stops
   function displayBusStops() {
+    let distanceMin = getDistanceFilter();
+    busStopMarkers.forEach(m => m.remove());
+    busStopMarkers = [];
 
-  // Get distance filter
-  let filterSelect = document.getElementById("distanceFilter");
-  let distanceMin = filterSelect ? parseInt(filterSelect.value) : 5;
-  
-  // Clear bus stops markers (otherwise they keep overlaying)
-  busStopMarkers.forEach(m => m.remove());
-  busStopMarkers = [];
-
-  var data = {
-    "address": "123 Main St",
-    "walking_time": 5,
-    "bus_stops_geojson": {
-      "type": "FeatureCollection",
-      "features": [
-        {
-          "type": "Feature",
-          "geometry": { "type": "Point", "coordinates": [-87.5960, 41.7942] },
-          "properties": {
-            "stop_name": "Lake Park & 56th",
-            "distance_min": 13,
-            "routes": ["2", "6", "28"],
-            "stop_id": "BUS12345"
-          }
-        },
-        {
-          "type": "Feature",
-          "geometry": { "type": "Point", "coordinates": [-87.5911, 41.8005] },
-          "properties": {
-            "stop_name": "Hyde Park & 53rd",
-            "distance_min": 4,
-            "routes": ["15", "55"],
-            "stop_id": "BUS67890"
-          }
-        }
-      ]
-    }
-  };
-
-  var features = data.bus_stops_geojson.features;
-
-  for (let i = 0; i < features.length; i++) {
-    let coords = features[i].geometry.coordinates;
-    let props = features[i].properties;
-
-    if (props.distance_min > distanceMin) continue;
-
-    let popup = new maplibregl.Popup({ offset: 25 }).setHTML(
-      `<strong>${props.stop_name}</strong><br>Routes: ${props.routes.join(", ")}`
-    );
-
-    let marker = new maplibregl.Marker({ color: 'blue' })
-      .setLngLat(coords)
-      .addTo(map);
-
-    marker.getElement().addEventListener('mouseenter', function () {
-      popup.setLngLat(coords).addTo(map);
+    busStopData.features.forEach(f => {
+      // Extract properties
+      let coords = f.geometry.coordinates;
+      let props = f.properties;
+      // Apply filter
+      if (props.distance_min > distanceMin) return;
+      // Show name and address
+      let popup = new maplibregl.Popup({ offset: 25 }).setHTML(
+        `<strong>${props.stop_name}</strong><br>Routes: ${props.routes.join(", ")}`);
+      let marker = new maplibregl.Marker({ color: 'blue' }).setLngLat(coords).addTo(map);
+      marker.getElement().addEventListener('mouseenter', () => popup.setLngLat(coords).addTo(map));
+      marker.getElement().addEventListener('mouseleave', () => popup.remove());
+      busStopMarkers.push(marker);
     });
-
-    marker.getElement().addEventListener('mouseleave', function () {
-      popup.remove();
-    });
-
-    busStopMarkers.push(marker);
   }
-}
-
 </script>
 
 <script>
   document.addEventListener('click', function(event) {
-    if (event.target && event.target.id === 'groceriesButton') {
-      console.log("Groceries button clicked");
-      displayGroceries();
+    // to catch all clicks (buttons were not working properly)
+    const groceriesBtn = event.target.closest('#groceriesButton');
+    const busStopsBtn = event.target.closest('#busStopsButton');
+
+    if (groceriesBtn) {
+      groceriesON = !groceriesON;
+      // Paint button when clicked
+      //groceriesBtn.classList.toggle('is-info', groceriesON);
+      if (groceriesON) {
+        console.log("Groceries button turned ON")
+        displayGroceries();
+      } else {
+        console.log("Groceries button turned OFF")
+        groceryMarkers.forEach(m => m.remove());
+        groceryMarkers = [];
+      }
+    }
+
+    if (busStopsBtn) {
+      busStopsON = !busStopsON;
+      // Paint button when clicked
+      //busStopsBtn.classList.toggle('is-info', busStopsON);
+      if (busStopsON) {
+        console.log("BusStops button turned ON")
+        displayBusStops();
+      } else {
+        console.log("BusStops button turned OFF")
+        busStopMarkers.forEach(m => m.remove());
+        busStopMarkers = [];
+      }
     }
   });
-</script>
 
-<script>
-  document.addEventListener('click', function(event) {
-    if (event.target && event.target.id === 'busStopsButton') {
-      console.log("Bus Stops button clicked");
-      displayBusStops();
+  // New event listener to update pins based on distance filter
+  document.addEventListener('change', function(event) {
+    if (event.target && event.target.id === 'distanceFilter') {
+      if (groceriesON) displayGroceries();
+      if (busStopsON) displayBusStops();
     }
   });
 </script>

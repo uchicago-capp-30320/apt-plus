@@ -261,12 +261,26 @@
         </div>
       `;
 
-       //Reconnect buttons replacing the HTML
+      //Reconnect buttons replacing the HTML
       document.getElementById("searchButton").addEventListener("click", getApartment);
-      document.getElementById("groceriesButton").addEventListener("click", displayGroceries);
-      document.getElementById("busStopsButton").addEventListener("click", displayBusStops);
     }
+
+    // Reconnect distance filter
+    const distanceFilter = document.getElementById("distanceFilter");
+    if (distanceFilter) {
+    distanceFilter.addEventListener("change", () => {
+    console.log("Distance filter changed (inside home.html)");
+
+      // Only call these if the map layers are ON
+      if (typeof groceriesON !== 'undefined' && groceriesON) {
+        displayGroceries();
+      }
+      if (typeof busStopsON !== 'undefined' && busStopsON) {
+        displayBusStops();
+    }
+  });
   }
+}
 </script>
 <!--
   to-do: refactor to combine both of thes script blocks with the DOM updates
