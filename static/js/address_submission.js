@@ -11,30 +11,44 @@ async function getApartment() {
 
   // Data validation
   if (!address) {
-    alert('Please enter an address.');
+    showSearchError('Please enter an address.'); // Use popup error handler to show validation error
     return;
   }
 
   try {
-    // Clean up the front page, while making the request
-    const responsePromise = sendRequest(address);
-    toggleLoadingWheel()
-    switchSearchViewLoading();
-    const response = await responsePromise;
-    toggleLoadingWheel() // Turn off loading after server response
-
-    // Check response 
-    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
-
+    // Show loading spinner while waiting for response
+    toggleLoadingWheel();
+  
+    // Send GET request to fetch_all_data
+    const response = await sendRequest(address); 
+  
+    // Stop spinner after response received
+    toggleLoadingWheel();
+  
+    // fetch_all_data returned an error — show popup error message 
+    if (!response.ok) {
+      const errorData = await response.json(); 
+      const message = errorData.Error;
+      showSearchError(message || 'Something went wrong.');
+      return;
+    }
+  
     // Parse data and place on map, assuming appropriate format from endpoint
     const data = await response.json();
     placeAddress(data);
 
+    // Clean up the front page and update left panel
+    switchSearchViewLoading();
+
     // Pull in data from the response to update the overlay
-    updateSearchView(data)
+    updateSearchView(data);
+
+    // Clear error message if everything worked
+    clearSearchError(); 
   } catch (err) {
     console.error('Address request could not be resolved by Server:', err.message);
-    alert('An error occurred while retrieving the apartment data.');
+    toggleLoadingWheel(); //Ensure spinner is removed even on failure
+    showSearchError('An error occurred while retrieving the apartment data.'); //Use popup error handler to show network failure
   }
 }
 
