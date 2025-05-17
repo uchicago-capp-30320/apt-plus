@@ -1,4 +1,3 @@
-
 async function getApartment() {
   /**
     * Makes a GET request for the apartment and then updates the DOM to 
@@ -12,25 +11,44 @@ async function getApartment() {
 
   // Data validation
   if (!address) {
-    alert('Please enter an address.');
+    showSearchError('Please enter an address.'); // Use popup error handler to show validation error
     return;
   }
 
   try {
-    const response = await sendRequest(address);
-
-    // Placeholder for DOM modification
-    hideRentSmarterBox()
-
-    // Check response 
-    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
-
+    // Show loading spinner while waiting for response
+    toggleLoadingWheel();
+  
+    // Send GET request to fetch_all_data
+    const response = await sendRequest(address); 
+  
+    // Stop spinner after response received
+    toggleLoadingWheel();
+  
+    // fetch_all_data returned an error — show popup error message 
+    if (!response.ok) {
+      const errorData = await response.json(); 
+      const message = errorData.Error;
+      showSearchError(message || 'Something went wrong.');
+      return;
+    }
+  
     // Parse data and place on map, assuming appropriate format from endpoint
     const data = await response.json();
     placeAddress(data);
+
+    // Clean up the front page and update left panel
+    switchSearchViewLoading();
+
+    // Pull in data from the response to update the overlay
+    updateSearchView(data);
+
+    // Clear error message if everything worked
+    clearSearchError(); 
   } catch (err) {
     console.error('Address request could not be resolved by Server:', err.message);
-    alert('An error occurred while retrieving the apartment data.');
+    toggleLoadingWheel(); //Ensure spinner is removed even on failure
+    showSearchError('An error occurred while retrieving the apartment data.'); //Use popup error handler to show network failure
   }
 }
 
@@ -47,4 +65,139 @@ async function sendRequest(address) {
 
   // Send the request and then store it as a variable so we can operate on the DOM
   return fetch(url, { method: 'GET' });
+}
+
+
+function switchSearchViewLoading() {
+  /**
+    * Modifies the main page view with placeholder information after a request 
+    * is sent to the fetch_all_data endpoint.
+    * @param {void}  
+    * @returns {void} 
+  */
+
+  // Remove right panel box
+  const rentSmarterBox = document.getElementById("rent-smarter-box");
+  if (rentSmarterBox) {
+    rentSmarterBox.remove() // Will be reloaded if they refresh to this page, fine to delete
+  }
+
+  // Modifies the left panel
+  const searchBox = document.getElementById("search-address-box");
+  if (searchBox) {
+
+    // Replace title
+    const title = document.getElementById("search-box-title");
+    title.textContent = "#### LongStreetName Type"; // Placeholder text for wrapping
+    title.classList.add("is-skeleton","is-size-6-mobile","is-size-5-tablet","is-size-4-desktop");
+    title.classList.remove("is-size-3-mobile","is-size-2-tablet","is-size-1-desktop"); // TODO refactor to utility function
+
+    // Remove content below search bar
+    const Content = document.getElementById('search-box-content')
+    Content.remove()
+
+    // Add control elements
+    const saveButtonContainer = createElement('div', searchBox, ['mb-4']);
+    const saveButton = createElement('button', saveButtonContainer, ['button', 'is-rounded', 'has-text-white', 'has-background-black']);
+    saveButton.textContent = 'Save';
+    const filtersTemplate = document.getElementById("filters-template").innerHTML;
+    const filters = createElement('div', searchBox, ['media', 'mb-4']);
+    filters.innerHTML = filtersTemplate;
+    
+    // Update content with inspections
+    const violations = createElement('div', searchBox, ['media']);
+    const violationsIcon = createElement('div', violations, ['media-left']);
+    const violationsIconSpan = createElement('span', violationsIcon, ['icon']);
+    const violationsIconFa = createElement('i', violationsIconSpan, ['fas','fa-exclamation-triangle','fa-lg'])
+    const violationsDesc = createElement('div', violations, ['media-content']);
+    const violationsTitle = createElement('p', violationsDesc, ['has-text-weight-bold', 'mb-2']);
+    violationsTitle.textContent = "Code Violations";
+    
+    // Summary containers
+    const violationsSummary = createElement('div', violationsDesc, ['has-text-justified', 'is-size-7', 'skeleton-lines', 'mb-2'], 'violations-summary');
+    const violationsIssues = createElement('div', violationsDesc, ['box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines'], 'violations-summary');
+   
+    // Fill summary containers with named and anonymous lines
+    const violationsIds = [
+      'violationsSummary',
+      'violationsNote',
+      'violationsTotal',
+      'violationsInspections',
+      'violationsStartDate'
+    ];
+    violationsIds.forEach(id => {
+      createElement('div', violationsSummary, [], id);
+    }); 
+    for (let i = 0; i < 10; i++) {
+      createElement('div', violationsIssues);
+    }
+  }
+}
+
+function updateSearchView(data) {
+  /** Updates the loading 
+   *  @param {json} data - GET response object to update the search view with the 
+   *  @returns {void} - returns nothing, just updates the DOM as relevant.
+  */
+  const title = document.getElementById("search-box-title");
+  title.innerText = toTitleCase(data[
+    "cleaned_address"
+    ].split(',')[0]);
+  title.classList.remove("is-skeleton");
+}
+
+function toggleLoadingWheel() {
+  /** Add a loader to the searchBox
+    * @returns {void} - modifies the DOM directly, does not modify div
+  */
+
+  // First check if a loader exists, then remove if so
+  const existingLoadingWheel = document.getElementById("loading-wheel");
+  if (existingLoadingWheel) {
+    existingLoadingWheel.remove();
+    return;
+  }
+
+  // If no loader, create loader
+  const searchBox = document.getElementById("search-address-box");
+
+  // Create overlay and loader
+  const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel")
+  const loadingWheel = createElement("div", overlay, ["loader"]);
+
+  // Link the overlay in the center of the underlaid object
+  searchBox.appendChild(overlay);
+  return;
+}
+
+/*-----------------------------------------------------------------------------
+ Utility Functions
+------------------------------------------------------------------------------*/
+function createElement(type, parent, classes = [], id = null) {
+  /** 
+   * Utility function to create an element with styling and append it to a parent lement
+   * @param {str} type - type of HTML element to create
+   * @param {str} parent - parent element to append the newly created element to
+   * @param {list} classes - list of classes to apply to elemenet
+   * @param {str} id - OPTIONAL id attribute to apply
+   * @returns {Element} - completed element returned to modify
+  */
+  const elem = document.createElement(type);
+
+  // A couple references below for how to handle if the class Array is empty:
+  // Ref: https://matcha.fyi/javascript-optional-chaining/
+  // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
+  if (classes?.length) elem.classList.add(...classes); 
+  if (id) elem.id = id;
+  if (parent) parent.appendChild(elem);
+  return elem;
+}
+
+function toTitleCase(str) {
+  /**
+   * Function to convert text to title case
+   * @param {string} str - string to convert to Title case
+   * Note: From: https://stackoverflow.com/a/196991
+  */
+  return str.replace(/[^-\s]+/g, s => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase());
 }
