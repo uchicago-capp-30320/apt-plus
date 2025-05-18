@@ -1,0 +1,18 @@
+:root {
+  --bulma-navbar-height: 3.25rem;
+}
+
+/* Logo visability */
+.light-mode-logo {
+  display: block;
+}
+
+.dark-mode-logo {
+  display: none;
+}
+html.is-dark .light-mode-logo {
+  display: none !important;
+}
+html.is-dark .dark-mode-logo {
+  display: block !important;
+}
