@@ -22,6 +22,19 @@
       <!-- Pass -->
     </div>
     <div class="navbar-end mr-6">
+      {% if user.is_authenticated %}
+      <div class="navbar-item">
+        <a class="navbar-item" href="{% url 'about' %}">
+          <strong>About</strong>
+        </a>
+        <a class="navbar-item" href="temp">
+          <strong>Saved Properties</strong>
+        </a>
+        <a class="navbar-item" href="temp">
+          <strong>Sign out</strong>
+        </a>
+      </div>
+      {% else %}
       <div class="navbar-item">
         <a class="navbar-item" href="{% url 'about' %}">
           <strong>About</strong>
@@ -30,6 +43,7 @@
           <strong>Sign in</strong>
         </a>
       </div>
+      {% endif %}
     </div>
   </div>
 </nav>
