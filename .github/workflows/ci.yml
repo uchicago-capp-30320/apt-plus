@@ -29,6 +29,8 @@ jobs:
       env:
         DEBUG: ${{ secrets.DEBUG }}
         _DEFAULT_DB: ${{ secrets._DEFAULT_DB }}
+        EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+        EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
       run: |
 
         # Collect static files
