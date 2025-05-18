@@ -100,17 +100,21 @@ function switchSearchViewLoading() {
 
 function initialSearchViewUpdate() {
   /** Function to swap out the landing page elements with search elements.
+   *  Moves vertically through the box to modify, delete, then add content.
   * @returns {void} - modifies the DOM, no returned object
   */
     const searchBox = document.getElementById('search-address-box')
-    const content = document.getElementById('search-box-content')
-    content.remove()
+    const searchBar = document.getElementById('search-box-bar')
 
     // Replace title to placeholder text
     const title = document.getElementById("search-box-title");
     title.textContent = "#### LongStreetNameMaxLen Type"; // Placeholder text for wrapping, 30 char max in the DB
-    title.classList.add("is-skeleton","is-size-6-mobile","is-size-5-tablet","is-size-4-desktop");
+    title.classList.add("is-skeleton","is-size-6-mobile","is-size-5-tablet","is-size-4-desktop", 'mb-0');
     title.classList.remove("is-size-3-mobile","is-size-2-tablet","is-size-1-desktop");
+    
+    // Add subtitle under
+    const subtitle = createElement('p', null, ['is-size-7', 'is-skeleton'], 'search-box-subtitle')
+    searchBox.insertBefore(subtitle, searchBar)
 
     // Add control elements
     const saveButtonContainer = createElement('div', searchBox, ['mb-4']);
@@ -154,11 +158,17 @@ function updateSearchView(data) {
    *  @param {json} data - GET response object to update the search view with. 
    *  @returns {void} - returns nothing, just updates the DOM as relevant.
   */
+  // First, extract address parts from the `fetch_all_data` reponse
+  address_parts = data["cleaned_address"].split(/,(.*)/s); // Ref: https://stackoverflow.com/a/4607799
+  console.log(address_parts);
+  
   const title = document.getElementById("search-box-title");
-  title.innerText = toTitleCase(data[
-    "cleaned_address"
-    ].split(',')[0]);
+  title.innerText = toTitleCase(address_parts[0]);
   title.classList.remove("is-skeleton");
+
+  const subtitle = document.getElementById("search-box-subtitle");
+  subtitle.innerText = toTitleCase(address_parts[1]);
+  subtitle.classList.remove("is-skeleton")
 }
 
 function toggleLoadingWheel() {
