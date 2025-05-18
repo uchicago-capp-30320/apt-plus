@@ -88,31 +88,53 @@
   var busStopsON = false;
 
   const groceryData = {
-    type: "FeatureCollection",
-    features: [
-      {
-        geometry: { type: "Point", coordinates: [-87.587851, 41.801710] },
-        properties: { name: "Whole Foods", distance_min: 4, address: "1521 E Hyde Park Blvd" }
-      },
-      {
-        geometry: { type: "Point", coordinates: [-87.588746, 41.796868] },
-        properties: { name: "Trader Joe's", distance_min: 6, address: "55th & Lake Park" }
-      }
-    ]
+    "address": "123 Main St",
+    "walking_time": 5,
+    "grocery_geojson": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": { "type": "Point", "coordinates": [-87.587851, 41.801710] },
+          "properties": { "name": "Whole Foods", "distance_min": 4, "address": "1521 E Hyde Park Blvd" }
+        },
+        {
+          "type": "Feature",
+          "geometry": { "type": "Point", "coordinates": [-87.588746, 41.796868] },
+          "properties": { "name": "Trader Joe's", "distance_min": 6, "address": "55th & Lake Park" }
+        }
+      ]
+    }
   };
 
   const busStopData = {
-    type: "FeatureCollection",
-    features: [
-      {
-        geometry: { type: "Point", coordinates: [-87.5960, 41.7942] },
-        properties: { stop_name: "Lake Park & 56th", distance_min: 13, routes: ["2", "6", "28"], stop_id: "BUS12345" }
-      },
-      {
-        geometry: { type: "Point", coordinates: [-87.5911, 41.8005] },
-        properties: { stop_name: "Hyde Park & 53rd", distance_min: 4, routes: ["15", "55"], stop_id: "BUS67890" }
-      }
-    ]
+    "address": "123 Main St",
+    "walking_time": 5,
+    "bus_stops_geojson": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": { "type": "Point", "coordinates": [-87.5960, 41.7942] },
+          "properties": {
+            "stop_name": "Lake Park & 56th",
+            "distance_min": 13,
+            "routes": ["2", "6", "28"],
+            "stop_id": "BUS12345"
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": { "type": "Point", "coordinates": [-87.5911, 41.8005] },
+          "properties": {
+            "stop_name": "Hyde Park & 53rd",
+            "distance_min": 4,
+            "routes": ["15", "55"],
+            "stop_id": "BUS67890"
+          }
+        }
+      ]
+    }
   };
 
   function displayGroceries() {
@@ -120,7 +142,7 @@
     groceryMarkers.forEach(m => m.remove());
     groceryMarkers = [];
 
-    groceryData.features.forEach(f => {
+    groceryData.grocery_geojson.features.forEach(f => {
       // Extract properties
       let coords = f.geometry.coordinates;
       let props = f.properties;
@@ -141,7 +163,7 @@
     busStopMarkers.forEach(m => m.remove());
     busStopMarkers = [];
 
-    busStopData.features.forEach(f => {
+    busStopData.bus_stops_geojson.features.forEach(f => {
       // Extract properties
       let coords = f.geometry.coordinates;
       let props = f.properties;
