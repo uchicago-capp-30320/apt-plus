@@ -1,33 +1,37 @@
 {% load static %}
 
+<!--Fix weird stacking-->
+
 <footer class="footer has-text-centered">
-  <div class="container">
-    <div class="columns">
-      <div class="column is-4">
-        <img src="{% static 'images/logo_bw.svg' %}" alt="Apartments Plus logo">
-      </div>
-      <div class="column is-4">
-        <div class="subscribe-form">
-          <h4 class="has-text-white is-size-5">Stay in touch</p>
-            <div class="field has-addons mt-2">
-              <div class="control is-expanded">
-                <input class="input is-rounded" type="email" placeholder="Enter your email">
-              </div>
-              <div class="control">
-                <button class="button is-rounded">
-                  <span class="icon">
-                    <i class="fas fa-paper-plane"></i>
-                  </span>
-                </button>
-              </div>
+  <div class="columns">
+    <!-- Logo-->
+    <div class="column is-3 is-offset-1">
+      <img class="light-mode-logo" src="{% static 'images/logo_color.svg' %}" alt="Apartments Plus logo">
+      <img class="dark-mode-logo" src="{% static 'images/logo_bw.svg' %}" alt="Apartments Plus logo">
+    </div>
+    <!--Subscribe form-->
+    <div class="column is-4">
+      <div class="subscribe-form">
+        <h4 class="is-size-5">Stay in touch</p>
+          <div class="field has-addons mt-2">
+            <div class="control is-expanded">
+              <input class="input is-rounded" type="email" placeholder="Enter your email">
             </div>
-        </div>
+            <div class="control">
+              <button class="button is-rounded">
+                <span class="icon">
+                  <i class="fas fa-paper-plane"></i>
+                </span>
+              </button>
+            </div>
+          </div>
       </div>
-      <div class="column is-4 has-text-white">
-        <a href="{% url 'home' %}">Home</a><br>
-        <a href="{% url 'about' %}">About</a><br>
-        <a href="https://github.com/uchicago-capp-30320/apt-plus">Contribute on GitHub</a>
-      </div>
+    </div>
+    <!--Links-->
+    <div class="column is-3">
+      <a href="{% url 'home' %}">Home</a><br>
+      <a href="{% url 'about' %}">About</a><br>
+      <a href="https://github.com/uchicago-capp-30320/apt-plus">Contribute on GitHub</a>
     </div>
   </div>
   <hr class="mt-6 mb-3">
