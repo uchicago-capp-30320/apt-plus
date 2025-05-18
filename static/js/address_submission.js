@@ -55,7 +55,7 @@ async function getApartment() {
 async function sendRequest(address) {
   /** 
    * Sends a GET request for any address to the fetch_all_address endpoint
-   * @param {string} address - compiled URL 
+   * @param {string} address - address to add into the compiled URL 
    * @returns {Promise<response>} returns the promise object of the get request
   */
 
@@ -66,7 +66,6 @@ async function sendRequest(address) {
   // Send the request and then store it as a variable so we can operate on the DOM
   return fetch(url, { method: 'GET' });
 }
-
 
 function switchSearchViewLoading() {
   /**
@@ -79,22 +78,39 @@ function switchSearchViewLoading() {
   // Remove right panel box
   const rentSmarterBox = document.getElementById("rent-smarter-box");
   if (rentSmarterBox) {
-    rentSmarterBox.remove() // Will be reloaded if they refresh to this page, fine to delete
+    rentSmarterBox.remove(); // Will be reloaded if they refresh to this page, fine to remove
   }
 
-  // Modifies the left panel
-  const searchBox = document.getElementById("search-address-box");
-  if (searchBox) {
-
-    // Replace title
+  // Fully update the left panel if the landing page Search Bar content exists
+  const content = document.getElementById('search-box-content')
+  if (content) { 
+    initialSearchViewUpdate();
+  } else {
+    // Wipe elements for new search
     const title = document.getElementById("search-box-title");
     title.textContent = "#### LongStreetName Type"; // Placeholder text for wrapping
-    title.classList.add("is-skeleton","is-size-6-mobile","is-size-5-tablet","is-size-4-desktop");
-    title.classList.remove("is-size-3-mobile","is-size-2-tablet","is-size-1-desktop"); // TODO refactor to utility function
+    title.classList.add("is-skeleton");
 
-    // Remove content below search bar
-    const Content = document.getElementById('search-box-content')
-    Content.remove()
+    const violationsSummary = getElementById('violations-summary');
+    const violationsIssues = getElementById('violations-summary');
+    violationsSummary.classList.add('skeleton-lines');
+    violationsIssues.classList.add('skeleton-lines');
+  }
+}
+
+function initialSearchViewUpdate() {
+  /** Function to swap out the landing page elements with search elements.
+  * @returns {void} - modifies the DOM, no returned object
+  */
+    const searchBox = document.getElementById('search-address-box')
+    const content = document.getElementById('search-box-content')
+    content.remove()
+
+    // Replace title to placeholder text
+    const title = document.getElementById("search-box-title");
+    title.textContent = "#### LongStreetNameMaxLen Type"; // Placeholder text for wrapping, 30 char max in the DB
+    title.classList.add("is-skeleton","is-size-6-mobile","is-size-5-tablet","is-size-4-desktop");
+    title.classList.remove("is-size-3-mobile","is-size-2-tablet","is-size-1-desktop");
 
     // Add control elements
     const saveButtonContainer = createElement('div', searchBox, ['mb-4']);
@@ -103,7 +119,7 @@ function switchSearchViewLoading() {
     const filtersTemplate = document.getElementById("filters-template").innerHTML;
     const filters = createElement('div', searchBox, ['media', 'mb-4']);
     filters.innerHTML = filtersTemplate;
-    
+     
     // Update content with inspections
     const violations = createElement('div', searchBox, ['media']);
     const violationsIcon = createElement('div', violations, ['media-left']);
@@ -116,27 +132,26 @@ function switchSearchViewLoading() {
     // Summary containers
     const violationsSummary = createElement('div', violationsDesc, ['has-text-justified', 'is-size-7', 'skeleton-lines', 'mb-2'], 'violations-summary');
     const violationsIssues = createElement('div', violationsDesc, ['box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines'], 'violations-summary');
-   
-    // Fill summary containers with named and anonymous lines
-    const violationsIds = [
-      'violationsSummary',
-      'violationsNote',
-      'violationsTotal',
-      'violationsInspections',
-      'violationsStartDate'
-    ];
-    violationsIds.forEach(id => {
-      createElement('div', violationsSummary, [], id);
-    }); 
-    for (let i = 0; i < 10; i++) {
-      createElement('div', violationsIssues);
-    }
-  }
-}
+  
+     // Fill summary containers with named and anonymous lines
+     const violationsIds = [
+       'violationsSummary',
+       'violationsNote',
+       'violationsTotal',
+       'violationsInspections',
+       'violationsStartDate'
+     ];
+     violationsIds.forEach(id => {
+       createElement('div', violationsSummary, [], id);
+     }); 
+     for (let i = 0; i < 10; i++) {
+       createElement('div', violationsIssues);
+     }
+   }
 
 function updateSearchView(data) {
-  /** Updates the loading 
-   *  @param {json} data - GET response object to update the search view with the 
+  /** Updates the loading text for the title basd on the returned GET response.
+   *  @param {json} data - GET response object to update the search view with. 
    *  @returns {void} - returns nothing, just updates the DOM as relevant.
   */
   const title = document.getElementById("search-box-title");
