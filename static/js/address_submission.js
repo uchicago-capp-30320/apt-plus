@@ -118,7 +118,7 @@ function initialSearchViewUpdate() {
 
     // Add control elements
     const saveButtonContainer = createElement('div', searchBox, ['mb-4']);
-    const saveButton = createElement('button', saveButtonContainer, ['button', 'is-rounded', 'has-text-white', 'has-background-black']);
+    const saveButton = createElement('button', saveButtonContainer, ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
     saveButton.textContent = 'Save';
     const filtersTemplate = document.getElementById("filters-template").innerHTML;
     const filters = createElement('div', searchBox, ['media', 'mb-4']);
