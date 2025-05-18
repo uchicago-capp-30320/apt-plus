@@ -16,3 +16,26 @@ html.is-dark .light-mode-logo {
 html.is-dark .dark-mode-logo {
   display: block !important;
 }
+
+/* Container clean-up */
+.map-container {
+  height: calc(100vh - var(--bulma-navbar-height));
+  position: relative;
+}
+
+.map-container-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100%;
+  z-index: 0;
+}
+
+.map-container-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+}
