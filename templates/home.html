@@ -14,17 +14,17 @@
   <div class="columns is-mobile is-multiline"
     style="position: absolute; top: 8rem; left: 0; right: 0; pointer-events: none;">
     <div class="column is-3 is-offset-1">
-      <div class="box" id="search-address-box" style="pointer-events:auto">
+      <div class="box is-relative" id="search-address-box" style="pointer-events:auto">
         <!-- Title -->
         <h1 class="title 
             is-size-3-mobile 
             is-size-2-tablet 
-            is-size-1-desktop">
+            is-size-1-desktop" id="search-box-title">
           Where are you thinking about living?
         </h1>
 
         <!-- search bar -->
-        <div class="field has-addons mt-4">
+        <div class="field has-addons mt-4" id="search-box-bar">
           <div class="control is-expanded">
             <input class="input is-rounded" id="addressInput" type="text" placeholder="Enter an address">
           </div>
@@ -38,7 +38,7 @@
         </div>
 
         <!-- Bullets -->
-        <div class="mt-5">
+        <div class="mt-5" id="search-box-content">
           <!-- Check it -->
           <div class="media mb-4">
             <div class="media-left">
@@ -61,7 +61,7 @@
             </div>
             <div class="media-content">
               <p><strong>Confirm it</strong></p>
-              <p>Set up custom filters for each address to make sure that the apartment you’re looking at is one you
+              <p>Set up custom filters for each address to make sure that the apartment you're looking at is one you
                 actually want to live in.</p>
             </div>
           </div>
@@ -89,16 +89,16 @@
 
         <p><strong>Rent Smarter</strong></p>
 
-        <p><small>Your next home shouldn’t come with surprises. We built Apartments Plus to take the guesswork out of
-            renting. See where you can buy your groceries, find how long it’ll take to get to work, and even learn
-            what’s wrong with the building. All before moving in.</p>
+        <p><small>Your next home shouldn't come with surprises. We built Apartments Plus to take the guesswork out of
+            renting. See where you can buy your groceries, find how long it'll take to get to work, and even learn
+            what's wrong with the building. All before moving in.</p>
 
         <p class="mt-3">Our process is simple. We take publicly accessible data, aggregate it, and then put it in a
-          format that you can easily understand. We’re doing this because we believe in transparency. We’ve all been
+          format that you can easily understand. We're doing this because we believe in transparency. We've all been
           burned by apartments, especially in places where you will only live for a couple years and your landlord knows
           it. Because of this motivation, our product will remain open source.</p>
 
-        <p class="mt-3">We’re starting in Chicago with Hyde Park, home to the University of Chicago. If you like using
+        <p class="mt-3">We're starting in Chicago with Hyde Park, home to the University of Chicago. If you like using
           Apartments Plus, we can work to bring this to a neighborhood near you.<samall>
         </p>
 
@@ -109,164 +109,10 @@
 </div>
 
 
-<script>
-  function hideRentSmarterBox() {
-    // Hide the "Rent Smarter" box
-    const rentBox = document.getElementById("rent-smarter-box");
-    if (rentBox) {
-      rentBox.style.display = "none";
-    }
-
-    // Get the left panel box
-    const searchBox = document.getElementById("search-address-box");
-
-    if (searchBox) {
-      // Replace its content with placeholder info
-      searchBox.innerHTML = `
-        <!-- Address Header -->
-        <h1 class="title is-size-4">5432 University Ave</h1>
-
-        <!-- Search Bar -->
-        <div class="field has-addons mt-4">
-          <div class="control is-expanded">
-            <input class="input is-rounded" type="text" placeholder="Enter an address">
-          </div>
-          <div class="control">
-            <button class="button is-rounded" id="searchButton">
-              <span class="icon has-text-dark">
-                <i class="fas fa-search"></i>
-              </span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Save Button -->
-        <div class="mb-4">
-          <button class="button is-rounded has-text-white has-background-black">Save</button>
-        </div>
-
-        <!-- Filters Section-->
-        <div class="media mb-4">
-          <div class="media-left">
-            <span class="icon" style="color: #0B8ADB;">
-              <i class="fas fa-sliders-h fa-lg"></i>
-            </span>
-          </div>
-          <div class="media-content">
-            <p><strong>Filters</strong></p>
-            <br>
-            <!-- Filters columns -->
-              <div class="columns is-multiline mb-4">
-                <!-- Walking Distance -->
-                <div class="column is-half-desktop is-full-mobile">
-                  <p class="is-size-7 has-text-weight-semibold mb-2">Walking Distance</p>
-                  <div class="field has-addons">
-                    <div class="control">
-                      <div class="select is-rounded is-small">
-                        <select>
-                          <option>5</option>
-                          <option>10</option>
-                          <option>15</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="control">
-                      <span class="button is-static is-rounded is-small">minutes</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Amenities -->
-                <div class="column is-half-desktop is-full-mobile">
-                  <p class="is-size-7 has-text-weight-semibold mb-2">Amenities</p>
-                  <div class="buttons are-small">
-                    <button class="button is-rounded">
-                      <span class="icon is-small"><i class="fas fa-shopping-cart"></i></span>
-                      <span>Groceries</span>
-                    </button>
-                    <button class="button is-rounded">
-                      <span class="icon is-small"><i class="fas fa-bus"></i></span> 
-                      <span>Bus Stop</span>
-                    </button>
-                    <button class="button is-rounded">
-                      <span class="icon is-small"><i class="fas fa-road"></i></span>
-                      <span>Bus Routes</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              </div>
-            </div>
-
-        <!-- Code Violations Section -->
-        <div class="media">
-          <div class="media-left">
-            <span class="icon" style="color: #DB0B0B;">
-              <i class="fas fa-exclamation-triangle fa-lg"></i>
-            </span>
-          </div>
-          <div class="media-content">
-            <p><strong>Code Violations</strong></p>
-            <br>
-            <!-- JSON Key:"Summary" -->
-              <p class="has-text-justified"><small>This building has received complaints about heating issues, hot water problems, and maintenance concerns in the past 5 years.</small></p>
-
-              <!-- Json Key:"Note" -->
-              <p class="has-text-justified mt-2 is-size-7"><em>*Note:</em> Unauthorized uses and cases where inspectors were denied entry were omitted.</p>
-
-              <!-- Stats -->
-              <p class="mt-2 mb-2">
-                <small>
-                  <!-- JSON key:"total_violations_count" -->
-                  <strong>Total Violations:</strong> 12 |
-                   <!-- JSON key:"total_inspections_count" -->
-                  <strong>Total Inspections:</strong> 2 |
-                   <!-- JSON key:"start_date" -->
-                  <strong>Since:</strong> Jan 2020
-                </small>
-              </p>
-
-              <!-- JSON key: "summarized_issues" -->
-              <div class="box has-background-light p-3" style="max-height: 150px; overflow-y: auto;">
-
-                <!-- JSON key:"date" -->
-                <p class="has-text-weight-semibold is-size-7">Jan 2024</p>
-                <ul class="ml-4 mb-3 is-size-7">
-                  <!-- JSON key:"issues" -->
-                  <!-- JSON key:"emoji" and key:"description" -->
-                  <li>🌡️ Inadequate heating and drafty windows with air seepage in Units 102, 103, and 104</li>
-                  <li>🚿 Hot water issues with low temperature (45-59°F) and low pressure in Units 102, 103, 104, and 205</li>
-                </ul>
-
-                
-                <p class="has-text-weight-semibold is-size-7">Oct 2023</p>
-                <ul class="ml-4 is-size-7">
-                  <li>🗑️ Overfilled trash cans and bags on the ground at west elevation</li>
-                </ul>
-
-                 
-                <p class="has-text-weight-semibold is-size-7">Jan 2024</p>
-                <ul class="ml-4 mb-3 is-size-7">
-                  <li>🌡️ Inadequate heating and drafty windows with air seepage in Units 102, 103, and 104</li>
-                  <li>🚿 Hot water issues with low temperature (45-59°F) and low pressure in Units 102, 103, 104, and 205</li>
-                </ul>
-
-                
-                <p class="has-text-weight-semibold is-size-7">Oct 2023</p>
-                <ul class="ml-4 is-size-7">
-                  <li>🗑️ Overfilled trash cans and bags on the ground at west elevation</li>
-                </ul>
-
-        </div>
-      `;
-    }
-  }
+<script type="text/template" id="filters-template">
+  {% include "address_search/filters.html" %}
 </script>
-<!--
-  to-do: refactor to combine both of thes script blocks with the DOM updates
-  Referenced by //Attach search event listener script, so must be first
--->
+<script src="{% static 'js/utils.js' %}"></script>
 <script src="{% static 'js/address_submission.js' %}"></script>
 <script>
   // Attach search event listener
