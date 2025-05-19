@@ -31,6 +31,7 @@ env.read_env(BASE_DIR / ".env")
 DEBUG = env.bool("DEBUG", False)
 
 # Set up email configuration to always use Brevo for sending emails
+# Default Brevo settings: https://help.brevo.com/hc/en-us/articles/10905415650322-Which-SMTP-port-should-I-use-Port-587-465-or-2525
 EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
 EMAIL_HOST = env.str("EMAIL_HOST", default="smtp-relay.brevo.com")
 EMAIL_PORT = env.int("EMAIL_PORT", default=587)
@@ -41,7 +42,6 @@ DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", default="arkadeep.b@gmail.com
 
 if DEBUG:
     SECRET_KEY = env.str("SECRET_KEY", "needs-to-be-set-in-prod")
-    EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
     print("DEBUG MODE: Sending emails via Brevo API")
     _DEFAULT_DB = env.db("_DEFAULT_DB")
 
@@ -84,7 +84,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.gis",  # Added for GeoDjango
     "allauth",
-    "anymail",
+    "anymail",  # Application for sending emails using Brevo
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
