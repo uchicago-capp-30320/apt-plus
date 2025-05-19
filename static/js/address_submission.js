@@ -197,35 +197,3 @@ function toggleLoadingWheel() {
   searchBox.appendChild(overlay);
   return;
 }
-
-/*-----------------------------------------------------------------------------
- Utility Functions
-------------------------------------------------------------------------------*/
-function createElement(type, parent, classes = [], id = null) {
-  /** 
-   * Utility function to create an element with styling and append it to a parent lement
-   * @param {str} type - type of HTML element to create
-   * @param {str} parent - parent element to append the newly created element to
-   * @param {list} classes - list of classes to apply to elemenet
-   * @param {str} id - OPTIONAL id attribute to apply
-   * @returns {Element} - completed element returned to modify
-  */
-  const elem = document.createElement(type);
-
-  // A couple references below for how to handle if the class Array is empty:
-  // Ref: https://matcha.fyi/javascript-optional-chaining/
-  // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
-  if (classes?.length) elem.classList.add(...classes); 
-  if (id) elem.id = id;
-  if (parent) parent.appendChild(elem);
-  return elem;
-}
-
-function toTitleCase(str) {
-  /**
-   * Function to convert text to title case
-   * @param {string} str - string to convert to Title case
-   * Note: From: https://stackoverflow.com/a/196991
-  */
-  return str.replace(/[^-\s]+/g, s => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase());
-}
