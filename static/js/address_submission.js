@@ -106,6 +106,8 @@ function initialSearchViewUpdate() {
   */
     const searchBox = document.getElementById('search-address-box')
     const searchBar = document.getElementById('search-box-bar')
+    const content = document.getElementById('search-box-content')
+    content.remove()
 
     // Replace title to placeholder text
     const title = document.getElementById("search-box-title");
