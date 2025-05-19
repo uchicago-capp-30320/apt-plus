@@ -12,6 +12,8 @@ WALKING_SPEED_PER_MINUTE = 70
 
 
 def home(request):
+    # todo
+    print(request.user)
     return render(request, "home.html")
 
 

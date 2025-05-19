@@ -21,6 +21,7 @@ from apt_app.views import home, about, fetch_all_data, fetch_bus_stops
 from apt_app.views_v2.groceries import fetch_groceries
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("", home, name="home"),
