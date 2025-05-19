@@ -22,8 +22,6 @@ async function getApartment() {
     // Send GET request to fetch_all_data
     const response = await sendRequest(address); 
   
-    // Stop spinner after response received
-    toggleLoadingWheel();
   
     // fetch_all_data returned an error — show popup error message 
     if (!response.ok) {
@@ -49,6 +47,9 @@ async function getApartment() {
     console.error('Address request could not be resolved by Server:', err.message);
     toggleLoadingWheel(); //Ensure spinner is removed even on failure
     showSearchError('An error occurred while retrieving the apartment data.'); //Use popup error handler to show network failure
+  } finally {
+    // Stop spinner after response received
+    toggleLoadingWheel();
   }
 }
 
