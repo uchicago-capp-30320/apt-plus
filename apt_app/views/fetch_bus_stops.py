@@ -1,9 +1,10 @@
 from django.http import JsonResponse
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import Distance as DistanceRatio
-from apt_app.models import TransitStop, Property
+from apt_app.models import TransitStop, Property, TransitRoute
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from config import load_constants
+from django.db.models import Prefetch
 
 CONSTANTS = load_constants()
 WALKING_METERS_PER_MIN = CONSTANTS["WALKING_METERS_PER_MIN"]
@@ -34,8 +35,14 @@ def _fetch_bus_stops(geocode, property_id, walking_time=5):
                 location__distance_lte=(reference_point, DistanceRatio(m=ratio_in_meters))
             )
             .annotate(distance=DistanceFunction("location", reference_point))
-            .order_by("name", "distance")
-            .distinct("name")
+            .prefetch_related(
+                ## why dont keep distinct route id here:
+                # could be different directions of the same route
+                Prefetch(
+                    "routes",
+                    queryset=TransitRoute.objects.only("route_id"),
+                )
+            )
         )
     except Exception as e:
         print(f"error: Failure in querying bus stop data: {str(e)}")
@@ -53,9 +60,9 @@ def _fetch_bus_stops(geocode, property_id, walking_time=5):
                         "coordinates": [stop.location.x, stop.location.y],
                     },
                     "properties": {
-                        # "stop_name": stop.name,
-                        "distance_min": round(stop.distance.m / 70),  # 70 m/min
-                        "routes": stop.name,
+                        "stop_name": stop.name,
+                        "distance_min": round(stop.distance.m / WALKING_METERS_PER_MIN),  # 70 m/min
+                        "routes": [route.route_id for route in stop.routes.all()],
                         "stop_id": stop.id,
                     },
                 }
