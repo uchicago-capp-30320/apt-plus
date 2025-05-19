@@ -2,6 +2,7 @@ import environ
 import structlog
 import sys
 from pathlib import Path
+import os
 
 # Preamble -----
 #
@@ -13,6 +14,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DEBUG=(bool, False),
 )
+log_dir = os.path.join(BASE_DIR, "tests/_logs")
+os.makedirs(log_dir, exist_ok=True)
+
 
 env.read_env(BASE_DIR / ".env")
 
@@ -39,7 +43,7 @@ else:
     SECRET_KEY = env.str("SECRET_KEY")
     _DEFAULT_DB = env.db()
     EMAIL_CONFIG = env.email()
-_DEFAULT_DB["ENGINE"] = "django.contrib.gis.db.backends.postgis" # Added engine for PostGIS
+_DEFAULT_DB["ENGINE"] = "django.contrib.gis.db.backends.postgis"  # Added engine for PostGIS
 DATABASES = {"default": _DEFAULT_DB}
 vars().update(EMAIL_CONFIG)
 
@@ -64,7 +68,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
-    "django.contrib.gis", # Added for GeoDjango
+    "django.contrib.gis",  # Added for GeoDjango
     "allauth",
     "allauth.account",
     # Uncomment for MFA/Webauthn
@@ -117,6 +121,9 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
+_DEFAULT_DB["ENGINE"] = "django.contrib.gis.db.backends.postgis"  # Added engine for PostGIS
+# add this new line below
+_DEFAULT_DB["TEST"] = {"MIRROR": "default"}
 
 
 # Authentication -----
