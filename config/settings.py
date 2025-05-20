@@ -44,6 +44,10 @@ else:
     _DEFAULT_DB = env.db()
     EMAIL_CONFIG = env.email()
 _DEFAULT_DB["ENGINE"] = "django.contrib.gis.db.backends.postgis"  # Added engine for PostGIS
+
+
+# ref: https://stackoverflow.com/a/79522985
+_DEFAULT_DB["TEST"] = {"MIRROR": "default"}
 DATABASES = {"default": _DEFAULT_DB}
 vars().update(EMAIL_CONFIG)
 
@@ -248,10 +252,10 @@ LOGGING = {
         # Modify this to match the name of your application.
         # to configure different logging for your app vs. Django's
         # internals.
-        # "YOUR_APP": {
-        #    "handlers": ["console", "flat_line_file", "json_file"],
-        #    "level": "INFO",
-        # },
+        "apt_app": {
+            "handlers": ["console", "flat_line_file", "json_file"],
+            "level": "INFO",
+        },
     },
 }
 
