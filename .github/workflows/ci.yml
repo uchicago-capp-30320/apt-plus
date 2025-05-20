@@ -7,13 +7,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout the repo
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Install uv and activate a virtual environment
+      uses: astral-sh/setup-uv@v6
+      with:
+        # Install the specific version of uv that we currently use
+        version: "0.6.14"
+        enable-cache: true
+        activate-environment: true
+
+    - name: Set up Python  # this is said to be faster than uv python install
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version-file: ".python-version"
 
     - name: Install GDAL dependencies for GeoDjango
       run: |
@@ -37,5 +45,5 @@ jobs:
         uv run manage.py collectstatic --noinput
 
         # Run tests and linter
-        uv run pytest apt_app/tests.py -v
+        uv run pytest tests/ci.py
         uv run ruff check .

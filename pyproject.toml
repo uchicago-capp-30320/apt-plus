@@ -31,6 +31,7 @@ dependencies = [
 
 [tool.ruff]
 line-length = 100
+extend-exclude = ["*.ipynb"]
 exclude = [
     "**/migrations/*.py",
 ]
@@ -48,7 +49,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-# "**/migrations/*.py" = ["E501"]
+"**/migrations/*.py" = ["E501"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
