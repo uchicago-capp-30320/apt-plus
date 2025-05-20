@@ -31,6 +31,9 @@ dependencies = [
 
 [tool.ruff]
 line-length = 100
+exclude = [
+    "**/migrations/*.py",
+]
 
 [tool.ruff.lint]
 select = [
