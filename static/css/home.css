@@ -1,8 +1,49 @@
 /* Overlay colors vars */
 :root {
-   --background-gray-a60: hsla(0, 0%, 86%, 0.6);
-   --bulma-grey-light: hsl(0, 0%, 86%);
-   --bulma-success: hsl(141, 71%, 48%);
+  --bulma-navbar-height: 3.25rem;
+  --background-gray-a60: hsla(0, 0%, 86%, 0.6);
+  --bulma-grey-light: hsl(0, 0%, 86%);
+  --bulma-success: hsl(141, 71%, 48%);
+}
+
+/* Logo visability */
+.light-mode-logo {
+  display: block;
+}
+
+.dark-mode-logo {
+  display: none;
+}
+html.is-dark .light-mode-logo {
+  display: none !important;
+}
+html.is-dark .dark-mode-logo {
+  display: block !important;
+}
+
+/* Container clean-up */
+.map-container {
+  height: calc(100vh - var(--bulma-navbar-height));
+  width: 100vw;
+  position: relative;
+}
+
+.map-container-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100%;
+  z-index: 0;
+}
+
+.map-container-overlay {
+  position: absolute;
+  width:100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
 #violations-box {
