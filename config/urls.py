@@ -27,6 +27,7 @@ from apt_app.views.views import (
 )
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("", home, name="home"),
