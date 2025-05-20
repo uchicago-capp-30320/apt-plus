@@ -45,6 +45,7 @@ select = [
 ignore = [
   "F401", # allow unused imports (useful for assignments)
   "N818",
+  "E501",
 ]
 
 [tool.ruff.lint.per-file-ignores]
