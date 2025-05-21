@@ -67,7 +67,7 @@ def _fetch_all_data(user_address) -> JsonResponse:
     south_limit_latitude = SOUTH
     east_limit_longitude = EAST
     west_limit_longitude = WEST
-    if not (east_limit_longitude <= longitude <= west_limit_longitude) or not (
+    if not (west_limit_longitude <= longitude <= east_limit_longitude) or not (
         south_limit_latitude <= latitude <= north_limit_latitude
     ):
         return JsonResponse(
