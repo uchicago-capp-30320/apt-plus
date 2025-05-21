@@ -1,0 +1,9 @@
+{
+    "HP_BOUNDS": {
+      "north": 41.810,
+      "south": 41.780,
+      "east": -87.580,
+      "west": -87.630
+    },
+    "WALKING_METERS_PER_MIN":70
+  }

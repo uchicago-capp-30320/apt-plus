@@ -30,21 +30,41 @@ env.read_env(BASE_DIR / ".env")
 # but in production all of these should be made explicit.
 DEBUG = env.bool("DEBUG", False)
 
+# Set up email configuration to always use Brevo for sending emails
+# Default Brevo settings: https://help.brevo.com/hc/en-us/articles/10905415650322-Which-SMTP-port-should-I-use-Port-587-465-or-2525
+EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+EMAIL_HOST = env.str("EMAIL_HOST", default="smtp-relay.brevo.com")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_HOST_USER = env.str("EMAIL_HOST_USER")  # This is the username for the Brevo SMTP service
+EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD")  # This is the password (API key)
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", default="arkadeep.b@gmail.com")
+
 if DEBUG:
     SECRET_KEY = env.str("SECRET_KEY", "needs-to-be-set-in-prod")
+    print("DEBUG MODE: Sending emails via Brevo API")
     _DEFAULT_DB = env.db("_DEFAULT_DB")
-    # default="sqlite:///" + str(BASE_DIR / "db.sqlite3"))
-    EMAIL_CONFIG = env.email(default="consolemail://")
+
 else:
     SECRET_KEY = env.str("SECRET_KEY")
+    print("PRODUCTION MODE: Emails will be sent via Brevo API")
     _DEFAULT_DB = env.db()
     EMAIL_CONFIG = env.email()
-_DEFAULT_DB["ENGINE"] = "django.contrib.gis.db.backends.postgis" # Added engine for PostGIS
+_DEFAULT_DB["ENGINE"] = "django.contrib.gis.db.backends.postgis"  # Added engine for PostGIS
+# ref: https://stackoverflow.com/a/79522985
+_DEFAULT_DB["TEST"] = {"MIRROR": "default"}
+
 DATABASES = {"default": _DEFAULT_DB}
-vars().update(EMAIL_CONFIG)
+
+ANYMAIL = {
+    "BREVO_API_KEY": env.str("EMAIL_HOST_PASSWORD"),  # Your Brevo API key
+    "SENDINBLUE_API_KEY": env.str("EMAIL_HOST_PASSWORD"),
+}
+
+BREVO_API_URL = "https://api.brevo.com/v3/"
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 INTERNAL_IPS = ["127.0.0.1"]
 
 # Debug Toolbar
@@ -64,9 +84,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
-    "django.contrib.gis", # Added for GeoDjango
+    "django.contrib.gis",  # Added for GeoDjango
     "allauth",
+    "anymail",  # Application for sending emails using Brevo
     "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "django.contrib.sites",
     # Uncomment for MFA/Webauthn
     # "allauth.mfa",
     "django_structlog",
@@ -118,6 +142,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+SITE_ID = 1
 
 # Authentication -----
 
@@ -176,6 +201,7 @@ if DJOK_USER_TYPE in ("email", "email+username"):
     ACCOUNT_LOGIN_METHODS = {"email"}
     ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
     ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
     ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = True
     if DJOK_USER_TYPE == "email":
         ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -190,6 +216,25 @@ if DJOK_USER_TYPE in ("email", "email+username"):
 # MFA_PASSKEY_SIGNUP_ENABLED = True
 # if DEBUG:
 #     MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = True
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+    }
+}
+
+LOGIN_REDIRECT_URL = "/"
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = None
+SOCIALACCOUNT_EMAIL_REQUIRED = True
 
 
 # Logging Config ---------
@@ -241,10 +286,10 @@ LOGGING = {
         # Modify this to match the name of your application.
         # to configure different logging for your app vs. Django's
         # internals.
-        # "YOUR_APP": {
-        #    "handlers": ["console", "flat_line_file", "json_file"],
-        #    "level": "INFO",
-        # },
+        "apt_app": {
+            "handlers": ["console", "flat_line_file", "json_file"],
+            "level": "INFO",
+        },
     },
 }
 

@@ -103,6 +103,7 @@ class Property(LocationMixin, models.Model):
     address = models.CharField(max_length=255)
     location = gis_models.PointField()
     created_at = models.DateTimeField(auto_now_add=True)
+    bus_stops = models.JSONField(null=True, blank=True)
 
     class Meta:
         indexes = [GistIndex(fields=["location"])]
@@ -250,10 +251,10 @@ class TransitStop(LocationBasedFacilities):
 
 
 class TransitRoute(models.Model):
-    id = models.AutoField(primary_key=True)
+    route_id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=50, choices=TransitType.choices, default=TransitType.OTHER)
-    geometry = gis_models.LineStringField()
+    geometry = gis_models.MultiLineStringField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     stops = models.ManyToManyField(TransitStop, related_name="routes")

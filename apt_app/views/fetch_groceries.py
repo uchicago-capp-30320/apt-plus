@@ -1,31 +1,26 @@
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.views.decorators.csrf import csrf_exempt
-
-
 from apt_app.models import Amenity, AmenityType
+from config import load_constants
 
-WALKING_SPEED_PER_MIN = 80  # Average walking speed in meters per minute
-# https://en.wikipedia.org/wiki/Preferred_walking_speed?utm_source=chatgpt.com
+CONSTANTS = load_constants()
+WALKING_METERS_PER_MIN = CONSTANTS["WALKING_METERS_PER_MIN"]
 
 
-@csrf_exempt
-@require_POST
-def fetch_groceries(request):
+def _fetch_groceries(geocode, walking_time=5) -> JsonResponse:
     try:
-        # Extract parameters from request
-        geocode = request.POST.get("geocode")
-        walking_time = int(request.POST.get("walking_time", 5))
-        _ = request.POST.get("property_id")  # placeholder for future caching
+        # NOTE:
+        # _ = request.GET.get("property_id")  # placeholder for future caching
 
         # Convert geocode to Point
         lat_str, lng_str = geocode.split(",")
         property_location = Point(float(lng_str), float(lat_str), srid=4326)
 
         # Convert walking time to distance
-        walking_distance = walking_time * WALKING_SPEED_PER_MIN
+        walking_distance = walking_time * WALKING_METERS_PER_MIN
 
         # Query nearby groceries
         groceries = (
@@ -47,7 +42,7 @@ def fetch_groceries(request):
                     },
                     "properties": {
                         "name": g.name,
-                        "distance_min": round(g.distance.m / WALKING_SPEED_PER_MIN, 1),
+                        "distance_min": round(g.distance.m / WALKING_METERS_PER_MIN, 1),
                         "address": getattr(g, "address", ""),
                     },
                 }
