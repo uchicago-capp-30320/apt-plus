@@ -109,12 +109,47 @@ class Property(LocationMixin, models.Model):
         indexes = [GistIndex(fields=["location"])]
 
 
+class Violation(models.Model):
+    violation_id = models.CharField(max_length=10, primary_key=True)
+    violation_last_modified_date = models.DateField()
+    violation_date = models.DateField()
+    violation_code = models.CharField(max_length=20)
+    violation_status = models.CharField(max_length=10)
+    violation_status_date = models.DateField(null=True, blank=True)
+    violation_description = models.TextField()
+    violation_location = models.TextField()
+    violation_inspector_comments = models.TextField()
+    violation_ordinance = models.TextField()
+    inspector_id = models.CharField(max_length=20)
+    inspection_number = models.IntegerField()
+    inspection_status = models.CharField(max_length=10)
+    inspection_waived = models.CharField(max_length=5)
+    inspection_category = models.CharField(max_length=20)  # NOTE
+    department_bureau = models.CharField(max_length=50)
+    address = models.CharField(max_length=100)
+    street_number = models.IntegerField()
+    street_direction = models.CharField(max_length=5)
+    street_name = models.CharField(max_length=20)
+    street_type = models.CharField(max_length=10)
+    property_group = models.IntegerField()
+    ssa = models.CharField(max_length=10)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    location = gis_models.PointField()
+
+
 class Inspection(models.Model):
     inspection_id = models.AutoField(primary_key=True)
     property = models.ForeignKey(Property, on_delete=models.CASCADE)
     date = models.DateField()
     result = models.CharField(max_length=50)
     notes = models.TextField()
+
+
+class InspectionSummary(models.Model):
+    # property = models.ForeignKey(Property, on_delete=models.CASCADE)
+    address = models.CharField(max_length=255)
+    summary = models.JSONField()
 
 
 class CrimeType(models.TextChoices):
@@ -216,10 +251,10 @@ class TransitStop(LocationBasedFacilities):
 
 
 class TransitRoute(models.Model):
-    id = models.AutoField(primary_key=True)
+    route_id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=50, choices=TransitType.choices, default=TransitType.OTHER)
-    geometry = gis_models.LineStringField()
+    geometry = gis_models.MultiLineStringField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     stops = models.ManyToManyField(TransitStop, related_name="routes")

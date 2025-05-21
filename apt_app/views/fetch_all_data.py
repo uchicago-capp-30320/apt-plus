@@ -3,26 +3,31 @@ import sys
 import censusgeocode as cg
 import json
 from dotenv import load_dotenv
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
-
-# Load environment variables
-load_dotenv()
-
-# Setup Django environment
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 import django  # noqa: E402
-
-django.setup()
-
 from django.core.exceptions import ValidationError  # noqa: E402
 from django.http import JsonResponse  # noqa: E402
 
 # Import model Property
 from apt_app.models import Property  # noqa: E402
+from config import load_constants
+
+CONSTANTS = load_constants()
+NORTH = CONSTANTS["HP_BOUNDS"]["north"]
+SOUTH = CONSTANTS["HP_BOUNDS"]["south"]
+EAST = CONSTANTS["HP_BOUNDS"]["east"]
+WEST = CONSTANTS["HP_BOUNDS"]["west"]
 
 
-def fetching_all_data(user_address):
+# sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
+# Load environment variables
+# load_dotenv()
+
+# Setup Django environment
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+django.setup()
+
+
+def _fetch_all_data(user_address) -> JsonResponse:
     """
     Function that takes the user_address string, and does the following:
     (i) Check that user_address is matched with an address from censusgeocode
@@ -58,11 +63,11 @@ def fetching_all_data(user_address):
     latitude = result[0].get("coordinates", {}).get("y")
 
     # Check if address is within the coordinates defined for "Hyde Park"
-    north_limit_latitude = 41.809647
-    south_limit_latitude = 41.780482
-    east_limit_longitude = -87.615877
-    west_limit_longitude = -87.579056
-    if not (east_limit_longitude <= longitude <= west_limit_longitude) or not (
+    north_limit_latitude = NORTH
+    south_limit_latitude = SOUTH
+    east_limit_longitude = EAST
+    west_limit_longitude = WEST
+    if not (west_limit_longitude <= longitude <= east_limit_longitude) or not (
         south_limit_latitude <= latitude <= north_limit_latitude
     ):
         return JsonResponse(
@@ -138,7 +143,7 @@ def save_property_in_django(address_input, latitude, longitude):
 if __name__ == "__main__":
     # Trial with example of user address, with prints to check that it is working
     user_address_example = "5496 S Hyde Park Blvd"
-    response_example = fetching_all_data(user_address_example)
+    response_example = _fetch_all_data(user_address_example)
     print(f"Status Code: {response_example.status_code}")
     body_dict = json.loads(response_example.content.decode())
     print(f"Response Data: {body_dict}")
