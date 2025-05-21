@@ -10,6 +10,9 @@ from django.contrib.gis.measure import Distance as DistanceRatio
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 import logging
 from django.db.models import Prefetch
+from django.core.serializers import serialize
+import json
+
 
 # Load environment variables
 load_dotenv()
@@ -126,6 +129,36 @@ def stops_near_a_point(latitude_input, longitude_input, walking_time_input):
     )
 
 
+def get_route_line(route_ids_list):
+    """
+    Function that print the route MultiLineString related to the list route_ids_list.
+    Returns None.
+    """
+    # Start time
+    start_time = time.perf_counter()
+
+    # Serialize the data to get the GeoJSON format
+    ## NOTE: I check the documentation related to GeoJSON serializer to check
+    ## how to use it.
+    ## Link: https://docs.djangoproject.com/en/5.1/ref/contrib/gis/serializers/
+    ## NOTE 2: THe "pk" parameter is the primary key, that in this case is the route_id,
+    ## and is useful for having that primary key inside the "properties" of the json.
+    geojson_output = serialize(
+        "geojson",
+        TransitRoute.objects.filter(route_id__in=route_ids_list),
+        geometry_field="geometry",
+        fields=("route_id", "name", "type", "pk"),
+    )
+    logger.info(geojson_output)
+
+    # Total time of function
+    end_time = time.perf_counter()
+    print(
+        f"Execution time of getting route lines of routes {route_ids_list}: "
+        f"{end_time - start_time:.2f} seconds"
+    )
+
+
 # Define auxiliar variables to run the code
 address_references = [
     ("55th and S Hyde Park Blvd", -87.58420643801648, 41.795416711406915),
@@ -140,15 +173,22 @@ address_references = [
 if __name__ == "__main__":
     # Get polyline related to a route, in this case, route 171
     route = "171"
-    print(f"Polyline related to bus {route}")
-    print(f"{TransitRoute.objects.get(route_id=route).geometry}")
+    logger.info(f"Polyline related to bus {route}")
+    logger.info(f"{TransitRoute.objects.get(route_id=route).geometry}")
+    route_ids_list = ["171"]
+    get_route_line(route_ids_list)
+    route_ids_list = ["171", "172", "192", "2", "6", "15", "28", "55"]
+    get_route_line(route_ids_list)
+
     # Check time for general data
     check_general_data()
+
     # Time for reference addresses, 15 minutes
     for address, latitude, longitude in address_references:
         print(address)
         walking_time_example = 15
         stops_near_a_point(latitude, longitude, walking_time_example)
+
     # Time for reference addresses, 2 minutes
     for address, latitude, longitude in address_references:
         print(address)
