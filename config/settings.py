@@ -51,8 +51,16 @@ else:
     _DEFAULT_DB = env.db()
     EMAIL_CONFIG = env.email()
 _DEFAULT_DB["ENGINE"] = "django.contrib.gis.db.backends.postgis"  # Added engine for PostGIS
-# ref: https://stackoverflow.com/a/79522985
-_DEFAULT_DB["TEST"] = {"MIRROR": "default"}
+
+
+"""comment out the following line to set the test db as a mirror of the default (prod/dev) db
+- https://stackoverflow.com/a/79522985
+- https://docs.djangoproject.com/en/5.2/topics/testing/advanced/#tests-and-multiple-databases"""
+# _DEFAULT_DB["TEST"] = {"MIRROR": "default"}
+
+"""explictly set the test db (which is not necessary here because the django default would be to
+create a test db named test_<default_db_name> which is exactly ours """
+# _DEFAULT_DB["TEST"] = {"NAME": "test_apt_dev"}
 
 DATABASES = {"default": _DEFAULT_DB}
 
