@@ -1,0 +1,49 @@
+{% load static %}
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand ml-6">
+    <a class="navbar-item" href="{% url 'home' %}">
+      <img class="light-mode-logo" src="{% static 'images/logo_color.svg' %}" alt="Apartments Plus logo">
+      <img class="dark-mode-logo" src="{% static 'images/logo_bw.svg' %}" alt="Apartments Plus logo">
+    </a>
+
+    <!-- Hidden on Desktop-->
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <!-- Hidden on mobile -->
+  <div class="navbar-menu">
+    <div class="navbar-start">
+      <!-- Pass -->
+    </div>
+    <div class="navbar-end mr-6">
+      {% if user.is_authenticated %}
+      <div class="navbar-item">
+        <a class="navbar-item" href="{% url 'about' %}">
+          <strong>About</strong>
+        </a>
+        <a class="navbar-item" href="temp">
+          <strong>Saved Properties</strong>
+        </a>
+        <a class="navbar-item" href="temp">
+          <strong>Sign out</strong>
+        </a>
+      </div>
+      {% else %}
+      <div class="navbar-item">
+        <a class="navbar-item" href="{% url 'about' %}">
+          <strong>About</strong>
+        </a>
+        <a class="navbar-item" href="temp">
+          <strong>Sign in</strong>
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</nav>
