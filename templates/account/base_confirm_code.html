@@ -6,18 +6,19 @@
 
 {% block content %}
 <div class="map-container">
+  <!-- Map container -->
   {% include "map.html" %}
 
   <div class="columns is-centered map-container-overlay is-vcentered" style="height: 100%;">
     <div class="column is-4">
       <div class="box mt-6" id="confirm-code-box" style="pointer-events:auto">
 
-        <!-- Título -->
+        <!-- Title -->
         <h1 class="title is-3 mb-4 has-text-left">
           {% block page_title %}{% trans "Confirm Code" %}{% endblock %}
         </h1>
 
-        <!-- Mensaje -->
+        <!-- Menssage -->
         <p class="is-size-6">
           {% trans "We've sent a code to" %} <a href="mailto:{{ email }}">{{ email }}</a>.
         </p>
@@ -25,11 +26,11 @@
           {% trans "The code expires shortly, so please enter it soon." %}
         </p>
 
-        <!-- Formulario -->
+        <!-- Form -->
         <form method="post" action="{% block action_url %}{% url 'account_email_verification_sent' %}{% endblock %}">
           {% csrf_token %}
 
-          <!-- Input del código -->
+          <!-- Code -->
           <div class="field">
             <label class="label">{% trans "Verification Code" %}</label>
             <div class="control has-icons-left">
@@ -42,14 +43,14 @@
 
           {{ redirect_field }}
 
-          <!-- Botón de confirmación -->
+          <!-- Confirm Button -->
           <div class="field mt-4">
             <button type="submit" class="button has-background-black is-link is-fullwidth is-rounded">
               {% trans "Confirm" %}
             </button>
           </div>
 
-          <!-- Cancelar -->
+          <!-- Cancel -->
           {% if cancel_url %}
             <div class="field mt-2">
               <a href="{{ cancel_url }}" class="button is-text is-small">

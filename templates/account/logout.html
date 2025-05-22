@@ -5,9 +5,11 @@
 {% block title %}{% trans "Sign Out" %} logout | apt-plus{% endblock %}
 
 {% block content %}
+<!-- Map container -->
 <div class="map-container">
   {% include "map.html" %}
 
+  <!-- Title -->
   <div class="columns is-centered map-container-overlay is-vcentered" style="height: 100%;">
     <div class="column is-4">
       <div class="box mt-6" style="pointer-events:auto">
@@ -24,6 +26,7 @@
           {% csrf_token %}
           {{ redirect_field }}
 
+          <!-- Sign out Button -->
           <div class="field">
             <button type="submit" class="button has-background-black is-link is-fullwidth is-rounded">
               {% trans "Sign Out" %}
