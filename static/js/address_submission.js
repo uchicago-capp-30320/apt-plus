@@ -33,7 +33,8 @@ async function getApartment() {
     // Parse data and place on map, assuming appropriate format from endpoint
     const data = await response.json();
     console.log(data);
-    const geocode = data.address_geojson.features[0].geometry.coordinates;
+    const coord = data.address_geojson.features[0].geometry.coordinates;
+    const geocode = coord[1] + "," + coord[0];
     let groceriesPromise = sendRequest('/fetch_groceries/', [geocode]); // start fetch_* requests ASAP
     let busStopsPromise = sendRequest('/fetch_bus_stops/', [geocode, data['property_id']]); 
     let inspectionsPromise = sendRequest('/fetch_inspections/', data["cleaned_address"]);
