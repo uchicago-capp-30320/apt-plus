@@ -92,8 +92,8 @@ function switchSearchViewLoading() {
     title.textContent = "#### LongStreetName Type"; // Placeholder text for wrapping
     title.classList.add("is-skeleton");
 
-    const violationsSummary = getElementById('violations-summary');
-    const violationsIssues = getElementById('violations-summary');
+    const violationsSummary = document.getElementById('violations-summary');
+    const violationsIssues = document.getElementById('violations-issues');
     violationsSummary.classList.add('skeleton-lines');
     violationsIssues.classList.add('skeleton-lines');
   }
@@ -138,7 +138,7 @@ function initialSearchViewUpdate() {
     
     // Summary containers
     const violationsSummary = createElement('div', violationsDesc, ['has-text-justified', 'is-size-7', 'skeleton-lines', 'mb-2'], 'violations-summary');
-    const violationsIssues = createElement('div', violationsDesc, ['box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines'], 'violations-summary');
+    const violationsIssues = createElement('div', violationsDesc, ['box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines'], 'violations-issues');
   
      // Fill summary containers with named and anonymous lines
      const violationsIds = [
@@ -163,9 +163,9 @@ function updateSearchView(data) {
   */
   // First, extract address parts from the `fetch_all_data` reponse
   address_parts = data["cleaned_address"].split(/,(.*)/s); // Ref: https://stackoverflow.com/a/4607799
-  console.log(address_parts);
   
   const title = document.getElementById("search-box-title");
+  title.dataset.address = data["cleaned_address"];
   title.innerText = toTitleCase(address_parts[0]);
   title.classList.remove("is-skeleton");
 

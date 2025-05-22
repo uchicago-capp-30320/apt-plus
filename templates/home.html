@@ -18,9 +18,7 @@
         <h1 class="title 
             is-size-4-mobile 
             is-size-3-tablet 
-            is-size-2-desktop">
-          id="search-box-title">
-
+            is-size-2-desktop" id="search-box-title">
           Where are you thinking about living?
         </h1>
 
@@ -111,9 +109,26 @@
 
 </div>
 
+<script>
+  // Reconnect distance filter
+  const distanceFilter = document.getElementById("distanceFilter");
+  if (distanceFilter) {
+    distanceFilter.addEventListener("change", () => {
+      console.log("Distance filter changed (inside home.html)");
+
+      // Only call these if the map layers are ON
+      if (typeof groceriesON !== 'undefined' && groceriesON) {
+        displayGroceries();
+      }
+      if (typeof busStopsON !== 'undefined' && busStopsON) {
+        displayBusStops();
+      }
+    });
+  }
+</script>
 
 <script type="text/template" id="filters-template">
-  {% include "address_search/filters.html" %}
+    {% include "address_search/filters.html" %}
 </script>
 <script src="{% static 'js/utils.js' %}"></script>
 <script src="{% static 'js/address_submission.js' %}"></script>
