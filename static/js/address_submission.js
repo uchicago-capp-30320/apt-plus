@@ -15,12 +15,13 @@ async function getApartment() {
     return;
   }
 
+  // Show loading spinner while waiting for response
+  toggleLoadingWheel();
+  let response, inspectionsPromise, groceriesPromise, busStopsPromise;
+
   try {
-    // Show loading spinner while waiting for response
-    toggleLoadingWheel();
-  
     // Send GET request to fetch_all_data
-    const response = await sendRequest('/fetch_all_data/', address); 
+    response = await sendRequest('/fetch_all_data/', address); 
   
     // fetch_all_data returned an error — show popup error message 
     if (!response.ok) {
@@ -35,41 +36,36 @@ async function getApartment() {
     console.log(data);
     const coord = data.address_geojson.features[0].geometry.coordinates;
     const geocode = coord[1] + "," + coord[0];
-    let groceriesPromise = sendRequest('/fetch_groceries/', [geocode]); // start fetch_* requests ASAP
-    let busStopsPromise = sendRequest('/fetch_bus_stops/', [geocode, data['property_id']]); 
-    let inspectionsPromise = sendRequest('/fetch_inspections/', data["cleaned_address"]);
+    
+    groceriesPromise = sendRequest('/fetch_groceries/', [geocode]); // start fetch_* requests ASAP
+    busStopsPromise = sendRequest('/fetch_bus_stops/', [geocode, data['property_id']]); 
+    inspectionsPromise = sendRequest('/fetch_inspections/', data["cleaned_address"]);
     // let routesPromise = make_requests(data); // placeholder for routes endpoint
+    
     placeAddress(data);
-
-    // Clean up the front page and update left panel
-    switchSearchViewLoading();
-
-    // Pull in data from the response to update the overlay
-    updateSearchView(data);
-
-    // Clear error message if everything worked
-    clearSearchError(); 
-
-    // Handle remaining calls
-    try {
-      const inspections = await inspectionsPromise; 
-      updateViolations(inspections);
-      const groceries = await groceriesPromise;
-      console.log(groceries.json());
-      // updateMapView(groceriesPromise);
-      const busStops = await busStopsPromise;
-      console.log(busStops.json());
-      // updateMapView(busStopsPromise);
-    } catch (err) {
-      console.error('Details request could not be resolved by server:', err.message);
-      showSearchError('An error occured while retrieving apartment details. Please try again.');
-    }
+    switchSearchViewLoading(); // Clean up the front page and update left panel
+    updateSearchView(data); // Pull in data from the response to update the overlay
+    clearSearchError(); // Clear error message if everything worked
   } catch (err) {
     console.error('Address request could not be resolved by Server:', err.message);
-    showSearchError('An error occurred while retrieving the apartment data.'); //Use popup error handler to show network failure
+    showSearchError('An error occurred while retrieving the apartment data.'); // Use popup error handler to show network failure
    } finally {
-    // Stop spinner after response received
     toggleLoadingWheel();
+  }
+
+   // Handle remaining calls
+   try {
+    const inspections = await inspectionsPromise; 
+    updateViolations(inspections);
+    const groceries = await groceriesPromise;
+    console.log(groceries.json());
+    // updateMapView(groceriesPromise);
+    const busStops = await busStopsPromise;
+    console.log(busStops.json());
+    // updateMapView(busStopsPromise);
+  } catch (err) {
+    console.error('Details request could not be resolved by server:', err.message);
+    showSearchError('An error occured while retrieving apartment details. Please try again.');
   }
 }
 
@@ -122,10 +118,24 @@ function switchSearchViewLoading() {
     title.textContent = "#### LongStreetName Type"; // Placeholder text for wrapping
     title.classList.add("is-skeleton");
 
+    // Wipe violations for new search
     const violationsSummary = document.getElementById('violations-summary');
     const violationsIssues = document.getElementById('violations-issues');
+    violationsSummary.innerText = '';
     violationsSummary.classList.add('skeleton-lines');
     violationsIssues.classList.add('skeleton-lines');
+
+    // Add formatting for skeleton lines
+    const violationsIds = [
+      'violationsNote',
+      'violationsTotal',
+      'violationsInspections',
+      'violationsStartDate'
+    ];
+    violationsIds.forEach(id => {
+      createElement('div', violationsSummary, [], id);
+    }); 
+
   }
 }
 
@@ -172,7 +182,6 @@ function initialSearchViewUpdate() {
   
      // Fill summary containers with named and anonymous lines
      const violationsIds = [
-       'violationsSummary',
        'violationsNote',
        'violationsTotal',
        'violationsInspections',
