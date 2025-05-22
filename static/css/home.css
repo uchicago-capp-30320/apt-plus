@@ -78,3 +78,12 @@ html.is-dark .dark-mode-logo {
    0% { transform: rotate(0deg); }
    100% { transform: rotate(360deg); }
  }
+
+ .map-container-overlay {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+}
