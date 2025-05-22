@@ -236,6 +236,7 @@ class AmenityType(models.TextChoices):
 
 class Amenity(LocationBasedFacilities):
     type = models.CharField(max_length=50, choices=AmenityType.choices, default=AmenityType.OTHER)
+    address = models.CharField(max_length=255, blank=True, default="")
 
 
 class TransitType(models.TextChoices):
