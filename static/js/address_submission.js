@@ -50,11 +50,10 @@ async function getApartment() {
     // Clear error message if everything worked
     clearSearchError(); 
 
-    // Handle remaining
-  try {
+    // Handle remaining calls
+    try {
       const inspections = await inspectionsPromise; 
-      console.log(inspections.json());
-      // updateViolations(details);
+      updateViolations(inspections);
       const groceries = await groceriesPromise;
       console.log(groceries.json());
       // updateMapView(groceriesPromise);
@@ -67,7 +66,6 @@ async function getApartment() {
     }
   } catch (err) {
     console.error('Address request could not be resolved by Server:', err.message);
-    toggleLoadingWheel(); //Ensure spinner is removed even on failure
     showSearchError('An error occurred while retrieving the apartment data.'); //Use popup error handler to show network failure
    } finally {
     // Stop spinner after response received
@@ -124,8 +122,8 @@ function switchSearchViewLoading() {
     title.textContent = "#### LongStreetName Type"; // Placeholder text for wrapping
     title.classList.add("is-skeleton");
 
-    const violationsSummary = getElementById('violations-summary');
-    const violationsIssues = getElementById('violations-summary');
+    const violationsSummary = document.getElementById('violations-summary');
+    const violationsIssues = document.getElementById('violations-issues');
     violationsSummary.classList.add('skeleton-lines');
     violationsIssues.classList.add('skeleton-lines');
   }
@@ -169,8 +167,8 @@ function initialSearchViewUpdate() {
     violationsTitle.textContent = "Code Violations";
     
     // Summary containers
-    const violationsSummary = createElement('div', violationsDesc, ['has-text-justified', 'is-size-7', 'skeleton-lines', 'mb-2'], 'violations-summary');
-    const violationsIssues = createElement('div', violationsDesc, ['box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines'], 'violations-summary');
+    const violationsSummary = createElement('div', violationsDesc, ['has-text-justified', 'is-size-6', 'skeleton-lines', 'mb-2'], 'violations-summary');
+    const violationsIssues = createElement('div', violationsDesc, ['box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines'], 'violations-issues');
   
      // Fill summary containers with named and anonymous lines
      const violationsIds = [
@@ -205,6 +203,49 @@ function updateSearchView(data) {
   const subtitle = document.getElementById("search-box-subtitle");
   subtitle.innerText = toTitleCase(address_parts[1]);
   subtitle.classList.remove("is-skeleton")
+}
+
+async function updateViolations(response) {
+  /** Function to update the violations panel of the frontend
+   * @param {array} response - response object from `/fetch_violations/`
+   * @returns {void} - modifies
+  */
+  data = await response.json()
+  console.log(data)
+
+  // Grab elements to update
+  violationsSummary = document.getElementById('violations-summary');
+  violationsIssues = document.getElementById('violations-issues');
+
+  // Remove skeleton lines
+  violationsSummary.classList.remove("skeleton-lines");
+  violationsIssues.classList.remove("skeleton-lines", 'is-hidden');
+  // ref: https://stackoverflow.com/a/3955238
+  while (violationsIssues.firstChild) { // Need to remove empty divs
+    violationsIssues.removeChild(violationsIssues.lastChild);
+  }
+  
+  // Handle Response formats
+  if (data['summary']) {
+    violationsSummary.innerText = data['summary'];
+    let i = 0;
+    for (const elemTime of data.summarized_issues) {
+      const time = createElement('p', violationsIssues, [`has-text-weight-bold`, `is-size-7`],  `time${i}`);
+      time.innerText = elemTime['date'];
+      
+      const list = createElement('ul', violationsIssues, [`is-size-7`], `list${i}`);
+      let j = 0;
+      for (const elemIssue of elemTime['issues']) {
+        const issue = createElement('li', list, null, `item${j}`);
+        issue.innerText = elemIssue['emoji'] + elemIssue['description'];
+        j++;
+      }
+      i++;
+    }
+  } else {
+    violationsSummary.innerText = data['note'];
+    violationsIssues.classList.add('is-hidden') // hide display box. Will remove in next API call
+  }
 }
 
 function toggleLoadingWheel() {
