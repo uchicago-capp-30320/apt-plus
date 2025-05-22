@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load allauth %}
+
+{% block title %}{% trans "Sign In" %} | apt-plus{% endblock %}
+
+{% block content %}
+<!-- Map container -->
+<div class="map-container">
+  {% include "map.html" %}
+
+
+  <div class="columns is-centered map-container-overlay is-vcentered" style="height: 100%;">
+    <div class="column is-4">
+      <div class="box mt-6" style="pointer-events:auto">
+
+        <!-- Title -->
+        {% if process == "connect" %}
+          <h1 class="title is-3 mb-4">
+            {% blocktrans with provider.name as provider %}Connect {{ provider }}{% endblocktrans %}
+          </h1>
+          <p class="is-size-6 mb-4">
+            {% blocktrans with provider.name as provider %}You are about to connect a new third-party account from {{ provider }}.{% endblocktrans %}
+          </p>
+        {% else %}
+          <h1 class="title is-3 mb-4">
+            {% blocktrans with provider.name as provider %}Sign In via {{ provider }}{% endblocktrans %}
+          </h1>
+          <p class="is-size-6 mb-4">
+            {% blocktrans with provider.name as provider %}You are about to sign in using a third-party account from {{ provider }}.{% endblocktrans %}
+          </p>
+        {% endif %}
+
+        <!-- Continue button form -->
+        <form method="post">
+          {% csrf_token %}
+          <div class="field mt-4">
+            <button type="submit" class="button has-background-black is-link is-fullwidth is-rounded">
+              {% trans "Continue" %}
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
