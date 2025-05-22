@@ -34,20 +34,10 @@ def test_fetch_groceries_hyde_park(client):
     assert response.status_code == 200
     assert len(data["grocery_geojson"]["features"]) > 0  # Expecting results nearby
 
-
 @pytest.mark.django_db
 def test_endpoint_available(client):
     """
-    Test that the endpoint is available
-    """
-    response = client.get("/fetch_inspections/", {"address": "5514 S BLACKSTONE AVE"})
-    assert response.status_code == 200, f"Response status code: {response.status_code} is not 200"
-
-
-@pytest.mark.django_db
-def test_endpoint_available(client):
-    """
-    Test that the /fetch_inspections/ endpoint is available and responds with 200.
+    Test that the /fetch_groceries/ endpoint is available and responds with 200.
     """
     response = client.get("/fetch_groceries/", {
         "geocode": "0.0,0.0",       # Random location in the ocean
