@@ -7,9 +7,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def parse_address(in_address):
-    """get the first part of address, before "Chicago IL 60XXX"""
-    return in_address.split(",")[0].strip()
+def parse_address(in_address: str) -> str:
+    """fetch the first part of address in uppercase, before "Chicago IL 60XXX"""
+    try:
+        return in_address.upper().split(",")[0].strip()
+    except Exception as e:
+        logger.error(f"Error parsing address: {e}")
+        return ""
 
 
 def _fetch_inspection_summaries(address, start_date=datetime.date(2020, 1, 1)) -> JsonResponse:
