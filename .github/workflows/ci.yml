@@ -17,6 +17,7 @@ jobs:
         version: "0.6.14"
         enable-cache: true
         activate-environment: true
+        cache-dependency-glob: "uv.lock" # invalidate cache if uv.lock changes
 
     - name: Set up Python  # this is said to be faster than uv python install
       uses: actions/setup-python@v5
@@ -24,26 +25,24 @@ jobs:
         python-version-file: ".python-version"
 
     - name: Install GDAL dependencies for GeoDjango
-      run: |
-          sudo apt-get update
-          sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev
+      run:
+        sudo apt-get update
+        sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev
 
-    - name: Install uv
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-
-    - name: Setup and run tests
+    - name: Run tests
       shell: bash
+
       env:
         DEBUG: ${{ secrets.DEBUG }}
         _DEFAULT_DB: ${{ secrets._DEFAULT_DB }}
         EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
         EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+
       run: |
 
         # Collect static files
         uv run manage.py collectstatic --noinput
 
         # Run tests and linter
-        uv run pytest tests/ci.py
+        uv run pytest tests
         uv run ruff check .
