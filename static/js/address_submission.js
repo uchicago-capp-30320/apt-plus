@@ -20,10 +20,9 @@ async function getApartment() {
   let response, inspectionsPromise, groceriesPromise, busStopsPromise;
 
   try {
-    // Send GET request to fetch_all_data
     response = await sendRequest('/fetch_all_data/', address); 
   
-    // fetch_all_data returned an error — show popup error message 
+    // fetch_all_data returned an error - show popup error message 
     if (!response.ok) {
       const errorData = await response.json(); 
       const message = errorData.Error;
@@ -33,7 +32,6 @@ async function getApartment() {
   
     // Parse data and place on map, assuming appropriate format from endpoint
     const data = await response.json();
-    console.log(data);
     const coord = data.address_geojson.features[0].geometry.coordinates;
     const geocode = coord[1] + "," + coord[0];
     
@@ -135,7 +133,6 @@ function switchSearchViewLoading() {
     violationsIds.forEach(id => {
       createElement('div', violationsSummary, [], id);
     }); 
-
   }
 }
 
@@ -197,7 +194,7 @@ function initialSearchViewUpdate() {
 
 function updateSearchView(data) {
   /** Updates the loading text for the title basd on the returned GET response.
-   *  @param {json} data - GET response object to update the search view with. 
+   *  @param {Object} data - JSON object from GET response to update the search view with. 
    *  @returns {void} - returns nothing, just updates the DOM as relevant.
   */
   // First, extract address parts from the `fetch_all_data` reponse
@@ -216,27 +213,24 @@ function updateSearchView(data) {
 
 async function updateViolations(response) {
   /** Function to update the violations panel of the frontend
-   * @param {array} response - response object from `/fetch_violations/`
+   * @param {Promise<object>} response - response object from `/fetch_violations/`
    * @returns {void} - modifies
   */
   data = await response.json()
-  console.log(data)
 
-  // Grab elements to update
+  // Update violations panel to display information
   violationsSummary = document.getElementById('violations-summary');
   violationsIssues = document.getElementById('violations-issues');
-
-  // Remove skeleton lines
   violationsSummary.classList.remove("skeleton-lines");
   violationsIssues.classList.remove("skeleton-lines", 'is-hidden');
   // ref: https://stackoverflow.com/a/3955238
-  while (violationsIssues.firstChild) { // Need to remove empty divs
+  while (violationsIssues.firstChild) { // Removes empty divs used for loading styling
     violationsIssues.removeChild(violationsIssues.lastChild);
   }
   
-  // Handle Response formats
-  if (data['summary']) {
-    violationsSummary.innerText = data['summary'];
+  // Add in data to display response issues by format
+  if (data['summary']) { // TODO: Expect API response to get standardized
+    violationsSummary.innerText = data['summary']; // Will move above the conditional and only have one branch
     let i = 0;
     for (const elemTime of data.summarized_issues) {
       const time = createElement('p', violationsIssues, [`has-text-weight-bold`, `is-size-7`],  `time${i}`);
@@ -253,12 +247,13 @@ async function updateViolations(response) {
     }
   } else {
     violationsSummary.innerText = data['note'];
-    violationsIssues.classList.add('is-hidden') // hide display box. Will remove in next API call
+    violationsIssues.classList.add('is-hidden') // hide display box. Next API call adds it back TODO: Test 
   }
 }
 
 function toggleLoadingWheel() {
   /** Add a loader to the searchBox
+    * @params {none} - no inputs 
     * @returns {void} - modifies the DOM directly, does not modify div
   */
 
@@ -267,16 +262,11 @@ function toggleLoadingWheel() {
   if (existingLoadingWheel) {
     existingLoadingWheel.remove();
     return;
+  } else {
+    const searchBox = document.getElementById("search-address-box");
+    const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel")
+    const loadingWheel = createElement("div", overlay, ["loader"]);
+    searchBox.appendChild(overlay);
+    return;
   }
-
-  // If no loader, create loader
-  const searchBox = document.getElementById("search-address-box");
-
-  // Create overlay and loader
-  const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel")
-  const loadingWheel = createElement("div", overlay, ["loader"]);
-
-  // Link the overlay in the center of the underlaid object
-  searchBox.appendChild(overlay);
-  return;
 }
