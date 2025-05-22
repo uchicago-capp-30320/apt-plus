@@ -163,9 +163,9 @@ function updateSearchView(data) {
   */
   // First, extract address parts from the `fetch_all_data` reponse
   address_parts = data["cleaned_address"].split(/,(.*)/s); // Ref: https://stackoverflow.com/a/4607799
-  console.log(address_parts);
   
   const title = document.getElementById("search-box-title");
+  title.dataset.address = data["cleaned_address"];
   title.innerText = toTitleCase(address_parts[0]);
   title.classList.remove("is-skeleton");
 
