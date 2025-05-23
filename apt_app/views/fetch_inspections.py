@@ -55,7 +55,7 @@ def _fetch_inspection_summaries(address, start_date=datetime.date(2020, 1, 1)) -
         # first case: no violations found
         if total_violations_count == 0:
             content["data_status"] = "no_violations"
-            content["note"] = "no violation record found for this address"
+            content["summary"] = "no violation record found for this address"
             return JsonResponse(content, status=200)
 
         content["total_violations_count"] = total_violations_count
@@ -70,7 +70,7 @@ def _fetch_inspection_summaries(address, start_date=datetime.date(2020, 1, 1)) -
         # second case: violations found but considered trivial and thus not summarized
         if not summary_json:
             content["data_status"] = "trivial_only"
-            content["note"] = (
+            content["summary"] = (
                 f"{total_violations_count} trivial violations were recorded on "
                 f"{total_inspections_count} occasions and omitted here for brevity."
             )
