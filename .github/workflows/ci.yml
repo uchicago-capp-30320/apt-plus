@@ -5,6 +5,11 @@ on: [push, pull_request]
 jobs:
   test-and-lint:
     runs-on: ubuntu-latest
+    env:
+      DEBUG: ${{ secrets.DEBUG }}
+      _DEFAULT_DB: ${{ secrets._DEFAULT_DB }}
+      EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+      EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
 
     steps:
       - name: Checkout repo
@@ -23,8 +28,8 @@ jobs:
           enable-cache: true
           activate-environment: true
           cache-dependency-glob: |
-            "uv.lock"
-            "pyproject.toml"
+            "**/uv.lock"
+            "**/pyproject.toml"
 
       - name: Install GDAL dependencies for GeoDjango
         run: |
@@ -35,11 +40,6 @@ jobs:
         run: uv run manage.py collectstatic --noinput
 
       - name: Run tests
-        env:
-          DEBUG: ${{ secrets.DEBUG }}
-          _DEFAULT_DB: ${{ secrets._DEFAULT_DB }}
-          EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
         run: uv run pytest tests/ci.py
 
       - name: Run Ruff linter
