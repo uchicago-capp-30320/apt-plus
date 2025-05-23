@@ -3,6 +3,16 @@ from apt_app.views.fetch_inspections import parse_address, _fetch_inspection_sum
 from django.http import JsonResponse
 import json
 
+
+def test_parse_address():
+    expected_upper = "5514 S BLACKSTONE AVE"
+    assert parse_address("5514 S Blackstone Ave") == expected_upper
+    assert parse_address(" 5514 S BLACKSTONE ave ") == expected_upper
+    assert parse_address("5514 S BLACKSTONE AVE") == expected_upper
+    assert parse_address("5514 S Blackstone Ave, Chicago, IL") == expected_upper
+    assert parse_address("5514 S Blackstone Ave, Chicago, IL 60615") == expected_upper
+
+
 # available = addresses exist and have summaries (for non-trivial violations)
 available_addresses = ["5514 S BLACKSTONE AVE", "1401 E 55TH ST"]
 
@@ -123,3 +133,8 @@ def test_endpoint_available(client):
     """
     response = client.get("/fetch_inspections/", {"address": "5514 S BLACKSTONE AVE"})
     assert response.status_code == 200, f"Response status code: {response.status_code} is not 200"
+
+
+def test_missing_address_param(client):
+    response = client.get("/fetch_inspections/")
+    assert response.status_code == 400, f"Response status code: {response.status_code} is not 400"
