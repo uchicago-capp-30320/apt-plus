@@ -7,42 +7,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout the repo
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Install uv and activate a virtual environment
-      uses: astral-sh/setup-uv@v6
-      with:
-        # Install the specific version of uv that we currently use
-        version: "0.6.14"
-        enable-cache: true
-        activate-environment: true
-        cache-dependency-glob: "uv.lock" # invalidate cache if uv.lock changes
+      - name: Set up Python  # this is said to be faster than uv python install
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
 
-    - name: Set up Python  # this is said to be faster than uv python install
-      uses: actions/setup-python@v5
-      with:
-        python-version-file: ".python-version"
+      - name: Install uv and activate a virtual environment
+        uses: astral-sh/setup-uv@v6
+        with:
+          # Install the specific version of uv that we currently use
+          version: "0.6.14"
+          enable-cache: true
+          activate-environment: true
+          cache-dependency-glob: |
+            "uv.lock"
+            "pyproject.toml"
 
-    - name: Install GDAL dependencies for GeoDjango
-      run:
-        sudo apt-get update
-        sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev
+      - name: Install GDAL dependencies for GeoDjango
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev
 
-    - name: Run tests
-      shell: bash
+      - name: Collect static files
+        run: uv run manage.py collectstatic --noinput
 
-      env:
-        DEBUG: ${{ secrets.DEBUG }}
-        _DEFAULT_DB: ${{ secrets._DEFAULT_DB }}
-        EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-        EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+      - name: Run tests
+        env:
+          DEBUG: ${{ secrets.DEBUG }}
+          _DEFAULT_DB: ${{ secrets._DEFAULT_DB }}
+          EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+        run: uv run pytest tests/ci.py
 
-      run: |
-
-        # Collect static files
-        uv run manage.py collectstatic --noinput
-
-        # Run tests and linter
-        uv run pytest tests
-        uv run ruff check .
+      - name: Run Ruff linter
+        run: uv run ruff check .
