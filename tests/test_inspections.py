@@ -88,7 +88,7 @@ def test_trivial_only_response_format(trivial_only_response):
 
     expected_keys = {
         "data_status",
-        "note",
+        "summary",
         "total_violations_count",
         "total_inspections_count",
         "start_date",
@@ -119,7 +119,7 @@ def test_no_violations_response_format(no_violations_response):
         f"Response status: {response_content['data_status']} is not 'no_violations'"
     )
 
-    expected_keys = {"data_status", "note", "start_date"}
+    expected_keys = {"data_status", "summary", "start_date"}
     response_keys = set(response_content.keys())
     assert expected_keys <= response_keys, (
         f"Expected keys {expected_keys - response_keys} are missing in the response"
