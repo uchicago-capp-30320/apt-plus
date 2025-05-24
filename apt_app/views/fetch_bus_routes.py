@@ -13,12 +13,20 @@ def _assign_color(feature, route_color_map):
     return feature
 
 
+def _parse_input_routes(in_routes: str) -> list:
+    """
+    Parse a common-seperated string of bus routes into list.
+    e.g. "171,172,55" -> [171,172,55]
+    """
+    return [r.strip() for r in in_routes.split(",")]
+
+
 def _fetch_bus_routes(routes: str):
-    route_num_list = routes.split(",")
+    route_num_list = _parse_input_routes(routes)
     try:
         routes = TransitRoute.objects.filter(route_id__in=route_num_list)
         if not routes:
-            return JsonResponse({"error": "This route does not pass Hyde Park"}, status=200)
+            return JsonResponse({"error": "This route does not pass Hyde Park"}, status=400)
         routes_list = list(routes)
     except TransitRoute.DoesNotExist as e:
         return JsonResponse({"error": f"This route does not pass Hyde Park: {e}"}, status=404)

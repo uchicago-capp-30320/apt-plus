@@ -1,7 +1,13 @@
 import pytest
-from apt_app.views.fetch_bus_routes import _fetch_bus_routes
+from pytest_django.asserts import assertTemplateNotUsed
+from apt_app.views.fetch_bus_routes import _fetch_bus_routes, _parse_input_routes
 from django.http import JsonResponse
 import json
+
+
+def test_parse_input_routes():
+    assert _parse_input_routes("171,172,55") == ["171", "172", "55"]
+    assert _parse_input_routes(" 171 , 172 , 55 ") == ["171", "172", "55"]
 
 
 @pytest.mark.django_db
@@ -44,6 +50,15 @@ def test_fetch_bus_routes_returns_valid_geojson_format():
 @pytest.mark.django_db
 def test_fetch_bus_routes_returns_no_available():
     response = _fetch_bus_routes("500")
-    assert response.status_code == 200, f"Expected 200 but got {response.status_code}"
+    assert response.status_code == 400, f"Expected 400 but got {response.status_code}"
     content = json.loads(response.content)
     assert "error" in content, "Missing 'error' in response content"
+
+
+@pytest.mark.django_db
+def test_endpoint_available(client):
+    """
+    Test that the endpoint is available
+    """
+    response = client.get("/fetch_bus_routes/", {"bus_route": "5,171"})
+    assert response.status_code == 200, f"Response status code: {response.status_code} is not 200"
