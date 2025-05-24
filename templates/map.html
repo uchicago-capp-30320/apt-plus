@@ -137,28 +137,7 @@
     }
   };
 
-  function displayGroceries() {
-    let distanceMin = getDistanceFilter();
-    groceryMarkers.forEach(m => m.remove());
-    groceryMarkers = [];
-
-    groceryData.grocery_geojson.features.forEach(f => {
-      // Extract properties
-      let coords = f.geometry.coordinates;
-      let props = f.properties;
-      // Apply filter
-      if (props.distance_min > distanceMin) return;
-      // Show name and address
-      let popup = new maplibregl.Popup({ offset: 25 }).setHTML(
-        `<strong>${props.name}</strong><br>${props.address}`);
-      let marker = new maplibregl.Marker({ color: 'green' }).setLngLat(coords).addTo(map);
-      marker.getElement().addEventListener('mouseenter', () => popup.setLngLat(coords).addTo(map));
-      marker.getElement().addEventListener('mouseleave', () => popup.remove());
-      groceryMarkers.push(marker);
-    });
-  }
-
-  function loadBusStopsToMap(geojson, filterDistance) {
+  function loadMarkersToMap(geojson, filterDistance, color, getPopupHTML) {
     const markers = [];
     geojson.features.forEach(f => {
       // Extract properties
@@ -166,10 +145,9 @@
       let props = f.properties;
       // Apply filter
       if (props.distance_min > filterDistance) return;
-      // Show name and address
-      let popup = new maplibregl.Popup({ offset: 25 }).setHTML(
-        `<strong>${props.stop_name}</strong><br>Routes: ${props.routes.join(", ")}`);
-      let marker = new maplibregl.Marker({ color: 'blue' }).setLngLat(coords).addTo(map);
+      // Popup
+      let popup = new maplibregl.Popup({ offset: 25 }).setHTML(getPopupHTML(props));
+      let marker = new maplibregl.Marker({ color: color }).setLngLat(coords).addTo(map);
       marker.getElement().addEventListener('mouseenter', () => popup.setLngLat(coords).addTo(map));
       marker.getElement().addEventListener('mouseleave', () => popup.remove());
       markers.push(marker);
@@ -177,15 +155,44 @@
     return markers;
   }
 
-  function removeBusStopsMarkers() {
-    busStopMarkers.forEach(m => m.remove());
-    busStopMarkers = [];
+  function removeMarkers(markers) {
+    markers.forEach(m => m.remove());
+    return [];
+  }
+
+  function updateGroceries() {
+    groceryMarkers = removeMarkers(groceryMarkers);
+    const distanceMin = getDistanceFilter();
+    groceryMarkers = loadMarkersToMap(
+      groceryData.grocery_geojson,
+      distanceMin,
+      'green',
+      props => `<strong>${props.name}</strong><br>${props.address}`
+    );
   }
 
   function updateBusStops() {
-    removeBusStopsMarkers();
+    busStopMarkers = removeMarkers(busStopMarkers);
     const distanceMin = getDistanceFilter();
-    busStopMarkers = loadBusStopsToMap(busStopData.bus_stops_geojson, distanceMin);
+    busStopMarkers = loadMarkersToMap(
+      busStopData.bus_stops_geojson,
+      distanceMin,
+      'blue',
+      props => `<strong>${props.stop_name}</strong><br>Routes: ${props.routes.join(", ")}`
+    );
+  }
+
+  function toggleGroceries() {
+    const groceriesBtn = document.getElementById('groceriesButton');
+    groceriesON = !groceriesON;
+    groceriesBtn.classList.toggle('is-info', groceriesON);
+    if (groceriesON) {
+      console.log("Groceries button turned ON");
+      updateGroceries();
+    } else {
+      console.log("Groceries button turned OFF");
+      groceryMarkers = removeMarkers(groceryMarkers);
+    }
   }
 
   function toggleBusStops() {
@@ -197,7 +204,7 @@
       updateBusStops();
     } else {
       console.log("BusStops button turned OFF");
-      removeBusStopsMarkers();
+      busStopMarkers = removeMarkers(busStopMarkers);
     }
   }
 </script>
@@ -209,17 +216,7 @@
     const busStopsBtn = event.target.closest('#busStopsButton');
 
     if (groceriesBtn) {
-      groceriesON = !groceriesON;
-      // Paint button when clicked
-      groceriesBtn.classList.toggle('is-info', groceriesON);
-      if (groceriesON) {
-        console.log("Groceries button turned ON")
-        displayGroceries();
-      } else {
-        console.log("Groceries button turned OFF")
-        groceryMarkers.forEach(m => m.remove());
-        groceryMarkers = [];
-      }
+      toggleGroceries();
     }
 
     if (busStopsBtn) {
@@ -230,7 +227,7 @@
   // New event listener to update pins based on distance filter
   document.addEventListener('change', function(event) {
     if (event.target && event.target.id === 'distanceFilter') {
-      if (groceriesON) displayGroceries();
+      if (groceriesON) updateGroceries();
       if (busStopsON) updateBusStops();
     }
   });
