@@ -28,19 +28,16 @@
     const data = typeof response === 'string' ? JSON.parse(response) : response;
 
     // Check for different possible formats
-    let coords;
-    if (data.address_geojson && data.address_geojson.features) {
-      // Format for test data
-      coords = data.address_geojson.features[0].geometry.coordinates;
-    } else if (data.features && data.features.length > 0) {
-      // Format for GeoJSON from endpoint
-      coords = data.features[0].geometry.coordinates;
+    let coords = data.address_geojson.features[0].geometry.coordinates;
+
+    // Display warning for not inside Hyde Park
+    console.log(data)
+    if (!data.has_data_inside_hyde_park) {
+      showSearchError(data.notes)
     }
 
-    const lat = parseFloat(coords[1]);
-    const lon = parseFloat(coords[0]);
-
-    console.log(`Found: ${lat}, ${lon}`);
+    const lat = parseFloat(coords[0]);
+    const lon = parseFloat(coords[1]);
 
     // Enable map interaction
     enableMapInteraction(map);
@@ -181,7 +178,7 @@
 </script>
 
 <script>
-  document.addEventListener('click', function(event) {
+  document.addEventListener('click', function (event) {
     // to catch all clicks (buttons were not working properly)
     const groceriesBtn = event.target.closest('#groceriesButton');
     const busStopsBtn = event.target.closest('#busStopsButton');
@@ -216,7 +213,7 @@
   });
 
   // New event listener to update pins based on distance filter
-  document.addEventListener('change', function(event) {
+  document.addEventListener('change', function (event) {
     if (event.target && event.target.id === 'distanceFilter') {
       if (groceriesON) displayGroceries();
       if (busStopsON) displayBusStops();
