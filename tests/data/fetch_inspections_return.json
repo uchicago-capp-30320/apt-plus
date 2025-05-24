@@ -34,7 +34,7 @@
   {
     "data_status": "trivial_only",
     "address": "1451 E 55TH ST",
-    "note": "6 trivial violations were recorded on 2 occasions and omitted from the summary.",
+    "summary": "6 trivial violations were recorded on 2 occasions and omitted from the summary.",
     "total_violations_count": 2,
     "total_inspections_count": 6,
     "start_date": "2020-01-01"
@@ -42,7 +42,7 @@
   {
     "data_status": "no_violations",
     "address": "100 N NON EXISTENT ST",
-    "note": "no violation record found for this address.",
+    "summary": "no violation record found for this address.",
     "start_date": "2020-01-01"
   }
 ]
