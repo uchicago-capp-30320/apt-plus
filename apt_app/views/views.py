@@ -11,6 +11,7 @@ from .fetch_all_data import _fetch_all_data
 from .fetch_groceries import _fetch_groceries
 from .fetch_bus_stops import _fetch_bus_stops
 from .fetch_inspections import _fetch_inspection_summaries
+from .fetch_bus_routes import _fetch_bus_routes
 
 
 def home(request):
@@ -48,6 +49,12 @@ def fetch_bus_stops(request):
 def fetch_inspections(request):
     address = request.GET.get("address", "")
     return _fetch_inspection_summaries(address)
+
+
+@require_GET
+def fetch_bus_routes(request):
+    route_id = request.GET.get("bus_route")
+    return _fetch_bus_routes(route_id)
 
 
 # TODO: this should be moved elsewhere since it is a hard-coded mock
