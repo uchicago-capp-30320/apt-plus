@@ -4,20 +4,23 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import Distance as DistanceRatio
+from django.shortcuts import redirect
 from apt_app.models import TransitStop, Property
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
+from django.contrib.auth.decorators import login_required
 from .fetch_all_data import _fetch_all_data
 from .fetch_groceries import _fetch_groceries
 from .fetch_bus_stops import _fetch_bus_stops
 from .fetch_inspections import _fetch_inspection_summaries
-from apt_app.models import Property, SavedProperty
+from apt_app.models import SavedProperty
 
 
 def home(request):
     # TODO: remove print debugging
     print(f"Current user: {request.user}")
+    print(f"Authentication status: {request.user.is_authenticated}")
     return render(request, "home.html")
 
 
@@ -79,10 +82,27 @@ def fetch_all_data_mock(request):
 
 def save_property(request):
     """Save a property and return HTML to replace the button."""
+
+    # TODO:
+    # Better error handling
+    # Should the saved property ID also be sent to the template?
+
     print("Save property endpoint triggered")
 
     # Get the address from the request
     property_address = request.GET.get("propertyAddress", "Unknown Address")
+
+    # Checking if the user is signed in
+    # If they are not, then we offer them an option to log in
+    if not request.user.is_authenticated:
+        request.session["pending_property_address"] = property_address
+
+        # Creating the login URL
+        login_url = "/accounts/login/?next=/handle_post_login/"
+
+        return render(
+            request, "snippets/save_property_login_required.html", {"login_url": login_url}
+        )
 
     # Title-case the string
     proper_address = property_address.title()
@@ -117,7 +137,7 @@ def save_property(request):
         address=property_address
     ).first()
 
-    if matching_property and not check_property_is_in_saved_property == 0:
+    if matching_property and not check_property_is_in_saved_property:
         saved_property = SavedProperty(
             user=request.user,
             property=matching_property,
@@ -130,6 +150,23 @@ def save_property(request):
 
     # Return template to replace the button
     return render(request, "snippets/save_property.html", {"property_address": proper_address})
+
+
+def handle_post_login(request):
+    """Handle users returning after login with a pending property view."""
+    if request.user.is_authenticated:
+        # Check for pending address in session
+        pending_address = request.session.get("pending_property_address")
+
+        if pending_address:
+            # Clear from session
+            del request.session["pending_property_address"]
+
+            # Store in a variable we'll pass to the template
+            return render(request, "return_to_property.html", {"property_address": pending_address})
+
+    # Default fallback - just go to homepage
+    return redirect("/")
 
 
 # class SavedProperty(models.Model):
@@ -147,7 +184,7 @@ def save_property(request):
 
 @csrf_exempt
 def update_property(request):
-    """Handle saving property details submitted via HTMX."""
+    """Handle saving property details."""
     if request.method == "POST":
         # Get form data
         property_address = request.POST.get("property_address", "")
@@ -190,5 +227,14 @@ def update_property(request):
         return render(
             request, "snippets/details_saved.html", {"property_address": property_address}
         )
+
+    return HttpResponse("Method not allowed", status=405)
+
+
+@csrf_exempt
+def delete_property(request):
+    """Handle soft delete property from the SavedProperty table"""
+    if request.method == "POST":
+        return HttpResponse("Testing", status=200)
 
     return HttpResponse("Method not allowed", status=405)

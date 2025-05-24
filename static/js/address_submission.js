@@ -6,6 +6,30 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     console.log("View Transitions API is not supported in this browser");
   }
+
+  // Check if we're returning from login with property address
+  const returnAddress = localStorage.getItem('returnToProperty');
+  if (returnAddress) {
+    console.log("Returning to property view:", returnAddress);
+    
+    // Clear the stored address
+    localStorage.removeItem('returnToProperty');
+    
+    // Wait for DOM to be fully loaded
+    setTimeout(function() {
+      // Set the address in the search input
+      const addressInput = document.getElementById('addressInput');
+      if (addressInput) {
+        addressInput.value = returnAddress;
+        
+        // Trigger search
+        const searchButton = document.querySelector('#search-box-bar .button');
+        if (searchButton) {
+          searchButton.click();
+        }
+      }
+    }, 500);
+  }
 });
 
 async function getApartment() {
@@ -132,7 +156,7 @@ function initialSearchViewUpdate() {
     // Add control elements
     const saveButtonContainer = createElement('div', searchBox, ['mb-4', 'slide-it'], 'save-button-container');
     const saveButton = createElement('button', saveButtonContainer, ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
-    saveButton.textContent = 'Save';
+    saveButton.textContent = 'Save to my list';
 
     console.log("HTMX available:", typeof htmx !== 'undefined');
     console.log("Save button created:", saveButton);
