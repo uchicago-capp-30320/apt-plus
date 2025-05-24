@@ -229,8 +229,8 @@ async function updateViolations(response) {
   }
   
   // Add in data to display response issues by format
-  if (data['summary']) { // TODO: Expect API response to get standardized
-    violationsSummary.innerText = data['summary']; // Will move above the conditional and only have one branch
+  violationsSummary.innerText = data['summary'];
+  if (data['data_status'] == "available") { // Only add issues list if they exist
     let i = 0;
     for (const elemTime of data.summarized_issues) {
       const time = createElement('p', violationsIssues, [`has-text-weight-bold`, `is-size-7`],  `time${i}`);
@@ -246,8 +246,7 @@ async function updateViolations(response) {
       i++;
     }
   } else {
-    violationsSummary.innerText = data['note'];
-    violationsIssues.classList.add('is-hidden') // hide display box. Next API call adds it back TODO: Test 
+    violationsIssues.classList.add('is-hidden')
   }
 }
 
