@@ -1,4 +1,5 @@
 import json
+import re
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.contrib.gis.geos import Point
@@ -11,9 +12,12 @@ from .fetch_all_data import _fetch_all_data
 from .fetch_groceries import _fetch_groceries
 from .fetch_bus_stops import _fetch_bus_stops
 from .fetch_inspections import _fetch_inspection_summaries
+from apt_app.models import Property, SavedProperty
 
 
 def home(request):
+    # TODO: remove print debugging
+    print(f"Current user: {request.user}")
     return render(request, "home.html")
 
 
@@ -71,3 +75,120 @@ def fetch_all_data_mock(request):
     }
     # Convert the dictionary to a JSON string before returning
     return HttpResponse(json.dumps(geojson), content_type="application/json")
+
+
+def save_property(request):
+    """Save a property and return HTML to replace the button."""
+    print("Save property endpoint triggered")
+
+    # Get the address from the request
+    property_address = request.GET.get("propertyAddress", "Unknown Address")
+
+    # Title-case the string
+    proper_address = property_address.title()
+
+    # Regular expression to correct common uppercase abbreviations (like state codes, "IL" here)
+    proper_address = re.sub(r"\b(Il)\b", "IL", proper_address)
+
+    # Print to console for debugging
+    print(f"Saving property at: {property_address}")
+    print(f"Request method: {request.method}")
+    print(f"Request GET params: {request.GET}")
+    print(f"User: {request.user}")
+
+    # Saving the property to the database
+    # Need to also check if the property doesn't already exist in the user's
+    # saved properties
+
+    # First need to query the database to get the the property ID
+    matching_property = Property.objects.filter(address=property_address).first()
+
+    if matching_property:
+        print(f"ID: {matching_property.id}")
+        print(f"Address: {matching_property.address}")
+        print(f"Location: {matching_property.location}")
+        print(f"Created At: {matching_property.created_at}")
+        print(f"Bus Stops: {matching_property.bus_stops}")
+    else:
+        print("No matching property found.")
+
+    # Check if the property is already present in saved_property
+    check_property_is_in_saved_property = SavedProperty.objects.filter(
+        address=property_address
+    ).first()
+
+    if matching_property and not check_property_is_in_saved_property == 0:
+        saved_property = SavedProperty(
+            user=request.user,
+            property=matching_property,
+            address=property_address,
+        )
+
+        saved_property.save()
+
+    # Consider sending the savedproperty ID as well
+
+    # Return template to replace the button
+    return render(request, "snippets/save_property.html", {"property_address": proper_address})
+
+
+# class SavedProperty(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_properties")
+#     property = models.ForeignKey("Property", on_delete=models.CASCADE)
+#     address = models.CharField(
+#         max_length=512, null=False, blank=False, default="Unknown Address"
+#     )  # Increased length
+#     custom_name = models.CharField(max_length=512, null=True, blank=True)  # Increased length
+#     date_saved = models.DateTimeField(auto_now_add=True)
+#     remarks = models.TextField(null=True, blank=True)  # Changed to TextField
+#     rent_price = models.IntegerField(null=True, blank=True)
+
+
+@csrf_exempt
+def update_property(request):
+    """Handle saving property details submitted via HTMX."""
+    if request.method == "POST":
+        # Get form data
+        property_address = request.POST.get("property_address", "")
+        property_address_upper_case = property_address.upper()
+        property_custom_name = request.POST.get("property_custom_name", "")
+        property_notes = request.POST.get("property_notes", "")
+        property_rent = request.POST.get("property_rent", "")
+
+        if property_rent == "":
+            property_rent = None
+
+        print(f"Updating property: {property_address}")
+        print(f"Upper case property address: {property_address.upper()}")
+        print(f"Custom name: {property_custom_name}")
+        print(f"Notes: {property_notes}")
+        print(f"Rent: {property_rent}")
+
+        # Need to add database logic
+
+        # Getting the saved property ID
+        matching_saved_property = SavedProperty.objects.filter(
+            address=property_address_upper_case
+        ).first()
+
+        if matching_saved_property:
+            print(f"ID: {matching_saved_property.id}")
+            print(f"Address: {matching_saved_property.address}")
+            print(f"User: {matching_saved_property.user}")
+        else:
+            print("No matching property found.")
+
+        if matching_saved_property:
+            matching_saved_property.custom_name = property_custom_name
+            matching_saved_property.remarks = property_notes
+            matching_saved_property.rent_price = property_rent
+
+            matching_saved_property.save()
+
+        # Return HTML that replaces just the form container
+        return render(
+            request, "snippets/details_saved.html", {"property_address": property_address}
+        )
+
+    return HttpResponse("Method not allowed", status=405)

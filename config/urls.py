@@ -24,6 +24,8 @@ from apt_app.views.views import (
     fetch_bus_stops,
     fetch_groceries,
     fetch_inspections,
+    save_property,
+    update_property,
 )
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
@@ -42,6 +44,8 @@ urlpatterns = [
         fetch_inspections,
         name="fetch_inspection_summaries",
     ),
+    path("save_property/", save_property, name="save_property"),
+    path("update_property/", update_property, name="update_property"),
 ]
 
 if settings.DEBUG and not settings.IS_TESTING:

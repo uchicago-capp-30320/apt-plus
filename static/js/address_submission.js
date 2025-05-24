@@ -1,3 +1,13 @@
+// Enable View Transitions for HTMX if the browser supports it
+document.addEventListener('DOMContentLoaded', function() {
+  if ('startViewTransition' in document) {
+    htmx.config.globalViewTransitions = true;
+    console.log("View Transitions API is supported and enabled");
+  } else {
+    console.log("View Transitions API is not supported in this browser");
+  }
+});
+
 async function getApartment() {
   /**
     * Makes a GET request for the apartment and then updates the DOM to 
@@ -120,9 +130,22 @@ function initialSearchViewUpdate() {
     searchBox.insertBefore(subtitle, searchBar)
 
     // Add control elements
-    const saveButtonContainer = createElement('div', searchBox, ['mb-4']);
+    const saveButtonContainer = createElement('div', searchBox, ['mb-4', 'slide-it'], 'save-button-container');
     const saveButton = createElement('button', saveButtonContainer, ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
     saveButton.textContent = 'Save';
+
+    console.log("HTMX available:", typeof htmx !== 'undefined');
+    console.log("Save button created:", saveButton);
+
+    // Add HTMX attributes to the save button
+    saveButton.setAttribute('hx-get', '/save_property/');
+    saveButton.setAttribute('hx-target', '#save-button-container');
+    saveButton.setAttribute('hx-trigger', 'click');
+    saveButton.setAttribute('hx-swap', 'outerHTML transition:true');
+    // HTMX will scan for attributes and add event listeners
+    // Without this, dynamically created content is incompatible with HTMX
+    htmx.process(saveButton);
+
     const filtersTemplate = document.getElementById("filters-template").innerHTML;
     const filters = createElement('div', searchBox, ['media', 'mb-4']);
     filters.innerHTML = filtersTemplate;
@@ -172,6 +195,21 @@ function updateSearchView(data) {
   const subtitle = document.getElementById("search-box-subtitle");
   subtitle.innerText = toTitleCase(address_parts[1]);
   subtitle.classList.remove("is-skeleton")
+
+  // Update the Save button's HTMX properties now that we have the address 
+  const saveButton = document.getElementById("save-button");
+  if (saveButton) {
+    // Update the hx-vals attribute with the actual address now that we have it
+    saveButton.setAttribute('hx-vals', `js:{propertyAddress: "${data["cleaned_address"]}"}`);
+    // Process the button since attributes were updated
+    htmx.process(saveButton);
+    
+    // For debugging: log that we updated the button
+    console.log("Save button updated with address:", data["cleaned_address"]);
+    
+  } else {
+    console.warn("Save button not found when updating address data");
+  }
 }
 
 function toggleLoadingWheel() {
