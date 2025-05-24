@@ -158,25 +158,47 @@
     });
   }
 
-  function displayBusStops() {
-    let distanceMin = getDistanceFilter();
-    busStopMarkers.forEach(m => m.remove());
-    busStopMarkers = [];
-
-    busStopData.bus_stops_geojson.features.forEach(f => {
+  function loadBusStopsToMap(geojson, filterDistance) {
+    const markers = [];
+    geojson.features.forEach(f => {
       // Extract properties
       let coords = f.geometry.coordinates;
       let props = f.properties;
       // Apply filter
-      if (props.distance_min > distanceMin) return;
+      if (props.distance_min > filterDistance) return;
       // Show name and address
       let popup = new maplibregl.Popup({ offset: 25 }).setHTML(
         `<strong>${props.stop_name}</strong><br>Routes: ${props.routes.join(", ")}`);
       let marker = new maplibregl.Marker({ color: 'blue' }).setLngLat(coords).addTo(map);
       marker.getElement().addEventListener('mouseenter', () => popup.setLngLat(coords).addTo(map));
       marker.getElement().addEventListener('mouseleave', () => popup.remove());
-      busStopMarkers.push(marker);
+      markers.push(marker);
     });
+    return markers;
+  }
+
+  function removeBusStopsMarkers() {
+    busStopMarkers.forEach(m => m.remove());
+    busStopMarkers = [];
+  }
+
+  function updateBusStops() {
+    removeBusStopsMarkers();
+    const distanceMin = getDistanceFilter();
+    busStopMarkers = loadBusStopsToMap(busStopData.bus_stops_geojson, distanceMin);
+  }
+
+  function toggleBusStops() {
+    const busStopsBtn = document.getElementById('busStopsButton');
+    busStopsON = !busStopsON;
+    busStopsBtn.classList.toggle('is-info', busStopsON);
+    if (busStopsON) {
+      console.log("BusStops button turned ON");
+      updateBusStops();
+    } else {
+      console.log("BusStops button turned OFF");
+      removeBusStopsMarkers();
+    }
   }
 </script>
 
@@ -201,17 +223,7 @@
     }
 
     if (busStopsBtn) {
-      busStopsON = !busStopsON;
-      // Paint button when clicked
-      busStopsBtn.classList.toggle('is-info', busStopsON);
-      if (busStopsON) {
-        console.log("BusStops button turned ON")
-        displayBusStops();
-      } else {
-        console.log("BusStops button turned OFF")
-        busStopMarkers.forEach(m => m.remove());
-        busStopMarkers = [];
-      }
+      toggleBusStops();
     }
   });
 
@@ -219,7 +231,7 @@
   document.addEventListener('change', function(event) {
     if (event.target && event.target.id === 'distanceFilter') {
       if (groceriesON) displayGroceries();
-      if (busStopsON) displayBusStops();
+      if (busStopsON) updateBusStops();
     }
   });
 </script>
