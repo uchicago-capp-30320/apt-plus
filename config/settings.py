@@ -64,7 +64,8 @@ ANYMAIL = {
 BREVO_API_URL = "https://api.brevo.com/v3/"
 
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0"] # Add 0.0.0.0 for Dokcer situation
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0", ".unnamed.computer"]
+# "0.0.0.0" for Docker, ".unnamed.computer" for prod
 INTERNAL_IPS = ["127.0.0.1"]
 
 # Debug Toolbar
