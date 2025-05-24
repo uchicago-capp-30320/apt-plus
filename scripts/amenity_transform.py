@@ -1,15 +1,18 @@
 import os
 import sys
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
 from dotenv import load_dotenv
-load_dotenv()
 import django
-django.setup()
 from apt_app.models import Amenity, AmenityType
 import pandas as pd
 from sqlalchemy import create_engine
 from tqdm import tqdm
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
+
+load_dotenv()
+
+django.setup()
 
 # === CONFIGURATION ===
 TARGET_RAW_TYPES = {
