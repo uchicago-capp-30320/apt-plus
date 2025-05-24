@@ -43,7 +43,6 @@ async function getApartment() {
     placeAddress(data);
     switchSearchViewLoading(); // Clean up the front page and update left panel
     updateSearchView(data); // Pull in data from the response to update the overlay
-    clearSearchError(); // Clear error message if everything worked
   } catch (err) {
     console.error('Address request could not be resolved by Server:', err.message);
     showSearchError('An error occurred while retrieving the apartment data.'); // Use popup error handler to show network failure
