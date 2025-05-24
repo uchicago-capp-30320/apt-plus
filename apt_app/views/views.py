@@ -110,12 +110,6 @@ def save_property(request):
     # Regular expression to correct common uppercase abbreviations (like state codes, "IL" here)
     proper_address = re.sub(r"\b(Il)\b", "IL", proper_address)
 
-    # Print to console for debugging
-    print(f"Saving property at: {property_address}")
-    print(f"Request method: {request.method}")
-    print(f"Request GET params: {request.GET}")
-    print(f"User: {request.user}")
-
     # Saving the property to the database
     # Need to also check if the property doesn't already exist in the user's
     # saved properties
@@ -132,12 +126,27 @@ def save_property(request):
     else:
         print("No matching property found.")
 
+    if not matching_property:
+        return HttpResponse("Could not find property in the Property table", status=400)
+
     # Check if the property is already present in saved_property
-    check_property_is_in_saved_property = SavedProperty.objects.filter(
-        address=property_address
+    # There can be two cases:
+    # 1. The property is not present in the SavedProperty table at all
+    # 2. The property is present, but is currently deleted
+
+    property_in_savedproperty = SavedProperty.objects.filter(
+        user=request.user, address=property_address
     ).first()
 
-    if matching_property and not check_property_is_in_saved_property:
+    if property_in_savedproperty:
+        # There is a match
+        # The user already has a property with this name saved
+        # We will not create a new record
+        # Just ensure that the is_deleted status is False
+        property_in_savedproperty.is_deleted = False
+        property_in_savedproperty.save()
+    elif not property_in_savedproperty:
+        # The propert does not exist in the table, will be created
         saved_property = SavedProperty(
             user=request.user,
             property=matching_property,
@@ -145,8 +154,6 @@ def save_property(request):
         )
 
         saved_property.save()
-
-    # Consider sending the savedproperty ID as well
 
     # Return template to replace the button
     return render(request, "snippets/save_property.html", {"property_address": proper_address})
@@ -167,19 +174,6 @@ def handle_post_login(request):
 
     # Default fallback - just go to homepage
     return redirect("/")
-
-
-# class SavedProperty(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_properties")
-#     property = models.ForeignKey("Property", on_delete=models.CASCADE)
-#     address = models.CharField(
-#         max_length=512, null=False, blank=False, default="Unknown Address"
-#     )  # Increased length
-#     custom_name = models.CharField(max_length=512, null=True, blank=True)  # Increased length
-#     date_saved = models.DateTimeField(auto_now_add=True)
-#     remarks = models.TextField(null=True, blank=True)  # Changed to TextField
-#     rent_price = models.IntegerField(null=True, blank=True)
 
 
 @csrf_exempt
@@ -206,7 +200,7 @@ def update_property(request):
 
         # Getting the saved property ID
         matching_saved_property = SavedProperty.objects.filter(
-            address=property_address_upper_case
+            user=request.user, address=property_address_upper_case
         ).first()
 
         if matching_saved_property:
@@ -234,7 +228,52 @@ def update_property(request):
 @csrf_exempt
 def delete_property(request):
     """Handle soft delete property from the SavedProperty table"""
+
+    # Delete can happen only if the user is authenticated
+    if not request.user.is_authenticated:
+        return HttpResponse("Authentication required", status=401)
+
     if request.method == "POST":
+        property_address = request.POST.get("property_address", "")
+
+        if not property_address:
+            return HttpResponse("Property address is required", status=400)
+
+        # Finding the property
+        property_address_upper_case = property_address.upper()
+        saved_property = SavedProperty.objects.filter(
+            user=request.user, address=property_address_upper_case, is_deleted=False
+        ).first()
+
+        # Handling the case where the error is not found
+        if not saved_property:
+            return HttpResponse("Saved property not found", status=404)
+
+        # Soft deleting the property
+        saved_property.soft_delete()
+
         return HttpResponse("Testing", status=200)
 
     return HttpResponse("Method not allowed", status=405)
+
+
+def check_property_status(request):
+    """Helper view to check if the property is already saved"""
+    if not request.user.is_authenticated:
+        return JsonResponse({"is_saved": False, "message": "User not authenticated"})
+
+    # Getting the property address from the request
+    property_address = request.GET.get("property_address", "")
+
+    if not property_address:
+        return JsonResponse({"error": "Address required"}, status=400)
+
+    # Checking if the property exists in the user's saved properties
+    is_saved = SavedProperty.objects.filter(
+        user=request.user, address=property_address.upper(), is_deleted=False
+    ).exists()
+
+    return JsonResponse({"is_saved": is_saved, "property_address": property_address})
+
+
+# save property needs to check for delete status as well
