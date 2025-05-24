@@ -1,4 +1,7 @@
-async function getApartment() {
+import { mapState } from "./map_state.js";
+// import { createElement, toTitleCase, showSearchError } from "./utils.js"
+
+export async function getApartment() {
   /**
     * Makes a GET request for the apartment and then updates the DOM to 
     * prepare for loading the data.
@@ -33,10 +36,8 @@ async function getApartment() {
     // Parse data and place on map, assuming appropriate format from endpoint
     const data = await response.json();
     const coord = data.address_geojson.features[0].geometry.coordinates;
-    const geocode = coord[1] + "," + coord[0];
-    
-    groceriesPromise = sendRequest('/fetch_groceries/', [geocode]); // start fetch_* requests ASAP
-    busStopsPromise = sendRequest('/fetch_bus_stops/', [geocode, data['property_id']]); 
+    groceriesPromise = sendRequest('/fetch_groceries/', [coord]); // start fetch_* requests ASAP
+    busStopsPromise = sendRequest('/fetch_bus_stops/', [coord, data['property_id']]); 
     inspectionsPromise = sendRequest('/fetch_inspections/', data["cleaned_address"]);
     // let routesPromise = make_requests(data); // placeholder for routes endpoint
     
@@ -55,11 +56,11 @@ async function getApartment() {
     const inspections = await inspectionsPromise; 
     updateViolations(inspections);
     const groceries = await groceriesPromise;
-    console.log(groceries.json());
-    // updateMapView(groceriesPromise);
     const busStops = await busStopsPromise;
-    console.log(busStops.json());
-    // updateMapView(busStopsPromise);
+    mapState.groceryData = await groceries.json(); // Per 5/24 discussion add Globally-scoped Grocery data, to refactor
+    mapState.busStopData = await busStops.json();  // Per 5/24 discussion add Globally-scoped Bus data, to refactor 
+    console.log(mapState)
+    return groceryData, busStopData;
   } catch (err) {
     console.error('Details request could not be resolved by server:', err.message);
     showSearchError('An error occured while retrieving apartment details. Please try again.');
@@ -215,11 +216,11 @@ async function updateViolations(response) {
    * @param {Promise<object>} response - response object from `/fetch_violations/`
    * @returns {void} - modifies
   */
-  data = await response.json()
+  const data = await response.json();
 
   // Update violations panel to display information
-  violationsSummary = document.getElementById('violations-summary');
-  violationsIssues = document.getElementById('violations-issues');
+  const violationsSummary = document.getElementById('violations-summary');
+  const violationsIssues = document.getElementById('violations-issues');
   violationsSummary.classList.remove("skeleton-lines");
   violationsIssues.classList.remove("skeleton-lines", 'is-hidden');
   // ref: https://stackoverflow.com/a/3955238
@@ -245,7 +246,7 @@ async function updateViolations(response) {
       i++;
     }
   } else {
-    violationsIssues.classList.add('is-hidden')
+    violationsIssues.classList.add('is-hidden');
   }
 }
 
@@ -262,7 +263,7 @@ function toggleLoadingWheel() {
     return;
   } else {
     const searchBox = document.getElementById("search-address-box");
-    const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel")
+    const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel");
     const loadingWheel = createElement("div", overlay, ["loader"]);
     searchBox.appendChild(overlay);
     return;
