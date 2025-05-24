@@ -252,13 +252,30 @@ def delete_property(request):
         # Soft deleting the property
         saved_property.soft_delete()
 
-        return HttpResponse("Testing", status=200)
+        html_response = f"""
+        <div id="save-button-container" class="mb-4 slide-it">
+            <div class="notification is-success">
+                <strong>{property_address}</strong> has been removed from your list.
+            </div>
+            <button class="button is-rounded has-text-white has-background-black mt-2"
+                    id="save-button"
+                    hx-get="/save_property/"
+                    hx-vals='js:{{propertyAddress: "{property_address}"}}'
+                    hx-target="#save-button-container"
+                    hx-trigger="click"
+                    hx-swap="outerHTML transition:true">
+                Save to my list
+            </button>
+        </div>
+        """
+
+        return HttpResponse(html_response)
 
     return HttpResponse("Method not allowed", status=405)
 
 
 def check_property_status(request):
-    """Helper view to check if the property is already saved"""
+    """Helper view to check if the property is saved"""
     if not request.user.is_authenticated:
         return JsonResponse({"is_saved": False, "message": "User not authenticated"})
 

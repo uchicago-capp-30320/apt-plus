@@ -1,3 +1,6 @@
+// Cache object
+const propertyStatusCache = {};
+
 // Enable View Transitions for HTMX if the browser supports it
 document.addEventListener('DOMContentLoaded', function() {
   if ('startViewTransition' in document) {
@@ -155,20 +158,25 @@ function initialSearchViewUpdate() {
 
     // Add control elements
     const saveButtonContainer = createElement('div', searchBox, ['mb-4', 'slide-it'], 'save-button-container');
-    const saveButton = createElement('button', saveButtonContainer, ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
-    saveButton.textContent = 'Save to my list';
+    
+    // Show a placeholder button immediately (neutral color)
+    const placeholderButton = createElement('button', saveButtonContainer, 
+      ['button', 'is-rounded', 'is-loading'], 'placeholder-button');
+    placeholderButton.textContent = 'Checking status...';
+    // const saveButton = createElement('button', saveButtonContainer, ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
+    // saveButton.textContent = 'Save to my list';
 
-    console.log("HTMX available:", typeof htmx !== 'undefined');
-    console.log("Save button created:", saveButton);
+    // console.log("HTMX available:", typeof htmx !== 'undefined');
+    // console.log("Save button created:", saveButton);
 
-    // Add HTMX attributes to the save button
-    saveButton.setAttribute('hx-get', '/save_property/');
-    saveButton.setAttribute('hx-target', '#save-button-container');
-    saveButton.setAttribute('hx-trigger', 'click');
-    saveButton.setAttribute('hx-swap', 'outerHTML transition:true');
-    // HTMX will scan for attributes and add event listeners
-    // Without this, dynamically created content is incompatible with HTMX
-    htmx.process(saveButton);
+    // // Add HTMX attributes to the save button
+    // saveButton.setAttribute('hx-get', '/save_property/');
+    // saveButton.setAttribute('hx-target', '#save-button-container');
+    // saveButton.setAttribute('hx-trigger', 'click');
+    // saveButton.setAttribute('hx-swap', 'outerHTML transition:true');
+    // // HTMX will scan for attributes and add event listeners
+    // // Without this, dynamically created content is incompatible with HTMX
+    // htmx.process(saveButton);
 
     const filtersTemplate = document.getElementById("filters-template").innerHTML;
     const filters = createElement('div', searchBox, ['media', 'mb-4']);
@@ -204,12 +212,12 @@ function initialSearchViewUpdate() {
    }
 
 function updateSearchView(data) {
-  /** Updates the loading text for the title basd on the returned GET response.
+  /** Updates the loading text for the title based on the returned GET response.
    *  @param {json} data - GET response object to update the search view with. 
    *  @returns {void} - returns nothing, just updates the DOM as relevant.
   */
   // First, extract address parts from the `fetch_all_data` reponse
-  address_parts = data["cleaned_address"].split(/,(.*)/s); // Ref: https://stackoverflow.com/a/4607799
+  address_parts = data["cleaned_address"].split(/,(.*)/s);
   
   const title = document.getElementById("search-box-title");
   title.dataset.address = data["cleaned_address"];
@@ -218,21 +226,84 @@ function updateSearchView(data) {
 
   const subtitle = document.getElementById("search-box-subtitle");
   subtitle.innerText = toTitleCase(address_parts[1]);
-  subtitle.classList.remove("is-skeleton")
+  subtitle.classList.remove("is-skeleton");
 
-  // Update the Save button's HTMX properties now that we have the address 
-  const saveButton = document.getElementById("save-button");
-  if (saveButton) {
-    // Update the hx-vals attribute with the actual address now that we have it
-    saveButton.setAttribute('hx-vals', `js:{propertyAddress: "${data["cleaned_address"]}"}`);
-    // Process the button since attributes were updated
-    htmx.process(saveButton);
+  // Check if the property is already saved by the user
+  checkPropertyStatus(data["cleaned_address"]);
+}
+
+// Add this new function to check property status and update the button accordingly
+async function checkPropertyStatus(propertyAddress) {
+  // Only proceed if container exists
+  const saveButtonContainer = document.getElementById("save-button-container");
+  if (!saveButtonContainer) return;
+
+  try {
+    // Check cache first
+    if (propertyStatusCache[propertyAddress] !== undefined) {
+      console.log("Using cached property status");
+      updateButtonBasedOnStatus(
+        propertyAddress, 
+        propertyStatusCache[propertyAddress], 
+        saveButtonContainer
+      );
+      return;
+    }
     
-    // For debugging: log that we updated the button
-    console.log("Save button updated with address:", data["cleaned_address"]);
+    // Make request to check if property is saved
+    const url = new URL('/check_property_status/', window.location.origin);
+    url.searchParams.append('property_address', propertyAddress);
     
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    // Store in cache
+    propertyStatusCache[propertyAddress] = data.is_saved;
+    
+    // Update the button
+    updateButtonBasedOnStatus(propertyAddress, data.is_saved, saveButtonContainer);
+  } catch (error) {
+    console.error("Error checking property status:", error);
+    // Show default save button on error
+    updateButtonBasedOnStatus(propertyAddress, false, saveButtonContainer);
+  }
+}
+
+// Extract button creation to a separate function
+function updateButtonBasedOnStatus(propertyAddress, isSaved, container) {
+  // Clear the container
+  container.innerHTML = '';
+  
+  if (isSaved) {
+    // Property is saved - show delete button
+    const deleteButton = createElement('button', container, 
+      ['button', 'is-rounded', 'has-text-white', 'has-background-danger'], 'delete-button');
+    deleteButton.textContent = 'Remove from my list';
+    
+    // Add HTMX attributes for delete
+    deleteButton.setAttribute('hx-post', '/delete_property/');
+    deleteButton.setAttribute('hx-vals', `js:{property_address: "${propertyAddress}"}`);
+    deleteButton.setAttribute('hx-target', '#save-button-container');
+    deleteButton.setAttribute('hx-trigger', 'click');
+    deleteButton.setAttribute('hx-swap', 'outerHTML transition:true');
+    
+    // Tell HTMX to process the button
+    htmx.process(deleteButton);
   } else {
-    console.warn("Save button not found when updating address data");
+    // Property is not saved - show save button
+    const saveButton = createElement('button', container, 
+      ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
+    saveButton.textContent = 'Save to my list';
+    
+    // Add HTMX attributes for save
+    saveButton.setAttribute('hx-get', '/save_property/');
+    saveButton.setAttribute('hx-vals', `js:{propertyAddress: "${propertyAddress}"}`);
+    saveButton.setAttribute('hx-target', '#save-button-container');
+    saveButton.setAttribute('hx-trigger', 'click'); 
+    saveButton.setAttribute('hx-swap', 'outerHTML transition:true');
+    
+    // Tell HTMX to process the button
+    htmx.process(saveButton);
   }
 }
 

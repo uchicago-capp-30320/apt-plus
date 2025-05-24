@@ -43,12 +43,24 @@
                 </div>
             </div>
             
-            <!-- Save Details Button -->
-            <div class="field">
+            <!-- Button Group for Save and Delete -->
+            <div class="field is-grouped">
                 <div class="control">
-                    <!-- class="button is-small is-primary is-rounded" -->
                     <button type="submit" class="button is-rounded has-text-white has-background-black">
                         Save Details
+                    </button>
+                </div>
+                <div class="control">
+                    <button type="button" 
+                            class="button is-danger is-outlined is-rounded"
+                            hx-post="/delete_property/"
+                            hx-vals='js:{property_address: "{{ property_address }}"}'
+                            hx-target="#save-button-container"
+                            hx-swap="outerHTML transition:true">
+                        <span class="icon is-small">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                        <span>Remove</span>
                     </button>
                 </div>
             </div>
