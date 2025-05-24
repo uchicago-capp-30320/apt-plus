@@ -1,7 +1,9 @@
-// Cache object
+// =============================================================================
+// INITIALIZATION AND SETUP
+// =============================================================================
 const propertyStatusCache = {};
 
-// Enable View Transitions for HTMX if the browser supports it
+// Enable View Transitions for HTMX
 document.addEventListener('DOMContentLoaded', function() {
   if ('startViewTransition' in document) {
     htmx.config.globalViewTransitions = true;
@@ -219,7 +221,7 @@ function updateSearchView(data) {
 }
 
 // Add this new function to check property status and update the button accordingly
-async function checkPropertyStatus(propertyAddress) {
+const checkPropertyStatus = async (propertyAddress) => {
   // Only proceed if container exists
   const saveButtonContainer = document.getElementById("save-button-container");
   if (!saveButtonContainer) return;
