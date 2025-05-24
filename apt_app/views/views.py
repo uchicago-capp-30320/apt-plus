@@ -18,9 +18,6 @@ from apt_app.models import SavedProperty
 
 
 def home(request):
-    # TODO: remove print debugging
-    print(f"Current user: {request.user}")
-    print(f"Authentication status: {request.user.is_authenticated}")
     return render(request, "home.html")
 
 
@@ -92,6 +89,8 @@ def save_property(request):
     # Get the address from the request
     property_address = request.GET.get("propertyAddress", "Unknown Address")
 
+    print(f"Property address: {property_address}")
+
     # Checking if the user is signed in
     # If they are not, then we offer them an option to log in
     if not request.user.is_authenticated:
@@ -115,7 +114,7 @@ def save_property(request):
     # saved properties
 
     # First need to query the database to get the the property ID
-    matching_property = Property.objects.filter(address=property_address).first()
+    matching_property = Property.objects.filter(address=property_address.upper()).first()
 
     if matching_property:
         print(f"ID: {matching_property.id}")
@@ -127,6 +126,7 @@ def save_property(request):
         print("No matching property found.")
 
     if not matching_property:
+        print("Could not find property in the Property table")
         return HttpResponse("Could not find property in the Property table", status=400)
 
     # Check if the property is already present in saved_property
@@ -135,22 +135,26 @@ def save_property(request):
     # 2. The property is present, but is currently deleted
 
     property_in_savedproperty = SavedProperty.objects.filter(
-        user=request.user, address=property_address
+        user=request.user, address=property_address.upper()
     ).first()
 
+    # This is a bit confusing
+    # If the property exists but is currently deleted, we will restore
     if property_in_savedproperty:
-        # There is a match
-        # The user already has a property with this name saved
-        # We will not create a new record
-        # Just ensure that the is_deleted status is False
-        property_in_savedproperty.is_deleted = False
-        property_in_savedproperty.save()
+        if property_in_savedproperty.is_deleted:
+            # There is a match
+            # The user already has a property with this name saved
+            # We will not create a new record
+            # We will restore the record
+            property_in_savedproperty.restore()
+        else:
+            pass
     elif not property_in_savedproperty:
         # The propert does not exist in the table, will be created
         saved_property = SavedProperty(
             user=request.user,
             property=matching_property,
-            address=property_address,
+            address=property_address.upper(),
         )
 
         saved_property.save()
@@ -246,6 +250,7 @@ def delete_property(request):
 
         # Handling the case where the property is not found
         if not saved_property:
+            print("Exec")
             return HttpResponse("Saved property not found", status=404)
 
         # Soft deleting the property
@@ -278,6 +283,3 @@ def check_property_status(request):
     ).exists()
 
     return JsonResponse({"is_saved": is_saved, "property_address": property_address})
-
-
-# save property needs to check for delete status as well

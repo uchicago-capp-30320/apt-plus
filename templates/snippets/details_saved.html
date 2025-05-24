@@ -3,4 +3,21 @@
         <!-- <strong class="has-text-white">Success!</strong> -->
         <p>Details for <strong>{{ property_address }}</strong> have been saved successfully!</p>
     </div>
+
+    <!-- Add button container with Remove button -->
+    <div class="field">
+        <div class="control">
+            <button type="button" 
+                    class="button is-danger is-outlined is-rounded"
+                    hx-post="/delete_property/"
+                    hx-vals='js:{property_address: "{{ property_address }}"}'
+                    hx-target="#save-button-container"
+                    hx-swap="outerHTML transition:true">
+                <span class="icon is-small">
+                    <i class="fas fa-trash"></i>
+                </span>
+                <span>Remove</span>
+            </button>
+        </div>
+    </div>
 </div>

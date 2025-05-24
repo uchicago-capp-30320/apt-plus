@@ -122,6 +122,7 @@ class SavedProperty(models.Model):
         """Restore a previously soft-deleted property."""
         self.is_deleted = False
         self.deleted_at = None
+        self.date_saved = timezone.now()
         self.save()
         return True
 

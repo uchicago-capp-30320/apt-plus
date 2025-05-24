@@ -163,20 +163,6 @@ function initialSearchViewUpdate() {
     const placeholderButton = createElement('button', saveButtonContainer, 
       ['button', 'is-rounded', 'is-loading'], 'placeholder-button');
     placeholderButton.textContent = 'Checking status...';
-    // const saveButton = createElement('button', saveButtonContainer, ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
-    // saveButton.textContent = 'Save to my list';
-
-    // console.log("HTMX available:", typeof htmx !== 'undefined');
-    // console.log("Save button created:", saveButton);
-
-    // // Add HTMX attributes to the save button
-    // saveButton.setAttribute('hx-get', '/save_property/');
-    // saveButton.setAttribute('hx-target', '#save-button-container');
-    // saveButton.setAttribute('hx-trigger', 'click');
-    // saveButton.setAttribute('hx-swap', 'outerHTML transition:true');
-    // // HTMX will scan for attributes and add event listeners
-    // // Without this, dynamically created content is incompatible with HTMX
-    // htmx.process(saveButton);
 
     const filtersTemplate = document.getElementById("filters-template").innerHTML;
     const filters = createElement('div', searchBox, ['media', 'mb-4']);
@@ -275,10 +261,18 @@ function updateButtonBasedOnStatus(propertyAddress, isSaved, container) {
   container.innerHTML = '';
   
   if (isSaved) {
+    // Add status notification 
+    const statusNote = createElement('div', container, ['notification', 'is-info', 'is-light', 'py-2', 'px-3', 'mb-2'], 'saved-status');
+    statusNote.innerHTML = '<span class="icon-text"><span class="icon"><i class="fas fa-bookmark"></i></span> <span>This property is in your saved list</span></span>';
+
     // Property is saved - show delete button
     const deleteButton = createElement('button', container, 
-      ['button', 'is-rounded', 'has-text-white', 'has-background-danger'], 'delete-button');
-    deleteButton.textContent = 'Remove from my list';
+      ['button', 'is-danger', 'is-outlined', 'is-rounded'], 'delete-button');
+    // Add icon and text as children
+    const iconSpan = createElement('span', deleteButton, ['icon', 'is-small']);
+    const icon = createElement('i', iconSpan, ['fas', 'fa-trash']);
+    const textSpan = createElement('span', deleteButton);
+    textSpan.textContent = 'Remove';
     
     // Add HTMX attributes for delete
     deleteButton.setAttribute('hx-post', '/delete_property/');
@@ -293,7 +287,12 @@ function updateButtonBasedOnStatus(propertyAddress, isSaved, container) {
     // Property is not saved - show save button
     const saveButton = createElement('button', container, 
       ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
-    saveButton.textContent = 'Save to my list';
+    
+    // Add icon and text as children
+    const iconSpan = createElement('span', saveButton, ['icon', 'is-small']);
+    const icon = createElement('i', iconSpan, ['fas', 'fa-bookmark']);
+    const textSpan = createElement('span', saveButton);
+    textSpan.textContent = 'Save to my list';
     
     // Add HTMX attributes for save
     saveButton.setAttribute('hx-get', '/save_property/');
