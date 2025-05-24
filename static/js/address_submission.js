@@ -40,9 +40,6 @@ async function getApartment() {
 
     // Pull in data from the response to update the overlay
     updateSearchView(data);
-
-    // Clear error message if everything worked
-    clearSearchError(); 
   } catch (err) {
     console.error('Address request could not be resolved by Server:', err.message);
     toggleLoadingWheel(); //Ensure spinner is removed even on failure
