@@ -53,7 +53,7 @@ def fetch_inspections(request):
 
 @require_GET
 def fetch_bus_routes(request):
-    route_id = request.GET.get("bus_route")
+    route_id = request.GET.get("bus_route", "")
     return _fetch_bus_routes(route_id)
 
 

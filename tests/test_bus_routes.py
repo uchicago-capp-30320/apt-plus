@@ -8,6 +8,8 @@ import json
 def test_parse_input_routes():
     assert _parse_input_routes("171,172,55") == ["171", "172", "55"]
     assert _parse_input_routes(" 171 , 172 , 55 ") == ["171", "172", "55"]
+    assert _parse_input_routes("  ") == []
+    assert _parse_input_routes("") == []
 
 
 @pytest.mark.django_db
