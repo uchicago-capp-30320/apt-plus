@@ -7,9 +7,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def parse_address(in_address):
-    """get the first part of address, before "Chicago IL 60XXX"""
-    return in_address.split(",")[0].strip()
+def parse_address(in_address: str) -> str:
+    """fetch the first part of address in uppercase, before "Chicago IL 60XXX"""
+    try:
+        return in_address.upper().split(",")[0].strip()
+    except Exception as e:
+        logger.error(f"Error parsing address: {e}")
+        return ""
 
 
 def _fetch_inspection_summaries(address, start_date=datetime.date(2020, 1, 1)) -> JsonResponse:
@@ -55,7 +59,7 @@ def _fetch_inspection_summaries(address, start_date=datetime.date(2020, 1, 1)) -
         # first case: no violations found
         if total_violations_count == 0:
             content["data_status"] = "no_violations"
-            content["note"] = "no violation record found for this address"
+            content["summary"] = "no violation record found for this address"
             return JsonResponse(content, status=200)
 
         content["total_violations_count"] = total_violations_count
@@ -70,7 +74,7 @@ def _fetch_inspection_summaries(address, start_date=datetime.date(2020, 1, 1)) -
         # second case: violations found but considered trivial and thus not summarized
         if not summary_json:
             content["data_status"] = "trivial_only"
-            content["note"] = (
+            content["summary"] = (
                 f"{total_violations_count} trivial violations were recorded on "
                 f"{total_inspections_count} occasions and omitted here for brevity."
             )

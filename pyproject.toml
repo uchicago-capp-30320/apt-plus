@@ -28,6 +28,7 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "django-anymail>=13.0",
     "pyjwt>=2.10.1",
+    "pytest-cov>=6.1.1",
     "passiogo>=0.2.2",
     "geojson>=3.2.0",
     "gunicorn>=23.0.0",
@@ -58,3 +59,4 @@ ignore = [
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
