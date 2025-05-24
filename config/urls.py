@@ -24,6 +24,7 @@ from apt_app.views.views import (
     fetch_bus_stops,
     fetch_groceries,
     fetch_inspections,
+    fetch_bus_routes,
 )
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
@@ -42,6 +43,7 @@ urlpatterns = [
         fetch_inspections,
         name="fetch_inspection_summaries",
     ),
+    path("fetch_bus_routes/", fetch_bus_routes, name="fetch_bus_routes"),
 ]
 
 if settings.DEBUG and not settings.IS_TESTING:
