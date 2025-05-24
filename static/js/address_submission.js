@@ -17,6 +17,10 @@ export async function getApartment() {
     showSearchError('Please enter an address.'); // Use popup error handler to show validation error
     return;
   }
+  
+  // First clean up mapState as we've just started modifying the address state
+  mapState.busStopData = null;
+  mapState.groceryData = null;
 
   // Show loading spinner while waiting for response
   toggleLoadingWheel();
