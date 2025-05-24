@@ -9,6 +9,22 @@ def _save_property(request):
     # Get the address from the request
     property_address = request.GET.get("propertyAddress", "Unknown Address")
 
+    # Check authentication
+    # If the user is not authenticated, and still click on the save button,
+    # we throw a message asking them to sign in. Once they sign in, they are
+    # redirected to the result page.
+    if not request.user.is_authenticated:
+        # Store the address for post-login redirection
+        request.session["pending_property_address"] = property_address
+
+        # Return a specific HTML snippet for unauthenticated users
+        login_url = "/accounts/login/?next=/handle_post_login/"
+        return render(
+            request,
+            "snippets/save_property_login_required.html",
+            {"login_url": login_url, "property_address": property_address},
+        )
+
     # Title-case the string
     # This is passed to the template for displaying to the user
     proper_address = property_address.title()
