@@ -1,64 +1,89 @@
-{% extends "account/base_entrance.html" %}
+{% extends "base.html" %}
 {% load i18n %}
 {% load allauth account %}
-{% block head_title %}
-    {% trans "Sign In" %}
-{% endblock head_title %}
+{% load socialaccount %} 
+
+{% block title %}{% trans "Sign In" %} signup | apt-plus{% endblock %}
+
 {% block content %}
-    {% element h1 %}
-        {% trans "Sign In" %}
-    {% endelement %}
-    {% if not SOCIALACCOUNT_ONLY %}
-        {% setvar link %}
-            <a href="{{ signup_url }}">
-            {% endsetvar %}
-            {% setvar end_link %}
-            </a>
-        {% endsetvar %}
-        {% element p %}
-            {% blocktranslate %}If you have not created an account yet, then please {{ link }}sign up{{ end_link }} first.{% endblocktranslate %}
-        {% endelement %}
-        {% url 'account_login' as login_url %}
-        {% element form form=form method="post" action=login_url tags="entrance,login" %}
-            {% slot body %}
-                {% csrf_token %}
-                {% element fields form=form unlabeled=True %}
-                {% endelement %}
-                {{ redirect_field }}
-            {% endslot %}
-            {% slot actions %}
-                {% element button type="submit" tags="prominent,login" %}
-                    {% trans "Sign In" %}
-                {% endelement %}
-            {% endslot %}
-        {% endelement %}
-    {% endif %}
-    {% if LOGIN_BY_CODE_ENABLED or PASSKEY_LOGIN_ENABLED %}
-        {% element hr %}
-        {% endelement %}
-        {% element button_group vertical=True %}
-            {% if PASSKEY_LOGIN_ENABLED %}
-                {% element button type="submit" form="mfa_login" id="passkey_login" tags="prominent,login,outline,primary" %}
-                    {% trans "Sign in with a passkey" %}
-                {% endelement %}
-            {% endif %}
-            {% if LOGIN_BY_CODE_ENABLED %}
-                {% element button href=request_login_code_url tags="prominent,login,outline,primary" %}
-                    {% trans "Send me a sign-in code" %}
-                {% endelement %}
-            {% endif %}
-        {% endelement %}
-    {% endif %}
-    {% if SOCIALACCOUNT_ENABLED %}
-        <!-- AB: The following include comes from allauth, it is not present in our templates
-     I am not sure what implication that has with regards to our application
-     I suppose we could always switch it out with our own template -->
-        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
-    {% endif %}
+
+<div class="map-container">
+  <!-- Map container -->
+  {% include "map.html" %}
+
+  <div class="columns is-centered map-container-overlay is-vcentered" style="height: 100%;">
+    <div class="column is-4">
+      <div class="box mt-6" id="login-box" style="pointer-events:auto">
+        
+        <!-- Title -->
+        <h1 class="title is-3 mb-4 has-text-left">{% trans "Welcome Back" %}</h1>
+
+        {% if not SOCIALACCOUNT_ONLY %}
+          {% url 'account_login' as login_url %}
+          <form method="post" action="{{ login_url }}">
+            {% csrf_token %}
+
+            <!-- Email Field -->
+            <div class="field">
+              <label class="label">{% trans "Email" %}</label>
+              <div class="control has-icons-left">
+                <input class="input is-rounded" type="text" name="login" placeholder="Email address" required id="id_login" value="{{ form.login.value|default_if_none:'' }}">
+                <span class="icon is-left">
+                  <i class="fas fa-envelope"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- Remember Me -->
+            <div class="field mt-2">
+              <label class="checkbox">
+                <input type="checkbox" name="remember" id="id_remember">
+                {% trans "Remember me" %}
+              </label>
+            </div>
+
+            {{ redirect_field }}
+
+            <!-- Submit Button -->
+            <div class="field mt-4">
+              <button class="button has-background-black is-link is-fullwidth is-rounded">
+                {% trans "Sign In" %}
+              </button>
+            </div>
+          </form>
+        {% endif %}
+
+        <!-- Google Login -->
+        {% if SOCIALACCOUNT_ENABLED %}
+        <div class="mt-4">
+          <a href="{% provider_login_url 'google' process='login'%}" 
+             class="button is-rounded is-fullwidth is-light is-flex is-align-items-center is-justify-content-center">
+            <span class="icon mr-2">
+              <i class="fab fa-google"></i>
+            </span>
+            <span>Sign in with Google</span>
+          </a>
+        </div>
+      {% endif %}
+
+        <!-- Sign up link -->
+        <p class="is-size-6 mt-5 has-text-left">
+          {% trans "Don't have an account?" %}
+          <a href="{{ signup_url }}" class="has-text-link has-text-weight-semibold" style="text-decoration: underline;">
+            {% trans "Sign up" %}
+          </a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}
+
 {% block extra_body %}
-    {{ block.super }}
-    {% if PASSKEY_LOGIN_ENABLED %}
-        {% include "mfa/webauthn/snippets/login_script.html" with button_id="passkey_login" %}
-    {% endif %}
+  {{ block.super }}
+  {% if PASSKEY_LOGIN_ENABLED %}
+    {% include "mfa/webauthn/snippets/login_script.html" with button_id="passkey_login" %}
+  {% endif %}
 {% endblock %}

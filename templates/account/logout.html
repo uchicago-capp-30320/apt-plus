@@ -1,25 +1,41 @@
-{% extends "account/base_manage.html" %}
-{% load allauth i18n %}
-{% block head_title %}
-    {% trans "Sign Out" %}
-{% endblock head_title %}
+{% extends "base.html" %}
+{% load i18n %}
+{% load allauth account %}
+
+{% block title %}{% trans "Sign Out" %} logout | apt-plus{% endblock %}
+
 {% block content %}
-    {% element h1 %}
-        {% trans "Sign Out" %}
-    {% endelement %}
-    {% element p %}
-        {% trans 'Are you sure you want to sign out?' %}
-    {% endelement %}
-    {% url 'account_logout' as action_url %}
-    {% element form method="post" action=action_url no_visible_fields=True %}
-        {% slot body %}
-            {% csrf_token %}
-            {{ redirect_field }}
-        {% endslot %}
-        {% slot actions %}
-            {% element button type="submit" %}
-                {% trans 'Sign Out' %}
-            {% endelement %}
-        {% endslot %}
-    {% endelement %}
-{% endblock content %}
+<!-- Map container -->
+<div class="map-container">
+  {% include "map.html" %}
+
+  <!-- Title -->
+  <div class="columns is-centered map-container-overlay is-vcentered" style="height: 100%;">
+    <div class="column is-4">
+      <div class="box mt-6" style="pointer-events:auto">
+        
+        <h1 class="title is-3 mb-4 has-text-left">
+          {% trans "Sign Out" %}
+        </h1>
+
+        <p class="is-size-6 mb-4">
+          {% trans "Are you sure you want to sign out?" %}
+        </p>
+
+        <form method="post" action="{% url 'account_logout' %}">
+          {% csrf_token %}
+          {{ redirect_field }}
+
+          <!-- Sign out Button -->
+          <div class="field">
+            <button type="submit" class="button has-background-black is-link is-fullwidth is-rounded">
+              {% trans "Sign Out" %}
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
