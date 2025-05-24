@@ -228,7 +228,6 @@ def update_property(request):
 @csrf_exempt
 def delete_property(request):
     """Handle soft delete property from the SavedProperty table"""
-
     # Delete can happen only if the user is authenticated
     if not request.user.is_authenticated:
         return HttpResponse("Authentication required", status=401)
@@ -245,31 +244,19 @@ def delete_property(request):
             user=request.user, address=property_address_upper_case, is_deleted=False
         ).first()
 
-        # Handling the case where the error is not found
+        # Handling the case where the property is not found
         if not saved_property:
             return HttpResponse("Saved property not found", status=404)
 
         # Soft deleting the property
         saved_property.soft_delete()
 
-        html_response = f"""
-        <div id="save-button-container" class="mb-4 slide-it">
-            <div class="notification is-success">
-                <strong>{property_address}</strong> has been removed from your list.
-            </div>
-            <button class="button is-rounded has-text-white has-background-black mt-2"
-                    id="save-button"
-                    hx-get="/save_property/"
-                    hx-vals='js:{{propertyAddress: "{property_address}"}}'
-                    hx-target="#save-button-container"
-                    hx-trigger="click"
-                    hx-swap="outerHTML transition:true">
-                Save to my list
-            </button>
-        </div>
-        """
-
-        return HttpResponse(html_response)
+        # Return template to replace the button
+        return render(
+            request,
+            "snippets/delete_property_response.html",
+            {"property_address": property_address},
+        )
 
     return HttpResponse("Method not allowed", status=405)
 
