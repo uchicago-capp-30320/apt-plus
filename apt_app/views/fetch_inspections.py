@@ -16,7 +16,9 @@ def parse_address(in_address: str) -> str:
         return ""
 
 
-def _fetch_inspection_summaries(address, start_date=datetime.date(2020, 1, 1)) -> JsonResponse:
+def _fetch_inspection_summaries(
+    address, start_date=datetime.date(2020, 1, 1)
+) -> JsonResponse:
     """
     Fetch inspection summaries for a given address and cut-off date.
 
@@ -43,8 +45,9 @@ def _fetch_inspection_summaries(address, start_date=datetime.date(2020, 1, 1)) -
         content = {"address": parsed_address, "start_date": start_date}
 
         violations = (
-            Violation.objects.filter(address__istartswith=parsed_address)
-            .filter(violation_date__gt=start_date)
+            Violation.objects.filter(address__istartswith=parsed_address).filter(
+                violation_date__gt=start_date
+            )
             # TODO: need to probably remove or relax this filter -- to be not just complaint
             .filter(inspection_category="COMPLAINT")
         )
@@ -59,7 +62,7 @@ def _fetch_inspection_summaries(address, start_date=datetime.date(2020, 1, 1)) -
         # first case: no violations found
         if total_violations_count == 0:
             content["data_status"] = "no_violations"
-            content["summary"] = "no violation record found for this address"
+            content["summary"] = "No violation record found for this address"
             return JsonResponse(content, status=200)
 
         content["total_violations_count"] = total_violations_count

@@ -131,8 +131,9 @@
     {% include "address_search/filters.html" %}
 </script>
 <script src="{% static 'js/utils.js' %}"></script>
-<script src="{% static 'js/address_submission.js' %}"></script>
-<script>
+<script type="module">
+  import { getApartment } from '{% static "js/address_submission.js" %}';
+
   // Attach search event listener
   const searchButton = document.getElementById('searchButton');
   searchButton.addEventListener('click', getApartment)
