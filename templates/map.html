@@ -15,8 +15,9 @@
   var currentMarker = null; // To store the marker
 
   async function placeAddress(response) {
-    // Start by clearing the map (for when the user does a second search)
+    // Start by clearing the map (for when the user does another search)
     clearMap();
+    resetButtons()
     /**
     * Places the submitted address on the map.
     * 
@@ -75,6 +76,7 @@
     map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
   }
 
+  // Helper function to remove address marker
   function clearMap() {
     if (currentMarker) {
       currentMarker.remove();
@@ -82,6 +84,16 @@
     }
     groceryMarkers = removeMarkers(groceryMarkers);
     busStopMarkers = removeMarkers(busStopMarkers);
+  }
+
+  // Helper function to deselect buttons
+  function resetButtons() {
+    groceriesON = false;
+    busStopsON = false;
+    const groceriesBtn = document.getElementById('groceriesButton');
+    const busStopsBtn = document.getElementById('busStopsButton');
+    if (groceriesBtn) groceriesBtn.classList.remove('is-info');
+    if (busStopsBtn) busStopsBtn.classList.remove('is-info');
   }
 
 </script>
