@@ -34,6 +34,15 @@ export async function getApartment() {
       const errorData = await response.json(); 
       const message = errorData.Error;
       showSearchError(message || 'Something went wrong.');
+
+      // Clean up violations panel as relevant
+      const violationsSummary = document.getElementById('violations-summary');
+      const violationsIssues = document.getElementById('violations-issues');
+      if (violationsSummary) {
+        violationsSummary.innerText = '-';
+        violationsIssues.classList.add('is-hidden');
+      }
+
       return;
     }
   
