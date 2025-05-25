@@ -72,7 +72,11 @@ export async function getApartment() {
     const busStops = await busStopsPromise;
     mapState.groceryData = await groceries.json(); // Per 5/24 discussion add Globally-scoped Grocery data, to refactor
     mapState.busStopData = await busStops.json();  // Per 5/24 discussion add Globally-scoped Bus data, to refactor 
-    console.log(mapState)
+
+    // update buttons
+    document.querySelectorAll('#filter-buttons .button.is-loading').forEach(button => {
+      button.classList.remove('is-loading');
+    });
   } catch (err) {
     console.error('Details request could not be resolved by server:', err.message);
     showSearchError('An error occured while retrieving apartment details. Please try again.');
@@ -221,6 +225,11 @@ function updateSearchView(data) {
   const subtitle = document.getElementById("search-box-subtitle");
   subtitle.innerText = toTitleCase(address_parts[1]);
   subtitle.classList.remove("is-skeleton")
+
+  // Collect buttons and add loading
+  document.querySelectorAll('#filter-buttons .button').forEach(button => {
+    button.classList.add('is-loading');
+  });
 }
 
 async function updateViolations(response) {
