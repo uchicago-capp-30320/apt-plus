@@ -67,3 +67,15 @@ def test_fetch_bus_stops_response_structure():
 def test_fetch_bus_stops_response_no_stops():
     response = _fetch_bus_stops("-87.590115956094, 41.795466862668", "35", 5)
     assert response.status_code == 400, f"Expected status code 400, got {response.status_code}"
+
+
+@pytest.mark.django_db
+def test_endpoint_available(client):
+    """
+    Test that the endpoint is available
+    """
+    response = client.get(
+        "/fetch_bus_stops/",
+        {"geocode": "41.795466862668, -87.590115956094", "property_id": "35", "walking_time": "5"},
+    )
+    assert response.status_code == 200, f"Response status code: {response.status_code} is not 200"
