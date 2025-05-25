@@ -117,10 +117,10 @@
       console.log("Distance filter changed (inside home.html)");
 
       // Only call these if the map layers are ON
-      if (typeof groceriesON !== 'undefined' && groceriesON) {
+      if (typeof mapState.groceriesOn !== 'undefined' && mapState.groceriesOn) {
         displayGroceries();
       }
-      if (typeof busStopsON !== 'undefined' && busStopsON) {
+      if (typeof mapState.busStopsOn !== 'undefined' && mapState.busStopsOn) {
         displayBusStops();
       }
     });
@@ -132,11 +132,44 @@
 </script>
 <script src="{% static 'js/utils.js' %}"></script>
 <script type="module">
+  import { mapState } from '{% static "js/map_state.js" %}';
   import { getApartment } from '{% static "js/address_submission.js" %}';
+  import { updateBusStops, updateGroceries, toggleBusStops, toggleGroceries } from '{% static "js/map_modifications.js" %}';
+
+  // Initialize MapLibre map (STATIC at first)
+  mapState.map = new maplibregl.Map({
+    container: 'map',
+    style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+    center: [-87.5995, 41.7925],
+    zoom: 13.6,
+    interactive: false
+  });
 
   // Attach search event listener
   const searchButton = document.getElementById('searchButton');
   searchButton.addEventListener('click', getApartment)
+
+  document.addEventListener('click', function (event) {
+    // To catch all clicks (buttons were not working properly)
+    const groceriesBtn = event.target.closest('#groceriesButton');
+    const busStopsBtn = event.target.closest('#busStopsButton');
+
+    if (groceriesBtn) {
+      toggleGroceries();
+    }
+
+    if (busStopsBtn) {
+      toggleBusStops();
+    }
+  });
+
+  // New event listener to update pins based on distance filter
+  document.addEventListener('change', function (event) {
+    if (event.target && event.target.id === 'distanceFilter') {
+      if (mapState.groceriesOn) updateGroceries();
+      if (mapState.busStopsOn) updateBusStops();
+    }
+  });
 
   // Add Bulma event listener for the navbar
   // from https://bulma.io/documentation/components/navbar/

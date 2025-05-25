@@ -1,5 +1,5 @@
 import { mapState } from "./map_state.js";
-// import { createElement, toTitleCase, showSearchError } from "./utils.js"
+import { placeAddress } from "./map_modifications.js"
 
 export async function getApartment() {
   /**
@@ -73,7 +73,6 @@ export async function getApartment() {
     mapState.groceryData = await groceries.json(); // Per 5/24 discussion add Globally-scoped Grocery data, to refactor
     mapState.busStopData = await busStops.json();  // Per 5/24 discussion add Globally-scoped Bus data, to refactor 
     console.log(mapState)
-    return groceryData, busStopData;
   } catch (err) {
     console.error('Details request could not be resolved by server:', err.message);
     showSearchError('An error occured while retrieving apartment details. Please try again.');

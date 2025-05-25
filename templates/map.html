@@ -1,28 +1,3 @@
 {% load static %}
 
 <div id="map" class="map-container-map"></div>
-
-<script src="{% static 'js/map_modifications.js' %}"></script>
-<script>
-  document.addEventListener('click', function (event) {
-    // To catch all clicks (buttons were not working properly)
-    const groceriesBtn = event.target.closest('#groceriesButton');
-    const busStopsBtn = event.target.closest('#busStopsButton');
-
-    if (groceriesBtn) {
-      toggleGroceries();
-    }
-
-    if (busStopsBtn) {
-      toggleBusStops();
-    }
-  });
-
-  // New event listener to update pins based on distance filter
-  document.addEventListener('change', function (event) {
-    if (event.target && event.target.id === 'distanceFilter') {
-      if (groceriesON) updateGroceries();
-      if (busStopsON) updateBusStops();
-    }
-  });
-</script>
