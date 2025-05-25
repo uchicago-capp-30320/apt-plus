@@ -46,7 +46,7 @@ html.is-dark .dark-mode-logo {
   pointer-events: none;
 }
 
-#violations-box {
+#violations-issues {
    max-height: 150px; 
    overflow-y: auto;
 }

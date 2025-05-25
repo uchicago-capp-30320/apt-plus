@@ -1,4 +1,7 @@
-async function getApartment() {
+import { mapState } from "./map_state.js";
+// import { createElement, toTitleCase, showSearchError } from "./utils.js"
+
+export async function getApartment() {
   /**
     * Makes a GET request for the apartment and then updates the DOM to 
     * prepare for loading the data.
@@ -14,52 +17,89 @@ async function getApartment() {
     showSearchError('Please enter an address.'); // Use popup error handler to show validation error
     return;
   }
+  
+  // First clean up mapState as we've just started modifying the address state
+  mapState.busStopData = null;
+  mapState.groceryData = null;
+
+  // Show loading spinner while waiting for response
+  toggleLoadingWheel();
+  let response, inspectionsPromise, groceriesPromise, busStopsPromise;
 
   try {
-    // Show loading spinner while waiting for response
-    toggleLoadingWheel();
+    response = await sendRequest('/fetch_all_data/', address); 
   
-    // Send GET request to fetch_all_data
-    const response = await sendRequest(address); 
-  
-  
-    // fetch_all_data returned an error — show popup error message 
+    // fetch_all_data returned an error - show popup error message 
     if (!response.ok) {
       const errorData = await response.json(); 
       const message = errorData.Error;
       showSearchError(message || 'Something went wrong.');
+
+      // Clean up violations panel as relevant
+      const violationsSummary = document.getElementById('violations-summary');
+      const violationsIssues = document.getElementById('violations-issues');
+      if (violationsSummary) {
+        violationsSummary.innerText = '-';
+        violationsIssues.classList.add('is-hidden');
+      }
+
       return;
     }
   
     // Parse data and place on map, assuming appropriate format from endpoint
     const data = await response.json();
+    const coord = data.address_geojson.features[0].geometry.coordinates;
+    groceriesPromise = sendRequest('/fetch_groceries/', [coord]); // start fetch_* requests ASAP
+    busStopsPromise = sendRequest('/fetch_bus_stops/', [coord, data['property_id']]); 
+    inspectionsPromise = sendRequest('/fetch_inspections/', data["cleaned_address"]);
+    // let routesPromise = make_requests(data); // placeholder for routes endpoint
+    
     placeAddress(data);
-
-    // Clean up the front page and update left panel
-    switchSearchViewLoading();
-
-    // Pull in data from the response to update the overlay
-    updateSearchView(data);
+    switchSearchViewLoading(); // Clean up the front page and update left panel
+    updateSearchView(data); // Pull in data from the response to update the overlay
   } catch (err) {
     console.error('Address request could not be resolved by Server:', err.message);
-    toggleLoadingWheel(); //Ensure spinner is removed even on failure
-    showSearchError('An error occurred while retrieving the apartment data.'); //Use popup error handler to show network failure
-  } finally {
-    // Stop spinner after response received
+    showSearchError('An error occurred while retrieving the apartment data.'); // Use popup error handler to show network failure
+   } finally {
     toggleLoadingWheel();
+  }
+
+   // Handle remaining calls
+   try {
+    const inspections = await inspectionsPromise; 
+    updateViolations(inspections);
+    const groceries = await groceriesPromise;
+    const busStops = await busStopsPromise;
+    mapState.groceryData = await groceries.json(); // Per 5/24 discussion add Globally-scoped Grocery data, to refactor
+    mapState.busStopData = await busStops.json();  // Per 5/24 discussion add Globally-scoped Bus data, to refactor 
+    console.log(mapState)
+    return groceryData, busStopData;
+  } catch (err) {
+    console.error('Details request could not be resolved by server:', err.message);
+    showSearchError('An error occured while retrieving apartment details. Please try again.');
   }
 }
 
-async function sendRequest(address) {
+async function sendRequest(endpoint, body) {
   /** 
-   * Sends a GET request for any address to the fetch_all_address endpoint
-   * @param {string} address - address to add into the compiled URL 
+   * Sends a GET request for any address to a fetch endpoint
+   * @param {string} endpoint - endpoint to direct
+   * @param {string} body - address or lat/lon to add into the compiled URL 
    * @returns {Promise<response>} returns the promise object of the get request
   */
 
   // Construct GET request
-  const url = new URL('/fetch_all_data/', window.location.origin);
-  url.searchParams.append('address', address);
+  const url = new URL(endpoint, window.location.origin);
+  if (endpoint==='/fetch_all_data/' || endpoint==='/fetch_inspections/') {
+    url.searchParams.append('address', body);
+  } else {
+    if (body[1]) { // fetch_bus_stops needs two params, TODO: request change
+      url.searchParams.append('geocode', body[0]);
+      url.searchParams.append('property_id', body[1]); 
+    } else {
+      url.searchParams.append('geocode', body[0]);
+    }
+  }
 
   // Send the request and then store it as a variable so we can operate on the DOM
   return fetch(url, { method: 'GET' });
@@ -89,10 +129,23 @@ function switchSearchViewLoading() {
     title.textContent = "#### LongStreetName Type"; // Placeholder text for wrapping
     title.classList.add("is-skeleton");
 
+    // Wipe violations for new search
     const violationsSummary = document.getElementById('violations-summary');
     const violationsIssues = document.getElementById('violations-issues');
+    violationsSummary.innerText = '';
     violationsSummary.classList.add('skeleton-lines');
     violationsIssues.classList.add('skeleton-lines');
+
+    // Add formatting for skeleton lines
+    const violationsIds = [
+      'violationsNote',
+      'violationsTotal',
+      'violationsInspections',
+      'violationsStartDate'
+    ];
+    violationsIds.forEach(id => {
+      createElement('div', violationsSummary, [], id);
+    }); 
   }
 }
 
@@ -134,12 +187,11 @@ function initialSearchViewUpdate() {
     violationsTitle.textContent = "Code Violations";
     
     // Summary containers
-    const violationsSummary = createElement('div', violationsDesc, ['has-text-justified', 'is-size-7', 'skeleton-lines', 'mb-2'], 'violations-summary');
+    const violationsSummary = createElement('div', violationsDesc, ['has-text-justified', 'is-size-6', 'skeleton-lines', 'mb-2'], 'violations-summary');
     const violationsIssues = createElement('div', violationsDesc, ['box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines'], 'violations-issues');
   
      // Fill summary containers with named and anonymous lines
      const violationsIds = [
-       'violationsSummary',
        'violationsNote',
        'violationsTotal',
        'violationsInspections',
@@ -155,14 +207,15 @@ function initialSearchViewUpdate() {
 
 function updateSearchView(data) {
   /** Updates the loading text for the title basd on the returned GET response.
-   *  @param {json} data - GET response object to update the search view with. 
+   *  @param {Object} data - JSON object from GET response to update the search view with. 
    *  @returns {void} - returns nothing, just updates the DOM as relevant.
   */
   // First, extract address parts from the `fetch_all_data` reponse
-  address_parts = data["cleaned_address"].split(/,(.*)/s); // Ref: https://stackoverflow.com/a/4607799
-  
+  let address_parts = data["cleaned_address"].split(/,(.*)/s); // Ref: https://stackoverflow.com/a/4607799
+
   const title = document.getElementById("search-box-title");
   title.dataset.address = data["cleaned_address"];
+  title.dataset.geocode = data.address_geojson.features[0].geometry.coordinates;
   title.innerText = toTitleCase(address_parts[0]);
   title.classList.remove("is-skeleton");
 
@@ -171,8 +224,48 @@ function updateSearchView(data) {
   subtitle.classList.remove("is-skeleton")
 }
 
+async function updateViolations(response) {
+  /** Function to update the violations panel of the frontend
+   * @param {Promise<object>} response - response object from `/fetch_violations/`
+   * @returns {void} - modifies
+  */
+  const data = await response.json();
+
+  // Update violations panel to display information
+  const violationsSummary = document.getElementById('violations-summary');
+  const violationsIssues = document.getElementById('violations-issues');
+  violationsSummary.classList.remove("skeleton-lines");
+  violationsIssues.classList.remove("skeleton-lines", 'is-hidden');
+  // ref: https://stackoverflow.com/a/3955238
+  while (violationsIssues.firstChild) { // Removes empty divs used for loading styling
+    violationsIssues.removeChild(violationsIssues.lastChild);
+  }
+  
+  // Add in data to display response issues by format
+  violationsSummary.innerText = data['summary'];
+  if (data['data_status'] == "available") { // Only add issues list if they exist
+    let i = 0;
+    for (const elemTime of data.summarized_issues) {
+      const time = createElement('p', violationsIssues, [`has-text-weight-bold`, `is-size-7`],  `time${i}`);
+      time.innerText = elemTime['date'];
+      
+      const list = createElement('ul', violationsIssues, [`is-size-7`], `list${i}`);
+      let j = 0;
+      for (const elemIssue of elemTime['issues']) {
+        const issue = createElement('li', list, null, `item${j}`);
+        issue.innerText = elemIssue['emoji'] + elemIssue['description'];
+        j++;
+      }
+      i++;
+    }
+  } else {
+    violationsIssues.classList.add('is-hidden');
+  }
+}
+
 function toggleLoadingWheel() {
   /** Add a loader to the searchBox
+    * @params {none} - no inputs 
     * @returns {void} - modifies the DOM directly, does not modify div
   */
 
@@ -181,16 +274,11 @@ function toggleLoadingWheel() {
   if (existingLoadingWheel) {
     existingLoadingWheel.remove();
     return;
+  } else {
+    const searchBox = document.getElementById("search-address-box");
+    const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel");
+    const loadingWheel = createElement("div", overlay, ["loader"]);
+    searchBox.appendChild(overlay);
+    return;
   }
-
-  // If no loader, create loader
-  const searchBox = document.getElementById("search-address-box");
-
-  // Create overlay and loader
-  const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel")
-  const loadingWheel = createElement("div", overlay, ["loader"]);
-
-  // Link the overlay in the center of the underlaid object
-  searchBox.appendChild(overlay);
-  return;
 }
