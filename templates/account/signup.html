@@ -1,45 +1,78 @@
-{% extends "account/base_entrance.html" %}
-{% load allauth i18n %}
-{% block head_title %}
-    {% trans "Signup" %}
-{% endblock head_title %}
+{% extends "base.html" %}
+{% load i18n %}
+{% load allauth account %}
+{% load socialaccount %}
+
+{% block title %}{% trans "Sign Up" %} signup| apt-plus{% endblock %}
+
 {% block content %}
-    {% element h1 %}
-        {% trans "Sign Up" %}
-    {% endelement %}
-    {% setvar link %}
-        <a href="{{ login_url }}">
-        {% endsetvar %}
-        {% setvar end_link %}
-        </a>
-    {% endsetvar %}
-    {% element p %}
-        {% blocktranslate %}Already have an account? Then please {{ link }}sign in{{ end_link }}.{% endblocktranslate %}
-    {% endelement %}
-    {% if not SOCIALACCOUNT_ONLY %}
-        {% url 'account_signup' as action_url %}
-        {% element form form=form method="post" action=action_url tags="entrance,signup" %}
-            {% slot body %}
-                {% csrf_token %}
-                {% element fields form=form unlabeled=True %}
-                {% endelement %}
-                {{ redirect_field }}
-            {% endslot %}
-            {% slot actions %}
-                {% element button tags="prominent,signup" type="submit" %}
-                    {% trans "Sign Up" %}
-                {% endelement %}
-            {% endslot %}
-        {% endelement %}
-    {% endif %}
-    {% if PASSKEY_SIGNUP_ENABLED %}
-        {% element hr %}
-        {% endelement %}
-        {% element button href=signup_by_passkey_url tags="prominent,signup,outline,primary" %}
-            {% trans "Sign up using a passkey" %}
-        {% endelement %}
-    {% endif %}
-    {% if SOCIALACCOUNT_ENABLED %}
-        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
-    {% endif %}
+
+<div class="map-container">
+  <!-- Map container -->
+  {% include "map.html" %}
+
+  <div class="columns is-centered map-container-overlay is-vcentered" style="height: 100%;">
+    <div class="column is-4">
+      <div class="box mt-6" id="signup-box" style="pointer-events:auto">
+        
+        <!-- Title -->
+        <h1 class="title is-3 mb-4 has-text-left">{% trans "Create an Account" %}</h1>
+
+        {% if not SOCIALACCOUNT_ONLY %}
+          {% url 'account_signup' as signup_url %}
+          <form method="post" action="{{ signup_url }}">
+            {% csrf_token %}
+
+            <!-- Email Field -->
+            <div class="field">
+              <label class="label">{% trans "Email" %}</label>
+              <div class="control has-icons-left">
+                <input class="input is-rounded" type="email" name="email" placeholder="Email address" required id="id_email" value="{{ form.email.value|default_if_none:'' }}">
+                <span class="icon is-left">
+                  <i class="fas fa-envelope"></i>
+                </span>
+              </div>
+            </div>
+
+            {{ redirect_field }}
+
+            <!-- Submit Button -->
+            <div class="field mt-4">
+              <button class="button has-background-black is-link is-fullwidth is-rounded">
+                {% trans "Sign Up" %}
+              </button>
+            </div>
+          </form>
+        {% endif %}
+
+        <!-- Google Signup -->
+        {% if SOCIALACCOUNT_ENABLED %}
+          <div class="mt-4">
+            <a href="{% provider_login_url 'google' process='signup'%}" 
+               class="button is-rounded is-fullwidth is-light is-flex is-align-items-center is-justify-content-center">
+              <span class="icon mr-2">
+                <i class="fab fa-google"></i>
+              </span>
+              <span>Sign up with Google</span>
+            </a>
+          </div>
+        {% endif %}
+
+        <!-- Login link -->
+        <p class="is-size-6 mt-5 has-text-left">
+          {% trans "Already have an account?" %}
+          <a href="{{ login_url }}" class="has-text-link has-text-weight-semibold" style="text-decoration: underline;">
+            {% trans "Sign in" %}
+          </a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}
+
+{% block extra_body %}
+  {{ block.super }}
+{% endblock %}

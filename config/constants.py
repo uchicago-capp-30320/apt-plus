@@ -3,6 +3,7 @@
 WARNING: When modifying this file you must also update static/constants.json
 
 """
+
 import json
 import sys
 from pathlib import Path

@@ -1,59 +1,80 @@
-{% extends "account/base_entrance.html" %}
+{% extends "base.html" %}
 {% load i18n %}
 {% load allauth account %}
+
+{% block title %}{% trans "Confirm Code" %} confirm code| apt-plus{% endblock %}
+
 {% block content %}
-    {% setvar title_ %}
-        {% block title %}{% endblock %}
-    {% endsetvar %}
-    {% setvar action_url %}
-        {% block action_url %}{% endblock %}
-    {% endsetvar %}
-    {% setvar extra_tags %}
-        {% block extra_tags %}{% endblock %}
-    {% endsetvar %}
-    {% setvar form_tags %}
-        entrance,{{ extra_tags }}
-    {% endsetvar %}
-    {% setvar submit_button_tags %}
-        prominent,confirm,{{ extra_tags }}
-    {% endsetvar %}
-    {% setvar recipient %}
-        {% block recipient %}{% endblock %}
-    {% endsetvar %}
-    {% element h1 %}
-        {{ title_ }}
-    {% endelement %}
-    {% element p %}
-        {% blocktranslate %}We've sent a code to {{ recipient }}. The code expires shortly, so please enter it soon.{% endblocktranslate %}
-    {% endelement %}
-    {% element form form=form method="post" action=action_url tags=form_tags %}
-        {% slot body %}
-            {% csrf_token %}
-            {% element fields form=form unlabeled=True %}
-            {% endelement %}
-            {{ redirect_field }}
-        {% endslot %}
-        {% slot actions %}
-            {% element button type="submit" tags=submit_button_tags %}
-                {% translate "Confirm" %}
-            {% endelement %}
-            {% if cancel_url %}
-                {% element button href=cancel_url tags="link,cancel" %}
-                    {% translate "Cancel" %}
-                {% endelement %}
-            {% else %}
-                {% element button type="submit" form="logout-from-stage" tags="link,cancel" %}
-                    {% translate "Cancel" %}
-                {% endelement %}
-            {% endif %}
-        {% endslot %}
-    {% endelement %}
-    {% if not cancel_url %}
-        <form id="logout-from-stage"
-              method="post"
-              action="{% url 'account_logout' %}">
+<div class="map-container">
+  <!-- Map container -->
+  {% include "map.html" %}
+
+  <div class="columns is-centered map-container-overlay is-vcentered" style="height: 100%;">
+    <div class="column is-4">
+      <div class="box mt-6" id="confirm-code-box" style="pointer-events:auto">
+
+        <!-- Title -->
+        <h1 class="title is-3 mb-4 has-text-left">
+          {% block page_title %}{% trans "Confirm Code" %}{% endblock %}
+        </h1>
+
+        <!-- Menssage -->
+        <p class="is-size-6">
+          {% trans "We've sent a code to" %} <a href="mailto:{{ email }}">{{ email }}</a>.
+        </p>
+        <p class="is-size-6 mb-4">
+          {% trans "The code expires shortly, so please enter it soon." %}
+        </p>
+
+        <!-- Form -->
+        <form method="post" action="{% block action_url %}{% url 'account_email_verification_sent' %}{% endblock %}">
+          {% csrf_token %}
+
+          <!-- Code -->
+          <div class="field">
+            <label class="label">{% trans "Verification Code" %}</label>
+            <div class="control has-icons-left">
+              <input class="input is-rounded" type="text" name="code" id="id_code" placeholder="Enter code" required>
+              <span class="icon is-left">
+                <i class="fas fa-key"></i>
+              </span>
+            </div>
+          </div>
+
+          {{ redirect_field }}
+
+          <!-- Confirm Button -->
+          <div class="field mt-4">
+            <button type="submit" class="button has-background-black is-link is-fullwidth is-rounded">
+              {% trans "Confirm" %}
+            </button>
+          </div>
+
+          <!-- Cancel -->
+          {% if cancel_url %}
+            <div class="field mt-2">
+              <a href="{{ cancel_url }}" class="button is-text is-small">
+                {% trans "Cancel" %}
+              </a>
+            </div>
+          {% else %}
+            <div class="field mt-2">
+              <button type="submit" form="logout-from-stage" class="button is-text is-small">
+                {% trans "Cancel" %}
+              </button>
+            </div>
+          {% endif %}
+        </form>
+
+        {% if not cancel_url %}
+          <form id="logout-from-stage" method="post" action="{% url 'account_logout' %}">
             <input type="hidden" name="next" value="{% url 'account_login' %}">
             {% csrf_token %}
-        </form>
-    {% endif %}
-{% endblock content %}
+          </form>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

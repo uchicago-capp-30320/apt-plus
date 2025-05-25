@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load allauth %}
+
+{% block title %}{% trans "Sign Up" %} | apt-plus{% endblock %}
+
+<!-- SOCIALACCOUNT LOGIN TEMPLATE -->
+{% block content %}
+ <!-- Map container -->
+<div class="map-container">
+  {% include "map.html" %}
+
+  <div class="columns is-centered map-container-overlay is-vcentered" style="height: 100%;">
+    <div class="column is-4">
+      <div class="box mt-6" style="pointer-events:auto">
+
+        <!-- Title -->
+        <h1 class="title is-3 mb-4 has-text-left">
+          {% trans "Sign Up" %}
+        </h1>
+
+        <!-- Message explaining third-party account usage -->
+        <p class="is-size-6 mb-4">
+          {% blocktrans with provider_name=account.get_provider.name site_name=site.name %}
+            You are about to use your {{ provider_name }} account to log in to {{ site_name }}.
+            As a final step, please complete the following form:
+          {% endblocktrans %}
+        </p>
+
+        <!-- Third-party sign-up form -->
+        <form method="post" action="{% url 'socialaccount_signup' %}">
+          {% csrf_token %}
+
+          <div class="field">
+            {{ form.as_p }}
+          </div>
+
+          {{ redirect_field }}
+
+          <div class="field mt-4">
+            <button type="submit" class="button has-background-black is-link is-fullwidth is-rounded">
+              {% trans "Sign Up" %}
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
