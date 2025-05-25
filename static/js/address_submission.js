@@ -1,12 +1,12 @@
 import { mapState } from "./map_state.js";
-// import { createElement, toTitleCase, showSearchError } from "./utils.js"
+import { placeAddress } from "./map_modifications.js"
 
 export async function getApartment() {
   /**
-    * Makes a GET request for the apartment and then updates the DOM to 
-    * prepare for loading the data.
-    * @param {void}  
-    * @returns {void} - Sends the request 
+    * Makes a GET request for the apartment and then updates the entire 
+    * left panel of the app to display data from follow-up calls.
+    * @param {void} 
+    * @returns {void} - Sends a series of requests and modifies elements.
   */
 
   // Need this inside getApartment since we need this on submit
@@ -14,7 +14,7 @@ export async function getApartment() {
 
   // Data validation
   if (!address) {
-    showSearchError('Please enter an address.'); // Use popup error handler to show validation error
+    showSearchError('Please enter an address.'); // Use pop-up error handler to show validation error
     return;
   }
   
@@ -72,8 +72,11 @@ export async function getApartment() {
     const busStops = await busStopsPromise;
     mapState.groceryData = await groceries.json(); // Per 5/24 discussion add Globally-scoped Grocery data, to refactor
     mapState.busStopData = await busStops.json();  // Per 5/24 discussion add Globally-scoped Bus data, to refactor 
-    console.log(mapState)
-    return groceryData, busStopData;
+
+    // update buttons
+    document.querySelectorAll('#filter-buttons .button.is-loading').forEach(button => {
+      button.classList.remove('is-loading');
+    });
   } catch (err) {
     console.error('Details request could not be resolved by server:', err.message);
     showSearchError('An error occured while retrieving apartment details. Please try again.');
@@ -96,8 +99,10 @@ async function sendRequest(endpoint, body) {
     if (body[1]) { // fetch_bus_stops needs two params, TODO: request change
       url.searchParams.append('geocode', body[0]);
       url.searchParams.append('property_id', body[1]); 
+      url.searchParams.append('walking_time', 15);
     } else {
       url.searchParams.append('geocode', body[0]);
+      url.searchParams.append('walking_time', 15);
     }
   }
 
@@ -214,20 +219,25 @@ function updateSearchView(data) {
   let address_parts = data["cleaned_address"].split(/,(.*)/s); // Ref: https://stackoverflow.com/a/4607799
 
   const title = document.getElementById("search-box-title");
-  title.dataset.address = data["cleaned_address"];
-  title.dataset.geocode = data.address_geojson.features[0].geometry.coordinates;
+  mapState.address = data["cleaned_address"];
+  mapState.geocode = data.address_geojson.features[0].geometry.coordinates;
   title.innerText = toTitleCase(address_parts[0]);
   title.classList.remove("is-skeleton");
 
   const subtitle = document.getElementById("search-box-subtitle");
   subtitle.innerText = toTitleCase(address_parts[1]);
   subtitle.classList.remove("is-skeleton")
+
+  // Collect buttons and add loading
+  document.querySelectorAll('#filter-buttons .button').forEach(button => {
+    button.classList.add('is-loading');
+  });
 }
 
 async function updateViolations(response) {
   /** Function to update the violations panel of the frontend
    * @param {Promise<object>} response - response object from `/fetch_violations/`
-   * @returns {void} - modifies
+   * @returns {void} - modifies violations data directly.
   */
   const data = await response.json();
 
