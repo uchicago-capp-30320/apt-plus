@@ -21,6 +21,14 @@ html.is-dark .dark-mode-logo {
   display: block !important;
 }
 
+/* Front-panel styling */
+.icon-format {
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Container clean-up */
 .map-container {
   height: calc(100vh - var(--bulma-navbar-height));
