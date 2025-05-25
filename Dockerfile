@@ -9,7 +9,12 @@ ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 
 # install GDAL & GEOS
+## libpq-dev: required to build psycopg2
+## gcc: required to comple C extensions (to build psycopg2)
+## gdal-bin: required for GeoDjango 
 RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
     gdal-bin \
     libgdal-dev \
     libgeos-dev \
