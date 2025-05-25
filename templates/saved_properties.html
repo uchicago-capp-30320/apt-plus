@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Saved Properties | apt-plus{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title is-2 has-text-centered">My Saved Properties</h1>
+
+        <!-- If the user has any saved properties, we will display cards -->
+        {% if saved_properties %}
+        <div class="columns is-multiline mb-4">
+            {% for saved_property in saved_properties %}
+            <div class="column is-4-desktop is-6-tablet" id="property-card-{{ forloop.counter }}">
+                <div class="card h-100">
+                    <div class="card-content">
+                        <!-- Header with property name -->
+                        <p class="title is-5 mb-2">
+                            {% if saved_property.custom_name %}
+                                {{ saved_property.custom_name }}
+                            {% else %}
+                                {{ saved_property.address|title }}
+                            {% endif %}
+                        </p>
+                        
+                        <!-- Address (if custom name is set) -->
+                        {% if saved_property.custom_name %}
+                            <p class="subtitle is-6 has-text-grey mb-3">{{ saved_property.address|title }}</p>
+                        {% endif %}
+                        
+                        <!-- Property details -->
+                        <div class="content">
+                            
+                            <!-- Rent price if available -->
+                            {% if saved_property.rent_price %}
+                            <p class="has-text-weight-bold mb-3">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fas fa-dollar-sign"></i></span>
+                                    <span>{{ saved_property.rent_price }}/month</span>
+                                </span>
+                            </p>
+                            {% endif %}
+                            
+                            <!-- Remarks/notes -->
+                            {% if saved_property.remarks %}
+                            <div class="block mt-3 mb-3">
+                                <p class="is-size-7 has-text-weight-bold mb-1">Notes:</p>
+                                <p>{{ saved_property.remarks }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Transit information -->
+                            {% with bus_data=saved_property.bus_stops_by_time %}
+                            {% if bus_data.total_stops > 0 %}
+                            <div class="block mt-4">
+                                <p class="is-size-10 has-text-weight-bold mb-1">Transit:</p>
+                                <!-- Change the flex container properties to allow for proper sizing -->
+                                <div class="is-flex is-flex-direction-column" style="align-items: flex-start;">
+                                    <span class="tag is-info is-light mb-1">
+                                        <span class="icon-text">
+                                            <span class="icon"><i class="fas fa-bus"></i></span>
+                                            <span>{{ bus_data.within_5_min }} stops within 5 min</span>
+                                        </span>
+                                    </span>
+                                    <span class="tag is-info is-light mb-1">
+                                        <span class="icon-text">
+                                            <span class="icon"><i class="fas fa-bus"></i></span>
+                                            <span>{{ bus_data.within_10_min }} stops within 10 min</span>
+                                        </span>
+                                    </span>
+                                    <span class="tag is-info is-light mb-1">
+                                        <span class="icon-text">
+                                            <span class="icon"><i class="fas fa-bus"></i></span>
+                                            <span>{{ bus_data.within_15_min }} stops within 15 min</span>
+                                        </span>
+                                    </span>
+                                    
+                                    {% with routes=saved_property.unique_bus_routes %}
+                                    {% if routes %}
+                                    <span class="tag is-success is-light">
+                                        <span class="icon-text">
+                                            <span class="icon"><i class="fas fa-route"></i></span>
+                                            <span>{{ saved_property.bus_routes_count }} routes</span>
+                                        </span>
+                                    </span>
+                                    {% endif %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                            
+                            <!-- Date saved -->
+                            <p class="is-size-7 has-text-grey mt-4">
+                                Saved on {{ saved_property.date_saved|date:"M j, Y" }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Card footer with actions -->
+                    <footer class="card-footer">
+                        <a href="/?address={{ saved_property.address|urlencode }}" class="card-footer-item">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fas fa-map"></i></span>
+                                <span>View on Map</span>
+                            </span>
+                        </a>
+                        <button class="card-footer-item button is-white has-text-danger" 
+                                hx-post="/delete_property/"
+                                hx-vals='{"property_address": "{{ saved_property.address }}"}'
+                                hx-target="#property-card-{{ forloop.counter }}"
+                                hx-swap="innerHTML fade-out"
+                                hx-confirm="Remove this property from your saved list?">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fas fa-trash"></i></span>
+                                <span>Remove</span>
+                            </span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% else %}
+        <!-- No saved properties message -->
+        <div class="notification is-info is-light mt-5">
+            <p class="has-text-centered p-5">
+                <span class="icon mb-3">
+                    <i class="fas fa-bookmark fa-2x"></i>
+                </span>
+                <br>
+                You don't have any saved properties yet.
+                <br>
+                <a href="/" class="button is-info is-outlined mt-4">Search for Properties</a>
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

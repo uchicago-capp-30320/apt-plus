@@ -93,7 +93,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class SavedProperty(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_properties")
-    property = models.ForeignKey("Property", on_delete=models.CASCADE)
+    property_obj = models.ForeignKey("Property", on_delete=models.CASCADE)
     address = models.CharField(max_length=512, null=False, blank=False, default="Unknown Address")
     custom_name = models.CharField(max_length=512, null=True, blank=True)
     date_saved = models.DateTimeField(auto_now_add=True)
@@ -125,6 +125,84 @@ class SavedProperty(models.Model):
         self.date_saved = timezone.now()
         self.save()
         return True
+
+    @property
+    def bus_stops_by_time(self):
+        """
+        Return a dictionary with counts of bus stops within different walking time ranges.
+        Returns:
+            dict: Contains counts of stops within 5, 10, and 15 minutes, and total stops
+        """
+        result = {
+            "within_5_min": 0,
+            "within_10_min": 0,
+            "within_15_min": 0,
+            "total_stops": 0,
+        }
+
+        # Check if property and bus_stops exist
+        if not self.property_obj or not self.property_obj.bus_stops:
+            return result
+
+        try:
+            # Count stops by time buckets
+            for stop in self.property_obj.bus_stops:
+                # Skip invalid entries
+                if not isinstance(stop, dict) or "properties" not in stop:
+                    continue
+
+                # Get distance in minutes
+                minutes = stop.get("properties", {}).get("distance_min", 999)
+
+                # Count by time buckets
+                result["total_stops"] += 1
+
+                if minutes <= 5:
+                    result["within_5_min"] += 1
+                if minutes <= 10:
+                    result["within_10_min"] += 1
+                if minutes <= 15:
+                    result["within_15_min"] += 1
+
+            return result
+
+        except (TypeError, AttributeError) as e:
+            # Log the error if needed
+            print(f"Error processing bus stops time buckets: {e}")
+            return result
+
+    @property
+    def unique_bus_routes(self):
+        """
+        Return a sorted list of unique bus routes serving this property.
+        Returns:
+            list: Sorted list of unique bus route numbers/names
+        """
+        if not self.property_obj or not self.property_obj.bus_stops:
+            return []
+
+        try:
+            routes = set()
+            for stop in self.property_obj.bus_stops:
+                if (
+                    isinstance(stop, dict)
+                    and "properties" in stop
+                    and "routes" in stop["properties"]
+                ):
+                    routes.update(stop["properties"]["routes"])
+            return sorted(routes)
+        except (TypeError, AttributeError) as e:
+            print(f"Error extracting unique bus routes: {e}")
+            return []
+
+    @property
+    def bus_routes_count(self):
+        """
+        Return the count of unique bus routes serving this property.
+        Returns:
+            int: Number of unique bus routes
+        """
+        return len(self.unique_bus_routes)
 
 
 class Property(LocationMixin, models.Model):
