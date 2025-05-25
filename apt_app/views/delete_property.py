@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -30,11 +31,14 @@ def _delete_property(request):
         # Soft deleting the property
         saved_property.soft_delete()
 
+        proper_address = property_address.title()
+        proper_address = re.sub(r"\b(Il)\b", "IL", proper_address)
+
         # Return template to replace the button
         return render(
             request,
             "snippets/delete_property_response.html",
-            {"property_address": property_address},
+            {"property_address": proper_address},
         )
 
     return HttpResponse("Method not allowed", status=405)
