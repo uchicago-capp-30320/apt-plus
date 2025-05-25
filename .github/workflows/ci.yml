@@ -40,7 +40,7 @@ jobs:
         run: uv run manage.py collectstatic --noinput
 
       - name: Run tests
-        run: uv run pytest tests/ci.py
+        run: uv run pytest # tests/ci.py
 
       - name: Run Ruff linter
         run: uvx ruff check .
