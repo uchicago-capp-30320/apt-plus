@@ -30,7 +30,9 @@ def _fetch_bus_routes(routes: str):
     try:
         routes_qs = TransitRoute.objects.filter(route_id__in=route_num_list)
         if not routes_qs:
-            return JsonResponse({"error": "This route does not pass Hyde Park"}, status=400)
+            return JsonResponse(
+                {"error": "This route is not available in our database"}, status=400
+            )
         routes_list = list(routes_qs)
     except TransitRoute.DoesNotExist as e:
         return JsonResponse({"error": f"This route does not pass Hyde Park: {e}"}, status=404)
