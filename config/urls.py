@@ -25,6 +25,11 @@ from apt_app.views.views import (
     fetch_groceries,
     fetch_inspections,
     fetch_bus_routes,
+    save_property,
+    update_property,
+    handle_post_login,
+    check_property_status,
+    delete_property,
 )
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
@@ -44,6 +49,11 @@ urlpatterns = [
         name="fetch_inspection_summaries",
     ),
     path("fetch_bus_routes/", fetch_bus_routes, name="fetch_bus_routes"),
+    path("save_property/", save_property, name="save_property"),
+    path("update_property/", update_property, name="update_property"),
+    path("handle_post_login/", handle_post_login, name="handle_post_login"),
+    path("check_property_status/", check_property_status, name="check_property_status"),
+    path("delete_property/", delete_property, name="delete_property"),
 ]
 
 if settings.DEBUG and not settings.IS_TESTING:
