@@ -1,5 +1,5 @@
   // Initialize MapLibre map (STATIC at first)
-  var map = new maplibregl.Map({
+  const map = new maplibregl.Map({
     container: 'map',
     style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
     center: [-87.5995, 41.7925],
@@ -7,12 +7,9 @@
     interactive: false
   });
 
-  const currentMarker = null; // To store the marker
+  let currentMarker = null; // To store the marker
 
   async function placeAddress(response) {
-    // Start by clearing the map (for when the user does another search)
-    clearMap();
-    resetButtons()
     /**
     * Places the submitted address on the map.
     * 
@@ -21,6 +18,10 @@
     */
     // Input error handling
     if (!response) return;
+
+    // Start by clearing the map (for when the user does another search)
+    clearMap();
+    resetButtons()
 
     // Handle both string and object inputs
     const data = typeof response === 'string' ? JSON.parse(response) : response;
@@ -93,10 +94,10 @@
     return filterSelect ? parseInt(filterSelect.value) : 5;
   }
 
-  var groceryMarkers = [];
-  var busStopMarkers = [];
-  var groceriesON = false;
-  var busStopsON = false;
+  let groceryMarkers = [];
+  let busStopMarkers = [];
+  let groceriesON = false;
+  let busStopsON = false;
 
   const groceryData = {
     "address": "123 Main St",
