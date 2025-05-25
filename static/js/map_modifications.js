@@ -124,8 +124,7 @@ function removeMarkers(markers) {
 export function updateGroceries() {
   groceryMarkers = removeMarkers(groceryMarkers);
   const distanceMin = getDistanceFilter();
-  console.log("Grocery geoJSON below:");
-  console.log(mapState.groceryData.grocery_geojson);
+  console.log(mapState)
   groceryMarkers = loadMarkersToMap(
     mapState.groceryData.grocery_geojson,
     distanceMin,
