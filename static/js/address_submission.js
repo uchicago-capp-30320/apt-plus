@@ -1,7 +1,43 @@
-import { mapState } from "./map_state.js";
-// import { createElement, toTitleCase, showSearchError } from "./utils.js"
+// =============================================================================
+// INITIALIZATION AND SETUP
+// =============================================================================
+const propertyStatusCache = {};
 
-export async function getApartment() {
+// Enable View Transitions for HTMX
+document.addEventListener('DOMContentLoaded', function() {
+  if ('startViewTransition' in document) {
+    htmx.config.globalViewTransitions = true;
+    console.log("View Transitions API is supported and enabled");
+  } else {
+    console.log("View Transitions API is not supported in this browser");
+  }
+
+  // Check if we're returning from login with property address
+  const returnAddress = localStorage.getItem('returnToProperty');
+  if (returnAddress) {
+    console.log("Returning to property view:", returnAddress);
+    
+    // Clear the stored address
+    localStorage.removeItem('returnToProperty');
+    
+    // Wait for DOM to be fully loaded
+    setTimeout(function() {
+      // Set the address in the search input
+      const addressInput = document.getElementById('addressInput');
+      if (addressInput) {
+        addressInput.value = returnAddress;
+        
+        // Trigger search
+        const searchButton = document.querySelector('#search-box-bar .button');
+        if (searchButton) {
+          searchButton.click();
+        }
+      }
+    }, 500);
+  }
+});
+
+async function getApartment() {
   /**
     * Makes a GET request for the apartment and then updates the DOM to 
     * prepare for loading the data.
@@ -17,89 +53,55 @@ export async function getApartment() {
     showSearchError('Please enter an address.'); // Use popup error handler to show validation error
     return;
   }
-  
-  // First clean up mapState as we've just started modifying the address state
-  mapState.busStopData = null;
-  mapState.groceryData = null;
-
-  // Show loading spinner while waiting for response
-  toggleLoadingWheel();
-  let response, inspectionsPromise, groceriesPromise, busStopsPromise;
 
   try {
-    response = await sendRequest('/fetch_all_data/', address); 
+    // Show loading spinner while waiting for response
+    toggleLoadingWheel();
   
-    // fetch_all_data returned an error - show popup error message 
+    // Send GET request to fetch_all_data
+    const response = await sendRequest(address); 
+  
+  
+    // fetch_all_data returned an error — show popup error message 
     if (!response.ok) {
       const errorData = await response.json(); 
       const message = errorData.Error;
       showSearchError(message || 'Something went wrong.');
-
-      // Clean up violations panel as relevant
-      const violationsSummary = document.getElementById('violations-summary');
-      const violationsIssues = document.getElementById('violations-issues');
-      if (violationsSummary) {
-        violationsSummary.innerText = '-';
-        violationsIssues.classList.add('is-hidden');
-      }
-
       return;
     }
   
     // Parse data and place on map, assuming appropriate format from endpoint
     const data = await response.json();
-    const coord = data.address_geojson.features[0].geometry.coordinates;
-    groceriesPromise = sendRequest('/fetch_groceries/', [coord]); // start fetch_* requests ASAP
-    busStopsPromise = sendRequest('/fetch_bus_stops/', [coord, data['property_id']]); 
-    inspectionsPromise = sendRequest('/fetch_inspections/', data["cleaned_address"]);
-    // let routesPromise = make_requests(data); // placeholder for routes endpoint
-    
     placeAddress(data);
-    switchSearchViewLoading(); // Clean up the front page and update left panel
-    updateSearchView(data); // Pull in data from the response to update the overlay
+
+    // Clean up the front page and update left panel
+    switchSearchViewLoading();
+
+    // Pull in data from the response to update the overlay
+    updateSearchView(data);
+
+    // Clear error message if everything worked
+    clearSearchError(); 
   } catch (err) {
     console.error('Address request could not be resolved by Server:', err.message);
-    showSearchError('An error occurred while retrieving the apartment data.'); // Use popup error handler to show network failure
-   } finally {
+    toggleLoadingWheel(); //Ensure spinner is removed even on failure
+    showSearchError('An error occurred while retrieving the apartment data.'); //Use popup error handler to show network failure
+  } finally {
+    // Stop spinner after response received
     toggleLoadingWheel();
-  }
-
-   // Handle remaining calls
-   try {
-    const inspections = await inspectionsPromise; 
-    updateViolations(inspections);
-    const groceries = await groceriesPromise;
-    const busStops = await busStopsPromise;
-    mapState.groceryData = await groceries.json(); // Per 5/24 discussion add Globally-scoped Grocery data, to refactor
-    mapState.busStopData = await busStops.json();  // Per 5/24 discussion add Globally-scoped Bus data, to refactor 
-    console.log(mapState)
-    return groceryData, busStopData;
-  } catch (err) {
-    console.error('Details request could not be resolved by server:', err.message);
-    showSearchError('An error occured while retrieving apartment details. Please try again.');
   }
 }
 
-async function sendRequest(endpoint, body) {
+async function sendRequest(address) {
   /** 
-   * Sends a GET request for any address to a fetch endpoint
-   * @param {string} endpoint - endpoint to direct
-   * @param {string} body - address or lat/lon to add into the compiled URL 
+   * Sends a GET request for any address to the fetch_all_address endpoint
+   * @param {string} address - address to add into the compiled URL 
    * @returns {Promise<response>} returns the promise object of the get request
   */
 
   // Construct GET request
-  const url = new URL(endpoint, window.location.origin);
-  if (endpoint==='/fetch_all_data/' || endpoint==='/fetch_inspections/') {
-    url.searchParams.append('address', body);
-  } else {
-    if (body[1]) { // fetch_bus_stops needs two params, TODO: request change
-      url.searchParams.append('geocode', body[0]);
-      url.searchParams.append('property_id', body[1]); 
-    } else {
-      url.searchParams.append('geocode', body[0]);
-    }
-  }
+  const url = new URL('/fetch_all_data/', window.location.origin);
+  url.searchParams.append('address', address);
 
   // Send the request and then store it as a variable so we can operate on the DOM
   return fetch(url, { method: 'GET' });
@@ -129,23 +131,10 @@ function switchSearchViewLoading() {
     title.textContent = "#### LongStreetName Type"; // Placeholder text for wrapping
     title.classList.add("is-skeleton");
 
-    // Wipe violations for new search
-    const violationsSummary = document.getElementById('violations-summary');
-    const violationsIssues = document.getElementById('violations-issues');
-    violationsSummary.innerText = '';
+    const violationsSummary = getElementById('violations-summary');
+    const violationsIssues = getElementById('violations-summary');
     violationsSummary.classList.add('skeleton-lines');
     violationsIssues.classList.add('skeleton-lines');
-
-    // Add formatting for skeleton lines
-    const violationsIds = [
-      'violationsNote',
-      'violationsTotal',
-      'violationsInspections',
-      'violationsStartDate'
-    ];
-    violationsIds.forEach(id => {
-      createElement('div', violationsSummary, [], id);
-    }); 
   }
 }
 
@@ -170,9 +159,13 @@ function initialSearchViewUpdate() {
     searchBox.insertBefore(subtitle, searchBar)
 
     // Add control elements
-    const saveButtonContainer = createElement('div', searchBox, ['mb-4']);
-    const saveButton = createElement('button', saveButtonContainer, ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
-    saveButton.textContent = 'Save';
+    const saveButtonContainer = createElement('div', searchBox, ['mb-4', 'slide-it'], 'save-button-container');
+    
+    // Show a placeholder button immediately (neutral color)
+    const placeholderButton = createElement('button', saveButtonContainer, 
+      ['button', 'is-rounded', 'is-loading'], 'placeholder-button');
+    placeholderButton.textContent = 'Checking status...';
+
     const filtersTemplate = document.getElementById("filters-template").innerHTML;
     const filters = createElement('div', searchBox, ['media', 'mb-4']);
     filters.innerHTML = filtersTemplate;
@@ -187,11 +180,12 @@ function initialSearchViewUpdate() {
     violationsTitle.textContent = "Code Violations";
     
     // Summary containers
-    const violationsSummary = createElement('div', violationsDesc, ['has-text-justified', 'is-size-6', 'skeleton-lines', 'mb-2'], 'violations-summary');
-    const violationsIssues = createElement('div', violationsDesc, ['box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines'], 'violations-issues');
+    const violationsSummary = createElement('div', violationsDesc, ['has-text-justified', 'is-size-7', 'skeleton-lines', 'mb-2'], 'violations-summary');
+    const violationsIssues = createElement('div', violationsDesc, ['box', 'has-background-light', 'mt-2', 'p-3', 'violations-box', 'skeleton-lines'], 'violations-summary');
   
      // Fill summary containers with named and anonymous lines
      const violationsIds = [
+       'violationsSummary',
        'violationsNote',
        'violationsTotal',
        'violationsInspections',
@@ -206,66 +200,116 @@ function initialSearchViewUpdate() {
    }
 
 function updateSearchView(data) {
-  /** Updates the loading text for the title basd on the returned GET response.
-   *  @param {Object} data - JSON object from GET response to update the search view with. 
+  /** Updates the loading text for the title based on the returned GET response.
+   *  @param {json} data - GET response object to update the search view with. 
    *  @returns {void} - returns nothing, just updates the DOM as relevant.
   */
   // First, extract address parts from the `fetch_all_data` reponse
-  let address_parts = data["cleaned_address"].split(/,(.*)/s); // Ref: https://stackoverflow.com/a/4607799
-
+  address_parts = data["cleaned_address"].split(/,(.*)/s);
+  
   const title = document.getElementById("search-box-title");
   title.dataset.address = data["cleaned_address"];
-  title.dataset.geocode = data.address_geojson.features[0].geometry.coordinates;
   title.innerText = toTitleCase(address_parts[0]);
   title.classList.remove("is-skeleton");
 
   const subtitle = document.getElementById("search-box-subtitle");
   subtitle.innerText = toTitleCase(address_parts[1]);
-  subtitle.classList.remove("is-skeleton")
+  subtitle.classList.remove("is-skeleton");
+
+  // Check if the property is already saved by the user
+  checkPropertyStatus(data["cleaned_address"]);
 }
 
-async function updateViolations(response) {
-  /** Function to update the violations panel of the frontend
-   * @param {Promise<object>} response - response object from `/fetch_violations/`
-   * @returns {void} - modifies
-  */
-  const data = await response.json();
+// Add this new function to check property status and update the button accordingly
+const checkPropertyStatus = async (propertyAddress) => {
+  // Only proceed if container exists
+  const saveButtonContainer = document.getElementById("save-button-container");
+  if (!saveButtonContainer) return;
 
-  // Update violations panel to display information
-  const violationsSummary = document.getElementById('violations-summary');
-  const violationsIssues = document.getElementById('violations-issues');
-  violationsSummary.classList.remove("skeleton-lines");
-  violationsIssues.classList.remove("skeleton-lines", 'is-hidden');
-  // ref: https://stackoverflow.com/a/3955238
-  while (violationsIssues.firstChild) { // Removes empty divs used for loading styling
-    violationsIssues.removeChild(violationsIssues.lastChild);
-  }
-  
-  // Add in data to display response issues by format
-  violationsSummary.innerText = data['summary'];
-  if (data['data_status'] == "available") { // Only add issues list if they exist
-    let i = 0;
-    for (const elemTime of data.summarized_issues) {
-      const time = createElement('p', violationsIssues, [`has-text-weight-bold`, `is-size-7`],  `time${i}`);
-      time.innerText = elemTime['date'];
-      
-      const list = createElement('ul', violationsIssues, [`is-size-7`], `list${i}`);
-      let j = 0;
-      for (const elemIssue of elemTime['issues']) {
-        const issue = createElement('li', list, null, `item${j}`);
-        issue.innerText = elemIssue['emoji'] + elemIssue['description'];
-        j++;
-      }
-      i++;
+  try {
+    // Check cache first
+    if (propertyStatusCache[propertyAddress] !== undefined) {
+      console.log("Using cached property status");
+      updateButtonBasedOnStatus(
+        propertyAddress, 
+        propertyStatusCache[propertyAddress], 
+        saveButtonContainer
+      );
+      return;
     }
+    
+    // Make request to check if property is saved
+    const url = new URL('/check_property_status/', window.location.origin);
+    url.searchParams.append('property_address', propertyAddress);
+    
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    // Store in cache
+    propertyStatusCache[propertyAddress] = data.is_saved;
+    
+    // Update the button
+    updateButtonBasedOnStatus(propertyAddress, data.is_saved, saveButtonContainer);
+  } catch (error) {
+    console.error("Error checking property status:", error);
+    // Show default save button on error
+    updateButtonBasedOnStatus(propertyAddress, false, saveButtonContainer);
+  }
+}
+
+// Extract button creation to a separate function
+function updateButtonBasedOnStatus(propertyAddress, isSaved, container) {
+  // Clear the container
+  container.innerHTML = '';
+  
+  if (isSaved) {
+    // Add status notification 
+    const statusNote = createElement('div', container, ['notification', 'is-info', 'is-light', 'py-2', 'px-3', 'mb-2'], 'saved-status');
+    statusNote.innerHTML = '<span class="icon-text"><span class="icon"><i class="fas fa-bookmark"></i></span> <span>This property is in your saved list</span></span>';
+
+    // Property is saved - show delete button
+    const deleteButton = createElement('button', container, 
+      ['button', 'is-danger', 'is-outlined', 'is-rounded'], 'delete-button');
+    // Add icon and text as children
+    const iconSpan = createElement('span', deleteButton, ['icon', 'is-small']);
+    const icon = createElement('i', iconSpan, ['fas', 'fa-trash']);
+    const textSpan = createElement('span', deleteButton);
+    textSpan.textContent = 'Remove';
+    
+    // Add HTMX attributes for delete
+    deleteButton.setAttribute('hx-post', '/delete_property/');
+    deleteButton.setAttribute('hx-vals', `js:{property_address: "${propertyAddress}"}`);
+    deleteButton.setAttribute('hx-target', '#save-button-container');
+    deleteButton.setAttribute('hx-trigger', 'click');
+    deleteButton.setAttribute('hx-swap', 'outerHTML transition:true');
+    
+    // Tell HTMX to process the button
+    htmx.process(deleteButton);
   } else {
-    violationsIssues.classList.add('is-hidden');
+    // Property is not saved - show save button
+    const saveButton = createElement('button', container, 
+      ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
+    
+    // Add icon and text as children
+    const iconSpan = createElement('span', saveButton, ['icon', 'is-small']);
+    const icon = createElement('i', iconSpan, ['fas', 'fa-bookmark']);
+    const textSpan = createElement('span', saveButton);
+    textSpan.textContent = 'Save to my list';
+    
+    // Add HTMX attributes for save
+    saveButton.setAttribute('hx-get', '/save_property/');
+    saveButton.setAttribute('hx-vals', `js:{propertyAddress: "${propertyAddress}"}`);
+    saveButton.setAttribute('hx-target', '#save-button-container');
+    saveButton.setAttribute('hx-trigger', 'click'); 
+    saveButton.setAttribute('hx-swap', 'outerHTML transition:true');
+    
+    // Tell HTMX to process the button
+    htmx.process(saveButton);
   }
 }
 
 function toggleLoadingWheel() {
   /** Add a loader to the searchBox
-    * @params {none} - no inputs 
     * @returns {void} - modifies the DOM directly, does not modify div
   */
 
@@ -274,11 +318,16 @@ function toggleLoadingWheel() {
   if (existingLoadingWheel) {
     existingLoadingWheel.remove();
     return;
-  } else {
-    const searchBox = document.getElementById("search-address-box");
-    const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel");
-    const loadingWheel = createElement("div", overlay, ["loader"]);
-    searchBox.appendChild(overlay);
-    return;
   }
+
+  // If no loader, create loader
+  const searchBox = document.getElementById("search-address-box");
+
+  // Create overlay and loader
+  const overlay = createElement("div", null, ["loader-overlay"], "loading-wheel")
+  const loadingWheel = createElement("div", overlay, ["loader"]);
+
+  // Link the overlay in the center of the underlaid object
+  searchBox.appendChild(overlay);
+  return;
 }
