@@ -15,6 +15,7 @@ export async function placeAddress(response) {
   // Start by clearing the map (for when the user does another search)
   clearMap();
   resetButtons()
+  clearBusRoutes(mapState.map);
 
   // Handle both string and object inputs
   const data = typeof response === 'string' ? JSON.parse(response) : response;
@@ -62,7 +63,7 @@ function enableMapInteraction() {
   map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 }
 
-// Helper function to remove address marker
+// Helper function to remove address and amenities markers
 function clearMap() {
   if (currentMarker) {
     currentMarker.remove();
@@ -70,16 +71,20 @@ function clearMap() {
   }
   groceryMarkers = removeMarkers(groceryMarkers);
   busStopMarkers = removeMarkers(busStopMarkers);
+
 }
 
 // Helper function to deselect buttons
 function resetButtons() {
   mapState.groceriesOn = false;
   mapState.busStopsOn = false;
+  mapState.busRoutesOn = false;
   const groceriesBtn = document.getElementById('groceriesButton');
   const busStopsBtn = document.getElementById('busStopsButton');
+  const busRoutesBtn = document.getElementById('busRoutesButton');
   if (groceriesBtn) groceriesBtn.classList.remove('is-info');
   if (busStopsBtn) busStopsBtn.classList.remove('is-info');
+  if (busRoutesBtn) busRoutesBtn.classList.remove('is-info');
 }
 
 function getDistanceFilter() {
