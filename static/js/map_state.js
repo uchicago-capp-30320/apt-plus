@@ -8,4 +8,5 @@ export const mapState = {
     map: null,
     groceriesOn: false,
     busStopsOn: false,
+    busRoutesOn: false,
   };
