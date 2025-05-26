@@ -5,10 +5,12 @@ from django.views.decorators.csrf import csrf_exempt
 from apt_app.models import SavedProperty
 
 
-@csrf_exempt
 def _delete_property(request):
     """Handle soft delete property from the SavedProperty table"""
     # Delete can happen only if the user is authenticated
+
+    print("delete endpoint triggered")
+
     if not request.user.is_authenticated:
         return HttpResponse("Authentication required", status=401)
 
@@ -17,6 +19,9 @@ def _delete_property(request):
 
         if not property_address:
             return HttpResponse("Property address is required", status=400)
+
+        print("exec")
+        print(property_address)
 
         # Finding the property
         property_address_upper_case = property_address.upper()
