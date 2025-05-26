@@ -204,6 +204,59 @@ class SavedProperty(models.Model):
         """
         return len(self.unique_bus_routes)
 
+    @property
+    def bus_routes_by_time(self):
+        """
+        Return a dictionary with unique bus routes within different walking time ranges.
+        Returns:
+            dict: Contains routes within 5, 10, and 15 minutes
+        """
+        result = {
+            "within_5_min": [],
+            "within_10_min": [],
+            "within_15_min": [],
+        }
+
+        # Check if property and bus_stops exist
+        if not self.property_obj or not self.property_obj.bus_stops:
+            return result
+
+        try:
+            # Initialize sets to collect unique routes in each time bucket
+            routes_5min = set()
+            routes_10min = set()
+            routes_15min = set()
+
+            # Extract routes by time buckets
+            for stop in self.property_obj.bus_stops:
+                # Skip invalid entries
+                if not isinstance(stop, dict) or "properties" not in stop:
+                    continue
+
+                # Get distance in minutes
+                minutes = stop.get("properties", {}).get("distance_min", 999)
+                stop_routes = stop.get("properties", {}).get("routes", [])
+
+                # Add routes to appropriate time buckets
+                if minutes <= 5:
+                    routes_5min.update(stop_routes)
+                if minutes <= 10:
+                    routes_10min.update(stop_routes)
+                if minutes <= 15:
+                    routes_15min.update(stop_routes)
+
+            # Convert sets to sorted lists
+            result["within_5_min"] = sorted(routes_5min)
+            result["within_10_min"] = sorted(routes_10min)
+            result["within_15_min"] = sorted(routes_15min)
+
+            return result
+
+        except (TypeError, AttributeError) as e:
+            # Log the error if needed
+            print(f"Error processing bus routes by time: {e}")
+            return result
+
 
 class Property(LocationMixin, models.Model):
     id = models.AutoField(primary_key=True)

@@ -56,7 +56,7 @@ def _save_property(request):
         # new instance and save it
         saved_property = SavedProperty(
             user=request.user,
-            property=matching_property,
+            property_obj=matching_property,
             address=property_address.upper(),
         )
         saved_property.save()

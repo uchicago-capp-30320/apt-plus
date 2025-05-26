@@ -18,16 +18,12 @@
                     <div class="card-content">
                         <!-- Header with property name -->
                         <p class="title is-5 mb-2">
-                            {% if saved_property.custom_name %}
-                                {{ saved_property.custom_name }}
-                            {% else %}
-                                {{ saved_property.address|title }}
-                            {% endif %}
+                            {{ saved_property.address|title }}
                         </p>
                         
                         <!-- Address (if custom name is set) -->
                         {% if saved_property.custom_name %}
-                            <p class="subtitle is-6 has-text-grey mb-3">{{ saved_property.address|title }}</p>
+                            <p class="subtitle is-6 has-text-grey mb-3">{{ saved_property.custom_name }}</p>
                         {% endif %}
                         
                         <!-- Property details -->
@@ -46,51 +42,57 @@
                             <!-- Remarks/notes -->
                             {% if saved_property.remarks %}
                             <div class="block mt-3 mb-3">
-                                <p class="is-size-7 has-text-weight-bold mb-1">Notes:</p>
+                                <p class="is-size-10 has-text-weight-bold mb-1">Notes:</p>
                                 <p>{{ saved_property.remarks }}</p>
                             </div>
                             {% endif %}
                             
                             <!-- Transit information -->
-                            {% with bus_data=saved_property.bus_stops_by_time %}
-                            {% if bus_data.total_stops > 0 %}
-                            <div class="block mt-4">
-                                <p class="is-size-10 has-text-weight-bold mb-1">Transit:</p>
-                                <!-- Change the flex container properties to allow for proper sizing -->
-                                <div class="is-flex is-flex-direction-column" style="align-items: flex-start;">
-                                    <span class="tag is-info is-light mb-1">
-                                        <span class="icon-text">
-                                            <span class="icon"><i class="fas fa-bus"></i></span>
-                                            <span>{{ bus_data.within_5_min }} stops within 5 min</span>
-                                        </span>
-                                    </span>
-                                    <span class="tag is-info is-light mb-1">
-                                        <span class="icon-text">
-                                            <span class="icon"><i class="fas fa-bus"></i></span>
-                                            <span>{{ bus_data.within_10_min }} stops within 10 min</span>
-                                        </span>
-                                    </span>
-                                    <span class="tag is-info is-light mb-1">
-                                        <span class="icon-text">
-                                            <span class="icon"><i class="fas fa-bus"></i></span>
-                                            <span>{{ bus_data.within_15_min }} stops within 15 min</span>
-                                        </span>
-                                    </span>
-                                    
-                                    {% with routes=saved_property.unique_bus_routes %}
-                                    {% if routes %}
-                                    <span class="tag is-success is-light">
+                            {% with routes_by_time=saved_property.bus_routes_by_time %}
+                            <!-- 5 min routes -->
+                            {% if routes_by_time.within_5_min %}
+                                <div class="mt-2">
+                                    <span class="tag is-success is-light" style="height: auto; white-space: normal; padding-top: 0.25em; padding-bottom: 0.25em;">
                                         <span class="icon-text">
                                             <span class="icon"><i class="fas fa-route"></i></span>
-                                            <span>{{ saved_property.bus_routes_count }} routes</span>
+                                            <span>{{ routes_by_time.within_5_min|length }} routes within 5 min: 
+                                                <span class="has-text-weight-bold">{{ routes_by_time.within_5_min|join:", " }}</span>
+                                            </span>
                                         </span>
                                     </span>
-                                    {% endif %}
-                                    {% endwith %}
                                 </div>
-                            </div>
+                            {% endif %}
+
+                            <!-- 10 min routes (only show if different from 5 min) -->
+                            {% if routes_by_time.within_10_min|length > routes_by_time.within_5_min|length %}
+                                <div class="mt-2">
+                                    <span class="tag is-success is-light" style="height: auto; white-space: normal; padding-top: 0.25em; padding-bottom: 0.25em;">
+                                        <span class="icon-text">
+                                            <span class="icon"><i class="fas fa-route"></i></span>
+                                            <span>{{ routes_by_time.within_10_min|length }} routes within 10 min: 
+                                                <span class="has-text-weight-bold">{{ routes_by_time.within_10_min|join:", " }}</span>
+                                            </span>
+                                        </span>
+                                    </span>
+                                </div>
+                            {% endif %}
+
+                            <!-- 15 min routes (only show if different from 10 min) -->
+                            {% if routes_by_time.within_15_min|length > routes_by_time.within_10_min|length %}
+                                <div class="mt-2">
+                                    <span class="tag is-success is-light" style="height: auto; white-space: normal; padding-top: 0.25em; padding-bottom: 0.25em;">
+                                        <span class="icon-text">
+                                            <span class="icon"><i class="fas fa-route"></i></span>
+                                            <span>{{ routes_by_time.within_15_min|length }} routes within 15 min: 
+                                                <span class="has-text-weight-bold">{{ routes_by_time.within_15_min|join:", " }}</span>
+                                            </span>
+                                        </span>
+                                    </span>
+                                </div>
                             {% endif %}
                             {% endwith %}
+
+                            <!-- Ideally have inspections information also be present here -->
                             
                             <!-- Date saved -->
                             <p class="is-size-7 has-text-grey mt-4">
@@ -109,7 +111,7 @@
                         </a>
                         <button class="card-footer-item button is-white has-text-danger" 
                                 hx-post="/delete_property/"
-                                hx-vals='{"property_address": "{{ saved_property.address }}"}'
+                                hx-vals='{"property_address": "{{ saved_property.address }}", "source": "saved_properties"}'
                                 hx-target="#property-card-{{ forloop.counter }}"
                                 hx-swap="innerHTML fade-out"
                                 hx-confirm="Remove this property from your saved list?">

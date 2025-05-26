@@ -20,6 +20,7 @@ from .update_property import _update_property
 from .delete_property import _delete_property
 from .check_property_status import _check_property_status
 from .handle_post_login import _handle_post_login
+from .saved_properties import _saved_properties
 
 
 def home(request):
@@ -112,35 +113,4 @@ def check_property_status(request):
 
 def saved_properties(request):
     """View for the user to see all their saved properties"""
-
-    # This endpoint only works if the user is authenticated
-    if not request.user.is_authenticated:
-        return HttpResponse("Authentication required", status=401)
-
-    # Checking if the user has any saved properties
-    saved_properties = SavedProperty.objects.filter(
-        user=request.user, is_deleted=False
-    ).select_related("property_obj")
-
-    if saved_properties.exists():
-        first_property = saved_properties[0]
-        print("\n=== SavedProperty Fields ===")
-        print(vars(first_property))  # This will print all fields and values
-
-        print("\n=== Related Property Fields ===")
-        print(
-            vars(first_property.property_obj)
-        )  # This will print all fields in the related Property
-
-        # If you want only the field names
-        print("\n=== SavedProperty Field Names ===")
-        print([field.name for field in first_property._meta.fields])
-
-        print("\n=== Property Field Names ===")
-        print([field.name for field in first_property.property_obj._meta.fields])
-
-    return render(
-        request,
-        "saved_properties.html",
-        {"saved_properties": saved_properties},
-    )
+    return _saved_properties(request)
