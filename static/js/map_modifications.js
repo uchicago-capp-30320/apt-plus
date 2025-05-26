@@ -112,7 +112,7 @@ function loadMarkersToMap(geojson, filterDistance, color, getPopupHTML) {
     // Apply filter
     if (props.distance_min > filterDistance) return;
     // Popup
-    let popup = new maplibregl.Popup({ offset: 25 }).setHTML(getPopupHTML(props));
+    let popup = new maplibregl.Popup({ offset: 25, closeButton: false }).setHTML(getPopupHTML(props));
     let marker = new maplibregl.Marker({ color: color }).setLngLat(coords).addTo(map);
     marker.getElement().addEventListener('mouseenter', () => popup.setLngLat(coords).addTo(map));
     marker.getElement().addEventListener('mouseleave', () => popup.remove());
