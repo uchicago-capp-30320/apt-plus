@@ -92,9 +92,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class SavedProperty(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_properties")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="saved_properties"
+    )
     property = models.ForeignKey("Property", on_delete=models.CASCADE)
-    address = models.CharField(max_length=512, null=False, blank=False, default="Unknown Address")
+    address = models.CharField(
+        max_length=512, null=False, blank=False, default="Unknown Address"
+    )
     custom_name = models.CharField(max_length=512, null=True, blank=True)
     date_saved = models.DateTimeField(auto_now_add=True)
     remarks = models.TextField(null=True, blank=True)
@@ -126,6 +130,137 @@ class SavedProperty(models.Model):
         self.save()
         return True
 
+    @property
+    def bus_stops_by_time(self):
+        """
+        Return a dictionary with counts of bus stops within different walking time ranges.
+        Returns:
+            dict: Contains counts of stops within 5, 10, and 15 minutes, and total stops
+        """
+        result = {
+            "within_5_min": 0,
+            "within_10_min": 0,
+            "within_15_min": 0,
+            "total_stops": 0,
+        }
+
+        # Check if property and bus_stops exist
+        if not self.property_obj or not self.property_obj.bus_stops:
+            return result
+
+        try:
+            # Count stops by time buckets
+            for stop in self.property_obj.bus_stops:
+                # Skip invalid entries
+                if not isinstance(stop, dict) or "properties" not in stop:
+                    continue
+
+                # Get distance in minutes
+                minutes = stop.get("properties", {}).get("distance_min", 999)
+
+                # Count by time buckets
+                result["total_stops"] += 1
+
+                if minutes <= 5:
+                    result["within_5_min"] += 1
+                if minutes <= 10:
+                    result["within_10_min"] += 1
+                if minutes <= 15:
+                    result["within_15_min"] += 1
+
+            return result
+
+        except (TypeError, AttributeError) as e:
+            # Log the error if needed
+            print(f"Error processing bus stops time buckets: {e}")
+            return result
+
+    @property
+    def unique_bus_routes(self):
+        """
+        Return a sorted list of unique bus routes serving this property.
+        Returns:
+            list: Sorted list of unique bus route numbers/names
+        """
+        if not self.property_obj or not self.property_obj.bus_stops:
+            return []
+
+        try:
+            routes = set()
+            for stop in self.property_obj.bus_stops:
+                if (
+                    isinstance(stop, dict)
+                    and "properties" in stop
+                    and "routes" in stop["properties"]
+                ):
+                    routes.update(stop["properties"]["routes"])
+            return sorted(routes)
+        except (TypeError, AttributeError) as e:
+            print(f"Error extracting unique bus routes: {e}")
+            return []
+
+    @property
+    def bus_routes_count(self):
+        """
+        Return the count of unique bus routes serving this property.
+        Returns:
+            int: Number of unique bus routes
+        """
+        return len(self.unique_bus_routes)
+
+    @property
+    def bus_routes_by_time(self):
+        """
+        Return a dictionary with unique bus routes within different walking time ranges.
+        Returns:
+            dict: Contains routes within 5, 10, and 15 minutes
+        """
+        result = {
+            "within_5_min": [],
+            "within_10_min": [],
+            "within_15_min": [],
+        }
+
+        # Check if property and bus_stops exist
+        if not self.property_obj or not self.property_obj.bus_stops:
+            return result
+
+        try:
+            # Initialize sets to collect unique routes in each time bucket
+            routes_5min = set()
+            routes_10min = set()
+            routes_15min = set()
+
+            # Extract routes by time buckets
+            for stop in self.property_obj.bus_stops:
+                # Skip invalid entries
+                if not isinstance(stop, dict) or "properties" not in stop:
+                    continue
+
+                # Get distance in minutes
+                minutes = stop.get("properties", {}).get("distance_min", 999)
+                stop_routes = stop.get("properties", {}).get("routes", [])
+
+                # Add routes to appropriate time buckets
+                if minutes <= 5:
+                    routes_5min.update(stop_routes)
+                if minutes <= 10:
+                    routes_10min.update(stop_routes)
+                if minutes <= 15:
+                    routes_15min.update(stop_routes)
+
+            # Convert sets to sorted lists
+            result["within_5_min"] = sorted(routes_5min)
+            result["within_10_min"] = sorted(routes_10min)
+            result["within_15_min"] = sorted(routes_15min)
+
+            return result
+
+        except (TypeError, AttributeError) as e:
+            # Log the error if needed
+            print(f"Error processing bus routes by time: {e}")
+            return result
+
 
 class Property(LocationMixin, models.Model):
     id = models.AutoField(primary_key=True)
@@ -133,7 +268,7 @@ class Property(LocationMixin, models.Model):
     location = gis_models.PointField()
     created_at = models.DateTimeField(auto_now_add=True)
     bus_stops = models.JSONField(null=True, blank=True)
-    groceries = models.JSONField(null=True, blank=True) # grocery data cache
+    groceries = models.JSONField(null=True, blank=True)  # grocery data cache
 
     class Meta:
         indexes = [GistIndex(fields=["location"])]
@@ -183,7 +318,10 @@ class InspectionSummary(models.Model):
 
 
 class CrimeType(models.TextChoices):
-    OFFENSE_INVOLVING_CHILDREN = "OFFENSE INVOLVING CHILDREN", "Offense Involving Children"
+    OFFENSE_INVOLVING_CHILDREN = (
+        "OFFENSE INVOLVING CHILDREN",
+        "Offense Involving Children",
+    )
     NARCOTICS = "NARCOTICS", "Narcotics"
     CRIM_SEXUAL_ASSAULT = "CRIM SEXUAL ASSAULT", "Crim Sexual Assault"
     CRIMINAL_DAMAGE = "CRIMINAL DAMAGE", "Criminal Damage"
@@ -265,7 +403,9 @@ class AmenityType(models.TextChoices):
 
 
 class Amenity(LocationBasedFacilities):
-    type = models.CharField(max_length=50, choices=AmenityType.choices, default=AmenityType.OTHER)
+    type = models.CharField(
+        max_length=50, choices=AmenityType.choices, default=AmenityType.OTHER
+    )
     address = models.CharField(max_length=255, blank=True, default="")
 
 
@@ -278,13 +418,17 @@ class TransitType(models.TextChoices):
 
 
 class TransitStop(LocationBasedFacilities):
-    type = models.CharField(max_length=50, choices=TransitType.choices, default=TransitType.OTHER)
+    type = models.CharField(
+        max_length=50, choices=TransitType.choices, default=TransitType.OTHER
+    )
 
 
 class TransitRoute(models.Model):
     route_id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255)
-    type = models.CharField(max_length=50, choices=TransitType.choices, default=TransitType.OTHER)
+    type = models.CharField(
+        max_length=50, choices=TransitType.choices, default=TransitType.OTHER
+    )
     geometry = gis_models.MultiLineStringField()
     created_at = models.DateTimeField(auto_now_add=True)
 
