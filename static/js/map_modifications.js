@@ -184,7 +184,7 @@ export function displayBusRoute(map, geojsonFeature) {
    * @param {maplibregl.Map} map - MapLibre map object
    * @param {object} geojsonFeature - GeoJSON MultiLineString Feature
    */
-  const routeId = geojsonFeature.route_id;
+  const routeId = geojsonFeature.properties.route_id;
   if (!routeId || mapState.routes[routeId]) return;
 
   const sourceId = `bus-route-source-${routeId}`;
