@@ -41,7 +41,7 @@ def _fetch_bus_stops(geocode: str, property_id: str, walking_time: int = 5):
         ratio_in_meters = walking_time * WALKING_METERS_PER_MIN
         reference_point = Point(lat, lon, srid=4326)
         # find stops within ratio_in_meters from the reference point
-        near_stops = (
+        all_near_stops = (
             TransitStop.objects.filter(
                 location__distance_lte=(reference_point, DistanceRatio(m=ratio_in_meters))
             )
@@ -52,7 +52,19 @@ def _fetch_bus_stops(geocode: str, property_id: str, walking_time: int = 5):
                     queryset=TransitRoute.objects.only("route_id"),
                 )
             )
+            .order_by("distance")
         )
+        seen_routes = set()
+        filtered_stops = []
+        for stop in all_near_stops:
+            stop_routes = set(route.route_id for route in stop.routes.all())
+            new_routes = stop_routes - seen_routes
+            # Only include this stop if it has at least one new route
+            if new_routes:
+                filtered_stops.append(stop)
+                seen_routes.update(new_routes)
+        near_stops = filtered_stops
+        print(near_stops)
     except Exception as e:
         return JsonResponse({"error": f"Failure in querying bus stop data: {str(e)}"}, status=400)
     if not near_stops:

@@ -1,0 +1,17 @@
+<div id="save-button-container" class="mb-4 slide-it">
+    <div class="notification is-warning">
+        <strong>{{ property_address }}</strong> has been removed from your list.
+    </div>
+    <button class="button is-rounded has-text-white has-background-black mt-2"
+            id="save-button"
+            hx-get="/save_property/"
+            hx-vals='js:{propertyAddress: "{{ property_address }}"}'
+            hx-target="#save-button-container"
+            hx-trigger="click"
+            hx-swap="outerHTML transition:true">
+        <span class="icon is-small">
+            <i class="fas fa-bookmark"></i>
+        </span>
+        <span>Save to my list</span>
+    </button>
+</div>

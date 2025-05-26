@@ -1,0 +1,72 @@
+<div id="save-button-container" class="mb-4">
+    <div class="notification is-success">
+        <strong>{{ property_address }}</strong> has been saved to your list!
+    </div>
+    
+    <!-- Wrapper div that will be the target for replacement -->
+    <div id="details-form-container" class="slide-it">
+        <!-- Actual form with proper form behavior -->
+        <form hx-post="/update_property/" 
+              hx-target="#details-form-container" 
+              hx-swap="outerHTML transition:true">
+             
+            <!-- Hidden input to pass the address -->
+            <input type="hidden" name="property_address" value="{{ property_address }}">
+            
+            <div class="field mb-2">
+                <label class="label is-small">Custom Name</label>
+                <div class="control">
+                    <textarea class="textarea is-small" 
+                              name="property_custom_name" 
+                              placeholder="Add a custom name to this property"
+                              rows="1"></textarea>
+                </div>
+            </div>
+            
+            <div class="field mb-2">
+                <label class="label is-small">Notes</label>
+                <div class="control">
+                    <textarea class="textarea is-small" 
+                              name="property_notes" 
+                              placeholder="Add notes about this property"
+                              rows="2"></textarea>
+                </div>
+            </div>
+            
+            <div class="field mb-4">
+                <label class="label is-small">Monthly rent ($)</label>
+                <div class="control">
+                    <input class="input is-small" 
+                           type="number" 
+                           name="property_rent"
+                           placeholder="1200">
+                </div>
+            </div>
+            
+            <!-- Button Group for Save and Delete -->
+            <div class="field is-grouped">
+                <div class="control">
+                    <button type="submit" class="button is-rounded has-text-white has-background-black">
+                        <span class="icon is-small">
+                            <i class="fas fa-save"></i>
+                        </span>
+                        <span>Save Details</span>
+                    </button>
+                </div>
+                <div class="control">
+                    <button type="button" 
+                            class="button is-danger is-outlined is-rounded"
+                            hx-post="/delete_property/"
+                            hx-vals='js:{property_address: "{{ property_address }}"}'
+                            hx-target="#save-button-container"
+                            hx-swap="outerHTML transition:true">
+                        <span class="icon is-small">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                        <span>Remove</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
