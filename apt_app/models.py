@@ -95,7 +95,7 @@ class SavedProperty(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="saved_properties"
     )
-    property = models.ForeignKey("Property", on_delete=models.CASCADE)
+    property_obj = models.ForeignKey("Property", on_delete=models.CASCADE)
     address = models.CharField(
         max_length=512, null=False, blank=False, default="Unknown Address"
     )
