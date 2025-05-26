@@ -1,7 +1,9 @@
 import pytest
 from apt_app.views.fetch_inspections import parse_address, _fetch_inspection_summaries
+from scripts.inspections_utils import remove_trailing_code_citation, clean_json_string
 from django.http import JsonResponse
 import json
+import textwrap
 
 
 def test_parse_address():
@@ -138,3 +140,49 @@ def test_endpoint_available(client):
 def test_missing_address_param(client):
     response = client.get("/fetch_inspections/")
     assert response.status_code == 400, f"Response status code: {response.status_code} is not 400"
+
+
+# ruff: noqa: E501
+@pytest.mark.parametrize(
+    "input_text, expected_output",
+    [
+        (
+            "Failed to maintain the exterior walls of a building or structure free from holes, breaks, loose or rotting boards or timbers and any other conditions which might admit rain or dampness to the walls.  (13-196-530(b), 13-196-641)",
+            "Failed to maintain the exterior walls of a building or structure free from holes, breaks, loose or rotting boards or timbers and any other conditions which might admit rain or dampness to the walls.",
+        ),
+        (
+            "Stop storing garbage and placing refuse containers improperly. (7-28-260)",
+            "Stop storing garbage and placing refuse containers improperly.",
+        ),
+        (
+            "Failed to provide porch which is more than two risers high with rails not less than three and one-half feet above the floor of the porch.  (13-196-570(b), 13-196-641",
+            "Failed to provide porch which is more than two risers high with rails not less than three and one-half feet above the floor of the porch.",
+        ),
+        (
+            "No codes here at all.",
+            "No codes here at all.",
+        ),
+        (None, ""),
+    ],
+)
+def test_remove_trailing_code_citation(input_text, expected_output):
+    assert remove_trailing_code_citation(input_text) == expected_output
+
+
+@pytest.mark.parametrize(
+    "input_str,expected",
+    [
+        ("""```json\n{\"key\": \"value\"}\n```""", '{"key": "value"}'),
+        ('{"key": "value"}', '{"key": "value"}'),  # no need for parsing
+        ("""```json\n{\n  \"a\": 1\n}\n```""", '{\n  "a": 1\n}'),
+        ("""{\"foo\": \"bar\"}""", '{"foo": "bar"}'),  # no markdown
+        ("""```json\n{\"foo\": \"bar\"}\n```\n""", '{"foo": "bar"}'),  # trailing newline
+        ("""```json\n{\"foo\": \"bar\"}\n```extra""", '{"foo": "bar"}'),
+        (
+            """```json\n{\"foo\": \"bar\"}\n```\n\n""",
+            '{"foo": "bar"}',
+        ),  # multiple trailing newlines
+    ],
+)
+def test_clean_json_string(input_str, expected):
+    assert clean_json_string(input_str) == expected

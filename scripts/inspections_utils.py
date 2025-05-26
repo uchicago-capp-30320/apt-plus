@@ -1,59 +1,79 @@
 # ruff: noqa: E501
 
 import pandas as pd
+import re
+from openai import OpenAI
+import duckdb
+from dotenv import load_dotenv
+import os
+import json
+
+load_dotenv()
+
+# ----- PREPROCESSING AND PROMPT GENERATION -----
+
+HP_NORTH_BOUND = 41.809647
+HP_SOUTH_BOUND = 41.780482
+HP_WEST_BOUND = -87.615877
+HP_EAST_BOUND = -87.579056
 
 ADDRESSES_TO_CHECK = [
     "5220 S HARPER AVE",
     "5514 S BLACKSTONE AVE",
     "5132 S CORNELL AVE",
     "5801 S DORCHESTER AVE",
+    "1001 E 53RD ST",  # should have no non-trivial violations -- needs to be skipped and should have no summary
 ]
 
+TRIVIAL_VIOLATION_CODES_DF = pd.DataFrame(
+    [
+        ["CN190019", "ARRANGE PREMISE INSPECTION", "inspector having no entry"],
+        ["CN193305", "ARRANGE PREMISE INSPECTION", "inspector having no entry"],
+        ["CN190029", "ARRANGE FOR REINSPECTION REGAR", "inspector having no entry"],
+    ],
+    columns=["code", "description", "summary"],
+)
 
-TRIVIAL_VIOLATION_CODES = [
-    ["CN190019", "ARRANGE PREMISE INSPECTION", "inspector having no entry"],
-    ["CN193305", "ARRANGE PREMISE INSPECTION", "inspector having no entry"],
-]
+TRIVIAL_VIOLATION_CODES = TRIVIAL_VIOLATION_CODES_DF["code"].tolist()
 
 BASE_PROMPT = """
-You are a helpful assistant that summarizes long inspection records for an apartment building into a succinct report with a one-line summary as well as bullet points of issues spotted on each occasion. You will be provided a concatenated string of the inspection records, and you will output a single json object that looks like the following example: "
+Your goal is to summarize lengthy inspection records for an apartment building into a succinct,
+reader-friendly format that is digestible and informative for a tenant searching for an apartment.
+You will be provided a concatenated report of alleged violations, and should output a json
+object like the following:
 
 {
-  "summary": "This building has received recent complaints regarding <> and <> concerns, including inadequate heat in at least one unit and multiple violations related to <>, which may pose potential <> risks",
-  "note": "Some issues on <> are omitted for brevity."
+  "summary": "This building was cited <'recently' or specify when> for alleged violations around <...> and <...> concerns,
+  including <one predominant issue such as 'inadequate heating in at least one unit'> and
+  <one or two other issues>."
+
   "summarized_issues": [
     {
-      "date": "Jan 2025", // following the Mon YYYY format
+      "date": "Jan 04, 2025", // following the Mon DD, YYYY format
       "issues": [
         {
           "emoji": "🧊", // use a relevant emoji and if possible a different one for each issue
-          "description": "Insufficient heating (60°F in living room and kitchen) in Unit a, b, c" //
+          "description": "Insufficient heating (60°F in living room and kitchen) and low hot water pressure in Unit <a, b, c>." //
         },
-        {
-          "emoji": "🚿",
-          "description": "Low hot water pressure and substandard temperature (as low as 45°F) in Units a, b, c"
-        }
       ]
     },'
     {
-      "date": "Mar 2024",
-      "issues": []
+      "date": "Mar 15, 2024",
+      "issues": [
         {
           "emoji": "🎨",
           "description": "Graffiti and overflowing trash in rear of building"
         },
-        {
-          "emoji": "🚪",
-          "description": "Multiple apartment and hallway doors jammed, missing, or propped open with wedges—posing potential fire safety risks"
-        }
       ]
     }
   ]
 }
 
-Use a more neural tone that resembles an inspector or assessor but is less esoteric and more appropriate -- one that is appropriate for presentation on an app that helps tenants find apartments. Each summarized issue description should be a short bullet-point summary that, when available, also specifies the unit number or building area at the end.
-
-The original full-length narrative report to be summarized reads as follows:
+The key is for each summarized issue description to be a concise and meaningful reorganization of
+otherwise too detailed or esoteric alleged violations. Depending on thematic relevance and violation
+location, multiple violations may be grouped into a single issue -- or one violation may be split
+into multiple issues. When available, also specify the unit number or building area in parentheses
+at the end of the description. The original full-length concatenated report is as follows:
 """
 
 # omitted part of the prompt:
@@ -69,7 +89,80 @@ def filter_by_violation_code(code: str, df: pd.DataFrame) -> pd.DataFrame:
     return df[df["VIOLATION CODE"] == code]
 
 
-def remove_trivial_violations_by_code(df: pd.DataFrame, trivial_codes: list) -> pd.DataFrame:
+def print_df_stats(func):
+    def wrapper(df_in: pd.DataFrame, *args, **kwargs):
+        df_out: pd.DataFrame = func(df_in, *args, **kwargs)
+        print(f"There are {len(df_out)} rows, with {df_out['ADDRESS'].nunique()} unique addresses")
+        return df_out
+
+    return wrapper
+
+
+@print_df_stats
+def filter_and_recast_columns(df: pd.DataFrame) -> pd.DataFrame:
+    query = """
+    SELECT
+        ADDRESS
+        ,"ID" as "VIOLATION ID"
+        ,strptime("VIOLATION DATE", '%m/%d/%Y') as "VIOLATION DATE"
+        ,"DEPARTMENT BUREAU"
+        ,"INSPECTION NUMBER" as "INSPECTION ID"
+        ,"INSPECTION CATEGORY"
+        ,"INSPECTION STATUS"
+        , "INSPECTOR ID"
+        ,"VIOLATION ORDINANCE"
+        ,"VIOLATION CODE"
+        ,"VIOLATION DESCRIPTION"
+        ,"VIOLATION LOCATION"
+        ,"VIOLATION INSPECTOR COMMENTS"
+        ,"VIOLATION STATUS"
+        , "VIOLATION STATUS DATE"
+    FROM df
+    ORDER BY ADDRESS, "VIOLATION DATE" desc, "INSPECTION CATEGORY"
+    """
+    return duckdb.sql(query).df()
+
+
+@print_df_stats
+def filter_by_date(df: pd.DataFrame, start_date: str, end_date: str) -> pd.DataFrame:
+    query = f"""
+    SELECT *
+    FROM df
+    WHERE "VIOLATION DATE" BETWEEN '{start_date}' AND '{end_date}'
+    """
+    return duckdb.sql(query).df()
+
+
+@print_df_stats
+def filter_for_recent(df: pd.DataFrame, start_date: str = "2020-01-01") -> pd.DataFrame:
+    query = f"""
+    SELECT *
+    FROM df
+    WHERE "VIOLATION DATE" >= DATE '{start_date}'
+    """
+    return duckdb.sql(query).df()
+
+
+@print_df_stats
+def filter_for_hyde_park(df: pd.DataFrame) -> pd.DataFrame:
+    query = f"""
+    SELECT *
+    FROM df
+    WHERE LATITUDE BETWEEN {HP_SOUTH_BOUND} AND {HP_NORTH_BOUND}
+        AND LONGITUDE BETWEEN {HP_WEST_BOUND} AND {HP_EAST_BOUND}
+    """
+    return duckdb.sql(query).df()
+
+
+@print_df_stats
+def filter_by_inspection_categories(df: pd.DataFrame, categories: list[str]) -> pd.DataFrame:
+    categories_upper = [c.upper() for c in categories]
+    return df[df["INSPECTION CATEGORY"].isin(categories_upper)]
+
+
+def remove_trivial_violations_by_code(
+    df: pd.DataFrame, trivial_codes: list[str] = TRIVIAL_VIOLATION_CODES
+) -> pd.DataFrame:
     return df[~df["VIOLATION CODE"].isin(trivial_codes)]
 
 
@@ -90,12 +183,36 @@ def filter_df_by_address(address: str, df: pd.DataFrame) -> pd.DataFrame:
     return df[df["ADDRESS"].str.upper().str.startswith(address.upper())]
 
 
-def generate_narrative_report_for_one_occasion(df: pd.DataFrame) -> str:
+_TRAILING_CODES = re.compile(
+    r"""\s*              # the blank(s) just before the codes
+        \(               # opening parenthesis that begins the codes
+        [^()]*           # anything that is not another parenthesis
+        (?:              # …optionally, one-level nested (…) like “(b)”
+            \([^()]*\)   #   the inner pair
+            [^()]*       #   stuff after the inner pair
+        )*               #   …repeat as needed
+        \)?              # optional closing “)” (covers malformed strings)
+        \s*$             # only whitespace until end-of-line
+    """,
+    re.VERBOSE,
+)
+
+
+def remove_trailing_code_citation(text: str) -> str:
     """
-    Helper function to generate the narrative report for a single inspection occasion (defined by a
+    Strip the trailing Chicago-style building-code parentheses, if present.
+    """
+    if not text:
+        return ""
+    return _TRAILING_CODES.sub("", text).rstrip()
+
+
+def generate_concat_report_for_one_occasion(df: pd.DataFrame) -> str:
+    """
+    Helper function to generate the concatenated report for a single inspection occasion (defined by a
     unique date).
 
-    The narrative report should look like:
+    The concatenated report should look like:
     On <date>, this property was cited for <n> alleged violations:
     - 1) it allegedly violated city ordiance <>; inspector commented: <>;
     - 2) it allegedly violated city ordiance <>; inspector commented: <>;
@@ -108,29 +225,122 @@ def generate_narrative_report_for_one_occasion(df: pd.DataFrame) -> str:
 
     for i, row in df.iterrows():
         violation_ordinance = row["VIOLATION ORDINANCE"]
+        cleaned_violation_ordinance = remove_trailing_code_citation(violation_ordinance)
         inspector_comments = row["VIOLATION INSPECTOR COMMENTS"]
-        r += f"{i + 1}) it allegedly violated city ordiance '{violation_ordinance}'. Inspector commented: '{inspector_comments}'; "
+        r += f"{i + 1}) Inspector noted issue(s) with '{inspector_comments}' -- which allegedly violated city ordiance '{cleaned_violation_ordinance}'; "
 
     return r
 
 
-def generate_narrative_report_for_all_occasions(df: pd.DataFrame) -> str:
+def generate_concat_report_for_all_occasions(df: pd.DataFrame) -> str:
     """
-    Concatenate the narrative reports from all inspection occasions for a given address.
+    Concatenate the concatenated reports from all inspection occasions for a given address.
     """
     df = df.sort_values(by=["VIOLATION DATE", "INSPECTION ID"], ascending=False)
     unique_occasion_dates = df["VIOLATION DATE"].unique()
-    out = "This building was cited for the following violations: "
+    out = "This building was cited on the following occasions: "
     for occasion_date in unique_occasion_dates:
         df_occasion = df[df["VIOLATION DATE"] == occasion_date]
-        out += "\n\n" + generate_narrative_report_for_one_occasion(df_occasion)
+        out += "\n\n" + generate_concat_report_for_one_occasion(df_occasion)
     return out
 
 
-def generate_prompt_from_address(address, df):
-    # NOTE: WIP
-    df = filter_df_by_address(address, df=df)
+def generate_prompt_from_address(address, df, base_prompt=BASE_PROMPT):
+    # find the subset of df that matches the address
+    df = filter_df_by_address(address, df)
+    # remove trivial violations
+    df = remove_trivial_violations_by_code(df, trivial_codes=TRIVIAL_VIOLATION_CODES)
+    # generate concatenated report
+    concat_report = generate_concat_report_for_all_occasions(df)
+    # generate prompt
+    prompt = base_prompt + "\n" + concat_report
+    return prompt
 
-    df.sort_values(by=["VIOLATION DATE", ""], ascending=False)
 
-    pass
+def clean_json_string(json_string: str) -> str:
+    """
+    If the string is fenced in a Markdown ```json … ``` code block,
+    return only the JSON inside.  Otherwise return the original string,
+    trimmed of leading/trailing whitespace.
+    """
+    # Look for the *first* ```json … ``` block, ignoring anything after it.
+    pattern = r"```json\s*(.*?)\s*```"
+    m = re.search(pattern, json_string, flags=re.DOTALL | re.IGNORECASE)
+    return m.group(1).strip() if m else json_string.strip()
+
+
+# ----- LLM API CALLS -----
+DS_PROVER_V2 = "deepseek/deepseek-prover-v2:free"
+GPT_41 = "openai/gpt-4.1"
+GEMINI_25 = "google/gemini-2.5-flash-preview-05-20"
+
+MODELS = [DS_PROVER_V2, GPT_41]
+
+OPENROUTER_CLIENT = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+)
+
+
+def query_request_mapper(address: str, df: pd.DataFrame) -> dict:
+    return {
+        DS_PROVER_V2: {
+            "model": DS_PROVER_V2,
+            "response_format": {"type": "json_schema"},
+            "messages": [
+                {
+                    "role": "user",
+                    "content": generate_prompt_from_address(
+                        address, df=df, base_prompt=BASE_PROMPT
+                    ),
+                },
+            ],
+        },
+        GPT_41: {
+            "model": GPT_41,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": generate_prompt_from_address(
+                                address, df=df, base_prompt=BASE_PROMPT
+                            ),
+                        }
+                    ],
+                }
+            ],
+        },
+        GEMINI_25: {
+            "model": GEMINI_25,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": generate_prompt_from_address(
+                                address, df=df, base_prompt=BASE_PROMPT
+                            ),
+                        }
+                    ],
+                }
+            ],
+        },
+    }
+
+
+def llm_summarize_from_address(
+    address: str, df: pd.DataFrame, model: str, client: OpenAI = OPENROUTER_CLIENT
+) -> dict:
+    completion = client.chat.completions.create(**query_request_mapper(address, df)[model])
+    # raw_return still may contain markdown markers i.e. ```json
+    try:
+        raw_return = completion.choices[0].message.content
+        # return raw_return
+        parsed_return = json.loads(clean_json_string(raw_return))
+        return parsed_return
+    except Exception as e:
+        print(f"Error {e} in parsing {raw_return}")
+        return {}
