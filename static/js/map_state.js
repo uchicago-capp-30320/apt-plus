@@ -6,4 +6,5 @@ export const mapState = {
     map: null,
     groceriesOn: false,
     busStopsOn: false,
+    routes: null,
   };
