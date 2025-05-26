@@ -169,3 +169,79 @@ export function toggleBusStops() {
     busStopMarkers = removeMarkers(busStopMarkers);
   }
 }
+
+// Bus routes
+mapState.routes = {};
+
+export function displayBusRoute(map, geojsonFeature) {
+  /**
+   * Function to display a bus route on the map
+   * @param {maplibregl.Map} map - MapLibre map object
+   * @param {object} geojsonFeature - GeoJSON MultiLineString Feature
+   */
+  const routeId = geojsonFeature.route_id;
+  if (!routeId || mapState.routes[routeId]) return;
+
+  const sourceId = `bus-route-source-${routeId}`;
+  const layerId = `bus-route-layer-${routeId}`;
+
+  map.addSource(sourceId, {
+      type: "geojson",
+      data: {
+          type: "FeatureCollection",
+          features: [geojsonFeature]
+      }
+  });
+
+  map.addLayer({
+      id: layerId,
+      type: "line",
+      source: sourceId,
+      paint: {
+          "line-color": geojsonFeature.properties.color,
+          "line-width": 4
+      }
+  });
+
+  mapState.routes[routeId] = {sourceId, layerId};
+}
+
+export function removeBusRoute(map, routeId) {
+  /** Function to remove a bus route from the map
+   * @param {maplibregl.Map} map - MapLibre map object
+   * @param {string} routeId - route identifier
+   */
+  const route = mapState.routes[routeId];
+  if (!route) return;
+
+  if (map.getLayer(route.layerId)) {
+      map.removeLayer(route.layerId);
+  }
+  if (map.getSource(route.sourceId)) {
+      map.removeSource(route.sourceId);
+  }
+
+  delete mapState.routes[routeId];
+}
+
+export function clearBusRoutes(map) {
+  /** Function to clear all bus routes from the map (after button is toggled off)
+   * @param {maplibregl.Map} map - MapLibre map object
+   */
+  Object.keys(mapState.routes).forEach(routeId => {
+      removeBusRoute(map, routeId);
+  });
+  // Reset tracked routes
+  mapState.routes = {};
+}
+
+export function toggleBusRoute(map, geojsonFeature) {
+  const routeId = geojsonFeature.route_id;
+  if (!routeId) return;
+
+  if (mapState.routes[routeId]) {
+      removeBusRoute(map, routeId);
+  } else {
+      displayBusRoute(map, geojsonFeature);
+  }
+}
