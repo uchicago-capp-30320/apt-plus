@@ -208,6 +208,15 @@ export function displayBusRoute(map, geojsonFeature) {
       }
   });
 
+  // Popups
+  map.on('click', layerId, (e) => {
+    const props = e.features[0].properties;
+    new maplibregl.Popup({ closeButton: false, closeOnClick: true })
+      .setLngLat(e.lngLat)
+      .setHTML(`<strong>Route ${props.route_id}</strong>`)
+      .addTo(map);
+  });
+
   mapState.routes[routeId] = {sourceId, layerId};
 }
 
