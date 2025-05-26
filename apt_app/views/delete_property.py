@@ -5,10 +5,10 @@ from django.views.decorators.csrf import csrf_exempt
 from apt_app.models import SavedProperty
 
 
-@csrf_exempt
 def _delete_property(request):
     """Handle soft delete property from the SavedProperty table"""
     # Delete can happen only if the user is authenticated
+
     if not request.user.is_authenticated:
         return HttpResponse("Authentication required", status=401)
 
