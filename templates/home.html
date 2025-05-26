@@ -134,7 +134,7 @@
 <script type="module">
   import { mapState } from '{% static "js/map_state.js" %}';
   import { getApartment } from '{% static "js/address_submission.js" %}';
-  import { updateBusStops, updateGroceries, toggleBusStops, toggleGroceries, toggleBusRoute } from '{% static "js/map_modifications.js" %}';
+  import { updateBusStops, updateGroceries, toggleBusStops, toggleGroceries, toggleBusRoute, displayBusRoute, clearBusRoutes } from '{% static "js/map_modifications.js" %}';
 
   // Initialize MapLibre map (STATIC at first)
   mapState.map = new maplibregl.Map({
@@ -164,11 +164,19 @@
     }
 
     if (busRoutesBtn) {
-      for (const busRoute of mapState.busRoutesData.features) {
-        // console.log(`Plotting: ${busRoute.properties.route_id}`)
-        // console.log(busRoute)
-        toggleBusRoute(mapState.map, busRoute);
-      }
+      mapState.busRoutesOn = !mapState.busRoutesOn;
+      busRoutesBtn.classList.toggle('is-info', mapState.busRoutesOn);
+
+      if (mapState.busRoutesOn) {
+      // Turn ON/OFF all routes (for now)
+        for (const busRoute of mapState.busRoutesData.features) {
+          // console.log(`Plotting: ${busRoute.properties.route_id}`)
+          // console.log(busRoute)
+          displayBusRoute(mapState.map, busRoute);
+        }
+      } else {
+          clearBusRoutes(mapState.map)
+        }
     }
   });
 
