@@ -4,7 +4,7 @@ This test is designed to be run inside the Docker container.
 Make sure to run:
     docker exec -it apt-plus-airflow-scheduler-1 bash
     pip install pytest
-    pytest tests/test_groceries_elt.py
+    pytest tests/groceries_elt_test.py
 """
 import sys
 sys.path.append("/opt/airflow")  # Ensure Airflow DAGs path is available
