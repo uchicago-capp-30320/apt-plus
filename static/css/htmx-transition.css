@@ -1,7 +1,7 @@
 /* 1. Add a minimum height to ensure consistent sizing during transitions */
 .slide-it {
   view-transition-name: slide-it;
-  min-height: 100px; /* Ensures consistent height during transition */
+  transition: height 0.3s ease-out;
 }
 
 /* 2. Update your existing animations to include opacity in slide animations for smoother effect */
@@ -27,9 +27,4 @@
 
 .htmx-settling {
   transition: all 0.3s ease-out;
-}
-
-/* 4. Optional: Add smoothing for height changes */
-.slide-it {
-  transition: height 0.3s ease-out;
 }
