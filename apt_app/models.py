@@ -93,7 +93,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class SavedProperty(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_properties")
-    property = models.ForeignKey("Property", on_delete=models.CASCADE)
+    property_obj = models.ForeignKey("Property", on_delete=models.CASCADE)
     address = models.CharField(max_length=512, null=False, blank=False, default="Unknown Address")
     custom_name = models.CharField(max_length=512, null=True, blank=True)
     date_saved = models.DateTimeField(auto_now_add=True)
@@ -133,7 +133,7 @@ class Property(LocationMixin, models.Model):
     location = gis_models.PointField()
     created_at = models.DateTimeField(auto_now_add=True)
     bus_stops = models.JSONField(null=True, blank=True)
-    groceries = models.JSONField(null=True, blank=True) # grocery data cache
+    groceries = models.JSONField(null=True, blank=True)  # grocery data cache
 
     class Meta:
         indexes = [GistIndex(fields=["location"])]
