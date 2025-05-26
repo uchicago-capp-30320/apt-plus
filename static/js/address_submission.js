@@ -1,6 +1,6 @@
-// =============================================================================
-// INITIALIZATION AND SETUP
-// =============================================================================
+import { mapState } from "./map_state.js";
+import { placeAddress } from "./map_modifications.js"
+
 const propertyStatusCache = {};
 
 // Enable View Transitions for HTMX
@@ -39,10 +39,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function getApartment() {
   /**
-    * Makes a GET request for the apartment and then updates the DOM to 
-    * prepare for loading the data.
-    * @param {void}  
-    * @returns {void} - Sends the request 
+    * Makes a GET request for the apartment and then updates the entire 
+    * left panel of the app to display data from follow-up calls.
+    * @param {void} 
+    * @returns {void} - Sends a series of requests and modifies elements.
   */
 
   // Need this inside getApartment since we need this on submit
@@ -50,7 +50,7 @@ async function getApartment() {
 
   // Data validation
   if (!address) {
-    showSearchError('Please enter an address.'); // Use popup error handler to show validation error
+    showSearchError('Please enter an address.'); // Use pop-up error handler to show validation error
     return;
   }
 
@@ -90,6 +90,24 @@ async function getApartment() {
     // Stop spinner after response received
     toggleLoadingWheel();
   }
+  
+   // Handle remaining calls
+   try {
+    const inspections = await inspectionsPromise; 
+    updateViolations(inspections);
+    const groceries = await groceriesPromise;
+    const busStops = await busStopsPromise;
+    mapState.groceryData = await groceries.json(); // Per 5/24 discussion add Globally-scoped Grocery data, to refactor
+    mapState.busStopData = await busStops.json();  // Per 5/24 discussion add Globally-scoped Bus data, to refactor 
+
+    // update buttons
+    document.querySelectorAll('#filter-buttons .button.is-loading').forEach(button => {
+      button.classList.remove('is-loading');
+    });
+  } catch (err) {
+    console.error('Details request could not be resolved by server:', err.message);
+    showSearchError('An error occured while retrieving apartment details. Please try again.');
+  }
 }
 
 async function sendRequest(address) {
@@ -100,8 +118,19 @@ async function sendRequest(address) {
   */
 
   // Construct GET request
-  const url = new URL('/fetch_all_data/', window.location.origin);
-  url.searchParams.append('address', address);
+  const url = new URL(endpoint, window.location.origin);
+  if (endpoint==='/fetch_all_data/' || endpoint==='/fetch_inspections/') {
+    url.searchParams.append('address', body);
+  } else {
+    if (body[1]) { // fetch_bus_stops needs two params, TODO: request change
+      url.searchParams.append('geocode', body[0]);
+      url.searchParams.append('property_id', body[1]); 
+      url.searchParams.append('walking_time', 15);
+    } else {
+      url.searchParams.append('geocode', body[0]);
+      url.searchParams.append('walking_time', 15);
+    }
+  }
 
   // Send the request and then store it as a variable so we can operate on the DOM
   return fetch(url, { method: 'GET' });
@@ -208,7 +237,8 @@ function updateSearchView(data) {
   address_parts = data["cleaned_address"].split(/,(.*)/s);
   
   const title = document.getElementById("search-box-title");
-  title.dataset.address = data["cleaned_address"];
+  mapState.address = data["cleaned_address"];
+  mapState.geocode = data.address_geojson.features[0].geometry.coordinates;
   title.innerText = toTitleCase(address_parts[0]);
   title.classList.remove("is-skeleton");
 
@@ -216,6 +246,11 @@ function updateSearchView(data) {
   subtitle.innerText = toTitleCase(address_parts[1]);
   subtitle.classList.remove("is-skeleton");
 
+  // Collect buttons and add loading
+  document.querySelectorAll('#filter-buttons .button').forEach(button => {
+    button.classList.add('is-loading');
+  });
+    
   // Check if the property is already saved by the user
   checkPropertyStatus(data["cleaned_address"]);
 }
@@ -254,6 +289,22 @@ const checkPropertyStatus = async (propertyAddress) => {
     console.error("Error checking property status:", error);
     // Show default save button on error
     updateButtonBasedOnStatus(propertyAddress, false, saveButtonContainer);
+
+async function updateViolations(response) {
+  /** Function to update the violations panel of the frontend
+   * @param {Promise<object>} response - response object from `/fetch_violations/`
+   * @returns {void} - modifies violations data directly.
+  */
+  const data = await response.json();
+
+  // Update violations panel to display information
+  const violationsSummary = document.getElementById('violations-summary');
+  const violationsIssues = document.getElementById('violations-issues');
+  violationsSummary.classList.remove("skeleton-lines");
+  violationsIssues.classList.remove("skeleton-lines", 'is-hidden');
+  // ref: https://stackoverflow.com/a/3955238
+  while (violationsIssues.firstChild) { // Removes empty divs used for loading styling
+    violationsIssues.removeChild(violationsIssues.lastChild);
   }
 }
 

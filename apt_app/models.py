@@ -90,12 +90,41 @@ class User(AbstractBaseUser, PermissionsMixin):
 # --- Custom models ---
 
 
-class FavoriteProperty(models.Model):
+class SavedProperty(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="favorite_properties")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_properties")
     property = models.ForeignKey("Property", on_delete=models.CASCADE)
-    custom_name = models.CharField(max_length=255, null=True, blank=True)
+    address = models.CharField(max_length=512, null=False, blank=False, default="Unknown Address")
+    custom_name = models.CharField(max_length=512, null=True, blank=True)
     date_saved = models.DateTimeField(auto_now_add=True)
+    remarks = models.TextField(null=True, blank=True)
+    rent_price = models.IntegerField(null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["address"]),
+            models.Index(fields=["is_deleted"]),
+        ]
+
+    def __str__(self):
+        return self.custom_name if self.custom_name else self.address
+
+    def soft_delete(self):
+        """Mark the property as deleted without removing it from the database."""
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.save()
+        return True
+
+    def restore(self):
+        """Restore a previously soft-deleted property."""
+        self.is_deleted = False
+        self.deleted_at = None
+        self.date_saved = timezone.now()
+        self.save()
+        return True
 
 
 class Property(LocationMixin, models.Model):
@@ -104,6 +133,7 @@ class Property(LocationMixin, models.Model):
     location = gis_models.PointField()
     created_at = models.DateTimeField(auto_now_add=True)
     bus_stops = models.JSONField(null=True, blank=True)
+    groceries = models.JSONField(null=True, blank=True) # grocery data cache
 
     class Meta:
         indexes = [GistIndex(fields=["location"])]

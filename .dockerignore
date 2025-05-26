@@ -1,0 +1,35 @@
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Editor and OS-specific files
+*.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Git-related files and folders
+.git/
+.gitignore
+
+# Build artifacts and local databases
+*.log
+*.sqlite3
+*.db
+
+# Node dependencies
+node_modules/
+
+# Environment variable files
+.env
+.env.*
