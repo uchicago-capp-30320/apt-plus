@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{% static 'css/bulma.css' %}">
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/htmx-transition.css' %}">
 
     <!-- mapLibre info-->
     <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
@@ -30,6 +31,13 @@
 
     <!-- Footer -->
     {% include "footer.html" %}
+
+    <!-- HTMX CSRF Configuration -->
+    <script>
+      document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+      });
+    </script>
 
   </body>
 

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container has-text-centered mt-6">
+    <div class="notification is-info">
+        <p class="title is-4">Welcome back!</p>
+        <p>Returning to your property search...</p>
+    </div>
+</div>
+
+<script>
+    // Store the property address for the home page to retrieve
+    localStorage.setItem('returnToProperty', '{{ property_address }}');
+    // Redirect to the home page
+    setTimeout(() => {
+        window.location.href = '/';
+    }, 1000);
+</script>
+{% endblock %}

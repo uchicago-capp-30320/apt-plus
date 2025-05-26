@@ -10,10 +10,23 @@ CONSTANTS = load_constants()
 WALKING_METERS_PER_MIN = CONSTANTS["WALKING_METERS_PER_MIN"]
 
 
-def _fetch_bus_stops(geocode, property_id, walking_time=5):
+def _fetch_bus_stops(geocode: str, property_id: str, walking_time: int = 5):
     """Take property location and desired walking distance,
     return disticnt bus stops within the walking distance.
     Update property table with the bus stops."""
+    if not property_id:
+        print("error: property_id is required")
+        return JsonResponse({"error": "property_id is required"}, status=400)
+    if not geocode:
+        print("error: geocode is required")
+        return JsonResponse({"error": "geocode is required"}, status=400)
+    if not walking_time:
+        print("error: walking_time is required")
+        return JsonResponse({"error": "walking_time is required"}, status=400)
+    if walking_time < 0:
+        print("error: walking_time must be greater than 0")
+        return JsonResponse({"error": "walking_time must be greater than 0"}, status=400)
+
     try:
         lon_str, lat_str = geocode.split(",")
         lon, lat = float(lon_str), float(lat_str)
@@ -24,32 +37,52 @@ def _fetch_bus_stops(geocode, property_id, walking_time=5):
     # borrow code from Miguel's scripts/check_data_cta_ctops.py refactor later
     # Distance in meters, GoogleMaps has a walking time of 4.2 km per hour.
     try:
+        walking_time = int(walking_time)
         ratio_in_meters = walking_time * WALKING_METERS_PER_MIN
         reference_point = Point(lat, lon, srid=4326)
         # find stops within ratio_in_meters from the reference point
-        # keep only closest stop for each name by using order_by and distinct
-        # NOTE: "Order_by" sorts the bus_stops by name and distance (closest stops first),
-        # and "distinct" keeps only the closest bus_stop by name.
-        near_stops = (
+        all_near_stops = (
             TransitStop.objects.filter(
                 location__distance_lte=(reference_point, DistanceRatio(m=ratio_in_meters))
             )
             .annotate(distance=DistanceFunction("location", reference_point))
             .prefetch_related(
-                ## why dont keep distinct route id here:
-                # could be different directions of the same route
                 Prefetch(
                     "routes",
                     queryset=TransitRoute.objects.only("route_id"),
                 )
             )
+            .order_by("distance")
         )
+        seen_routes = set()
+        filtered_stops = []
+        for stop in all_near_stops:
+            stop_routes = set(route.route_id for route in stop.routes.all())
+            new_routes = stop_routes - seen_routes
+            # Only include this stop if it has at least one new route
+            if new_routes:
+                filtered_stops.append(stop)
+                seen_routes.update(new_routes)
+        near_stops = filtered_stops
+        print(near_stops)
     except Exception as e:
-        print(f"error: Failure in querying bus stop data: {str(e)}")
         return JsonResponse({"error": f"Failure in querying bus stop data: {str(e)}"}, status=400)
+    if not near_stops:
+        return JsonResponse({"error": "No bus stops found within the walking distance"}, status=400)
+
+    # get property object
     try:
         prop = Property.objects.get(id=property_id)
+    except Exception as e:
+        return JsonResponse({"error": f"Invalid property_id: {str(e)}"}, status=400)
+
+    # format response
+    try:
         clean_address = prop.address
+    except Exception as e:
+        return JsonResponse({"error": f"No address info in property table: {str(e)}"}, status=400)
+
+    try:
         features = []
         for stop in near_stops:
             features.append(
@@ -63,7 +96,7 @@ def _fetch_bus_stops(geocode, property_id, walking_time=5):
                         "stop_name": stop.name,
                         "distance_min": round(stop.distance.m / WALKING_METERS_PER_MIN),  # 70 m/min
                         "routes": [route.route_id for route in stop.routes.all()],
-                        "stop_id": stop.id,
+                        "stop_id": str(stop.id),
                     },
                 }
             )
@@ -75,15 +108,11 @@ def _fetch_bus_stops(geocode, property_id, walking_time=5):
                 "features": features,
             },
         }
-
         ## update property table
         if not prop.bus_stops:
-            print("no records in the cache table, updating:")
-            prop.bus_stops = features
+            prop.bus_stops = response
             prop.save()
-            print("property table updated")
     except Exception as e:
-        print(f"error: Failure in updating cache table: {str(e)}")
-        return JsonResponse({"error": f"Failure in updating cache table: {str(e)}"}, status=400)
+        return JsonResponse({"error": f"Failed to update property table: {str(e)}"}, status=400)
 
     return JsonResponse(response)
