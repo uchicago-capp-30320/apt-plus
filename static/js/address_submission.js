@@ -79,11 +79,27 @@ export async function getApartment() {
 
     // update buttons
     document.querySelectorAll('#filter-buttons .button.is-loading').forEach(button => {
-      button.classList.remove('is-loading');
+      if (button.id !== "busRoutesButton") {
+        button.classList.remove('is-loading');
+      }
     });
   } catch (err) {
     console.error('Details request could not be resolved by server:', err.message);
     showSearchError('An error occured while retrieving apartment details. Please try again.');
+  }
+
+  // Save route data
+  try {
+    const busRoutes = await routesPromise;
+    mapState.busRoutesData = busRoutes;
+    document.querySelectorAll('#filter-buttons .button.is-loading').forEach(button => {
+      if (button.id === "busRoutesButton") {
+        button.classList.remove('is-loading');
+      }
+    });
+  } catch (err) {
+    console.error('Details request could not be resolved by server:', err.message);
+    showSearchError('An error occured while retrieving bus route details. Please try again.');
   }
 }
 
