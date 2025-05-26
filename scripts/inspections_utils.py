@@ -37,9 +37,9 @@ TRIVIAL_VIOLATION_CODES_DF = pd.DataFrame(
 TRIVIAL_VIOLATION_CODES = TRIVIAL_VIOLATION_CODES_DF["code"].tolist()
 
 BASE_PROMPT = """
-Your goal is to summarize lengthy inspection records for an apartment building into a succinct,
-reader-friendly format that is digestible and informative for a tenant searching for an apartment.
-You will be provided a concatenated report of alleged violations, and should output a json
+Your goal is to summarize lengthy inspection records for an apartment building into a succinct, \
+reader-friendly format that is digestible and informative for a tenant searching for an apartment. \
+You will be provided a concatenated report of alleged violations, and should output a json \
 object like the following:
 
 {
@@ -69,11 +69,11 @@ object like the following:
   ]
 }
 
-The key is for each summarized issue description to be a concise and meaningful reorganization of
-otherwise too detailed or esoteric alleged violations. Depending on thematic relevance and violation
-location, multiple violations may be grouped into a single issue -- or one violation may be split
-into multiple issues. When available, also specify the unit number or building area in parentheses
-at the end of the description. The original full-length concatenated report is as follows:
+The key is for each summarized issue description to be a concise and meaningful reorganization of \
+otherwise too detailed or esoteric alleged violations. Depending on thematic relevance and violation \
+location, multiple violations may be grouped into a single issue -- or one violation may be split \
+into multiple issues. When available, also specify the unit number or building area in parentheses \
+at the end of the description. The original full-length concatenated report is as follows: \
 """
 
 # omitted part of the prompt:
@@ -331,16 +331,30 @@ def query_request_mapper(address: str, df: pd.DataFrame) -> dict:
     }
 
 
-def llm_summarize_from_address(
+def llm_summarize_for_one_address(
     address: str, df: pd.DataFrame, model: str, client: OpenAI = OPENROUTER_CLIENT
 ) -> dict:
     completion = client.chat.completions.create(**query_request_mapper(address, df)[model])
     # raw_return still may contain markdown markers i.e. ```json
     try:
         raw_return = completion.choices[0].message.content
-        # return raw_return
         parsed_return = json.loads(clean_json_string(raw_return))
         return parsed_return
     except Exception as e:
         print(f"Error {e} in parsing {raw_return}")
         return {}
+
+
+def generate_summary_for_one_address(address, df, model):
+    print(f"ADDRESS: {address}")
+    # first check if the address has any non-trivial violations
+    # by checking if the df is empty if trivial violations are removed
+    df_filtered = filter_df_by_address(address, df).pipe(remove_trivial_violations_by_code)
+    if df_filtered.empty:
+        print("No non-trivial violations, skipping...\n----------------------------")
+        return None
+    # if df_filtered is not empty, summarize
+    summary_json = llm_summarize_for_one_address(address=address, df=df, model=model)
+    return summary_json
+    print(f"SUMMARY: {summary_json}")
+    print("\n----------------------------")
