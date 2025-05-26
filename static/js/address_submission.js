@@ -91,7 +91,7 @@ export async function getApartment() {
   // Save route data
   try {
     const busRoutes = await routesPromise;
-    mapState.busRoutesData = busRoutes;
+    mapState.busRoutesData = await busRoutes.json();
     document.querySelectorAll('#filter-buttons .button.is-loading').forEach(button => {
       if (button.id === "busRoutesButton") {
         button.classList.remove('is-loading');
@@ -133,7 +133,7 @@ async function sendRequest(endpoint, body) {
 }
 
 async function parse_busroutes(data) {
-  /** Takes the fetch_routes and then hits the 
+  /** Takes the fetch_routes output and produces a list of unique routes.
    *  @param {Object} data - a JSON formatted list of responses.
    *  @returns {array} routes - a list of unique bus routes to request 
   */
