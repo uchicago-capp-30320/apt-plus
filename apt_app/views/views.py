@@ -41,8 +41,9 @@ def fetch_all_data(request):
 def fetch_groceries(request):
     # extract parameters from request
     geocode = request.GET.get("geocode")
+    property_id = request.GET.get("property_id")
     walking_time = int(request.GET.get("walking_time", 5))
-    return _fetch_groceries(geocode, walking_time)
+    return _fetch_groceries(geocode, property_id, walking_time)
 
 
 @require_GET
