@@ -3,8 +3,9 @@ export const mapState = {
     geocode:   null,
     groceryData: null,
     busStopData: null,
+    busRoutesData: null,
+    routes: null,
     map: null,
     groceriesOn: false,
     busStopsOn: false,
-    routes: null,
   };
