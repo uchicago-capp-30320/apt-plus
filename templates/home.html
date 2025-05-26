@@ -134,7 +134,7 @@
 <script type="module">
   import { mapState } from '{% static "js/map_state.js" %}';
   import { getApartment } from '{% static "js/address_submission.js" %}';
-  import { updateBusStops, updateGroceries, toggleBusStops, toggleGroceries } from '{% static "js/map_modifications.js" %}';
+  import { updateBusStops, updateGroceries, toggleBusStops, toggleGroceries, toggleBusRoute } from '{% static "js/map_modifications.js" %}';
 
   // Initialize MapLibre map (STATIC at first)
   mapState.map = new maplibregl.Map({
@@ -153,6 +153,7 @@
     // To catch all clicks (buttons were not working properly)
     const groceriesBtn = event.target.closest('#groceriesButton');
     const busStopsBtn = event.target.closest('#busStopsButton');
+    const busRoutesBtn = event.target.closest('#busRoutesButton');
 
     if (groceriesBtn) {
       toggleGroceries();
@@ -160,6 +161,14 @@
 
     if (busStopsBtn) {
       toggleBusStops();
+    }
+
+    if (busRoutesBtn) {
+      for (const busRoute of mapState.busRoutesData.features) {
+        // console.log(`Plotting: ${busRoute.properties.route_id}`)
+        // console.log(busRoute)
+        toggleBusRoute(mapState.map, busRoute);
+      }
     }
   });
 
