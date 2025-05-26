@@ -24,7 +24,7 @@ export async function getApartment() {
 
   // Show loading spinner while waiting for response
   toggleLoadingWheel();
-  let response, inspectionsPromise, groceriesPromise, busStopsPromise;
+  let response, inspectionsPromise, groceriesPromise, busStopsPromise, routesPromise;
 
   try {
     response = await sendRequest('/fetch_all_data/', address); 
@@ -73,6 +73,10 @@ export async function getApartment() {
     mapState.groceryData = await groceries.json(); // Per 5/24 discussion add Globally-scoped Grocery data, to refactor
     mapState.busStopData = await busStops.json();  // Per 5/24 discussion add Globally-scoped Bus data, to refactor 
 
+    // Send routes API call  
+    const routes = await parse_busroutes(mapState.busStopData);
+    routesPromise = sendRequest('/fetch_bus_routes/', routes.join(','));
+
     // update buttons
     document.querySelectorAll('#filter-buttons .button.is-loading').forEach(button => {
       button.classList.remove('is-loading');
@@ -95,6 +99,8 @@ async function sendRequest(endpoint, body) {
   const url = new URL(endpoint, window.location.origin);
   if (endpoint==='/fetch_all_data/' || endpoint==='/fetch_inspections/') {
     url.searchParams.append('address', body);
+  } else if (endpoint==='/fetch_bus_routes/') {
+    url.searchParams.append('bus_route', body);
   } else {
     if (body[1]) { // fetch_bus_stops needs two params, TODO: request change
       url.searchParams.append('geocode', body[0]);
@@ -108,6 +114,18 @@ async function sendRequest(endpoint, body) {
 
   // Send the request and then store it as a variable so we can operate on the DOM
   return fetch(url, { method: 'GET' });
+}
+
+async function parse_busroutes(data) {
+  /** Takes the fetch_routes and then hits the 
+   *  @param {Object} data - a JSON formatted list of responses.
+   *  @returns {array} routes - a list of unique bus routes to request 
+  */
+  let routes = []; 
+  for (const elem of data.bus_stops_geojson.features) {
+    routes = routes.concat(elem.properties.routes); // ['171', '55']
+  } 
+  return [...new Set(routes)]; // ref: https://stackoverflow.com/a/9229821
 }
 
 function switchSearchViewLoading() {
