@@ -68,7 +68,7 @@ def test_available_response_format(available_response):
             )
 
 
-trivial_only_addresses = ["1451 E 55TH ST"]
+trivial_only_addresses = ["5300 S HYDE PARK BLVD", "1001 E 53RD ST"]
 
 
 @pytest.fixture(params=trivial_only_addresses)

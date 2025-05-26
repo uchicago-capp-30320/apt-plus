@@ -25,7 +25,7 @@ ADDRESSES_TO_CHECK = [
     "5514 S BLACKSTONE AVE",
     "5132 S CORNELL AVE",
     "5801 S DORCHESTER AVE",
-    "1001 E 53RD ST",  # should have no non-trivial violations -- needs to be skipped and should have no summary
+    "1001 E 53RD ST",  # should be trivial-only -- needs to be skipped and should have no summary
 ]
 
 TRIVIAL_VIOLATION_CODES_DF = pd.DataFrame(

@@ -2,6 +2,7 @@ from apt_app.models import Violation, InspectionSummary
 import datetime
 from django.http import JsonResponse, HttpRequest
 import logging
+from scripts import inspections_utils as iu
 
 # Get a logger for this module
 logger = logging.getLogger(__name__)
@@ -16,9 +17,7 @@ def parse_address(in_address: str) -> str:
         return ""
 
 
-def _fetch_inspection_summaries(
-    address, start_date=datetime.date(2020, 1, 1)
-) -> JsonResponse:
+def _fetch_inspection_summaries(address, start_date=datetime.date(2020, 1, 1)) -> JsonResponse:
     """
     Fetch inspection summaries for a given address and cut-off date.
 
@@ -30,8 +29,6 @@ def _fetch_inspection_summaries(
     ref:
     - https://docs.djangoproject.com/en/5.1/ref/models/class/#doesnotexist
     """
-
-    # TODO: refine error handling
     try:
         if not address:
             return JsonResponse({"error": "Address is required"}, status=400)
@@ -45,18 +42,17 @@ def _fetch_inspection_summaries(
         content = {"address": parsed_address, "start_date": start_date}
 
         violations = (
-            Violation.objects.filter(address__istartswith=parsed_address).filter(
-                violation_date__gt=start_date
-            )
-            # TODO: need to probably remove or relax this filter -- to be not just complaint
-            .filter(inspection_category="COMPLAINT")
+            Violation.objects.filter(address__istartswith=parsed_address)
+            .filter(violation_date__gt=start_date)
+            # TODO: might want to parameterize this in the future
+            .filter(inspection_category__in=["COMPLAINT", "PERIODIC"])
         )
 
         total_violations_count = violations.count()
-        total_inspections_count = violations.distinct("inspection_number").count()
+        total_occasions_count = violations.distinct("violation_date").count()
         logger.info(
-            f"Total violations: {total_violations_count}"
-            f"Total inspections: {total_inspections_count}"
+            f"Total violations: {total_violations_count}, \
+            Total inspections: {total_occasions_count}"
         )
 
         # first case: no violations found
@@ -66,25 +62,32 @@ def _fetch_inspection_summaries(
             return JsonResponse(content, status=200)
 
         content["total_violations_count"] = total_violations_count
-        content["total_inspections_count"] = total_inspections_count
+        content["total_inspections_count"] = total_occasions_count
 
         inspection_summary = InspectionSummary.objects.filter(
             address__istartswith=parsed_address
-        ).first()  # TODO: need to use time-based sorting later
-        summary_json = inspection_summary.summary
-        logger.debug(f"Inspection summary JSON: {summary_json}")
+        ).first()  # TODO: need to appply time-based sorting
 
         # second case: violations found but considered trivial and thus not summarized
-        if not summary_json:
+        if not inspection_summary:
             content["data_status"] = "trivial_only"
             content["summary"] = (
-                f"{total_violations_count} trivial violations were recorded on "
-                f"{total_inspections_count} occasions and omitted here for brevity."
+                f"{total_violations_count} trivial violations about inspector having no entry were \
+                reported on {total_occasions_count} occasions and omitted here for brevity."
             )
             return JsonResponse(content, status=200)
 
         # third case: violations found and summarized
+        summary_json = inspection_summary.summary
+        logger.debug(f"Inspection summary JSON: {summary_json}")
+        trivial_violations = violations.filter(violation_code__in=iu.TRIVIAL_VIOLATION_CODES)
+        trivial_violations_count = trivial_violations.count()
+        trivial_occasions_count = trivial_violations.distinct("violation_date").count()
         content = content | summary_json
+        content["note"] = (
+            f"{trivial_violations_count} trivial violations about inspector having no entry were \
+            reported on {trivial_occasions_count} occasions and omitted here for brevity."
+        )
         content["data_status"] = "available"
         return JsonResponse(content, status=200)
 
