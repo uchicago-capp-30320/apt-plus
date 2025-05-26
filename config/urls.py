@@ -55,7 +55,7 @@ urlpatterns = [
     path("handle_post_login/", handle_post_login, name="handle_post_login"),
     path("check_property_status/", check_property_status, name="check_property_status"),
     path("delete_property/", delete_property, name="delete_property"),
-    path("saved_properties/", save_property, name="saved_properties"),
+    path("saved_properties/", saved_properties, name="saved_properties"),
 ]
 
 if settings.DEBUG and not settings.IS_TESTING:
