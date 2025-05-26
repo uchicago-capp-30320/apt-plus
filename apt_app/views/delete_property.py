@@ -14,6 +14,8 @@ def _delete_property(request):
 
     if request.method == "POST":
         property_address = request.POST.get("property_address", "")
+        # Identifying where the delete request is coming from
+        source = request.POST.get("source", "default")
 
         if not property_address:
             return HttpResponse("Property address is required", status=400)
@@ -33,6 +35,11 @@ def _delete_property(request):
 
         proper_address = property_address.title()
         proper_address = re.sub(r"\b(Il)\b", "IL", proper_address)
+
+        # If the request is coming from saved_properties, we will send back a
+        # different render template
+        if source == "saved_properties":
+            return render(request, "snippets/saved_properties_delete.html")
 
         # Return template to replace the button
         return render(
