@@ -268,6 +268,11 @@ class Amenity(LocationBasedFacilities):
     type = models.CharField(max_length=50, choices=AmenityType.choices, default=AmenityType.OTHER)
     address = models.CharField(max_length=255, blank=True, default="")
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["address", "type"], name="unique_address_type")
+        ]
+
 
 class TransitType(models.TextChoices):
     CTA = "cta", "CTA"
