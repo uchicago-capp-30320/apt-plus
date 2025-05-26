@@ -185,7 +185,7 @@ if __name__ == "__main__":
         "Drexel",
         "Friend Center/Metra",
         "Red Line/Arts Block",
-        # 'Midway Metra',
+        "Midway Metra",
     ]
     get_route_line(route_ids_list)
 

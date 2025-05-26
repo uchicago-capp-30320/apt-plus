@@ -195,6 +195,41 @@
     }
   });
 
+  // Using HTMX view transition
+  // TODO: Refactor this.
+  document.addEventListener('DOMContentLoaded', function () {
+    if ('startViewTransition' in document) {
+      htmx.config.globalViewTransitions = true;
+      console.log("View Transitions API is supported and enabled");
+    } else {
+      console.log("View Transitions API is not supported in this browser");
+    }
+
+    // Check if we're returning from login with property address
+    const returnAddress = localStorage.getItem('returnToProperty');
+    if (returnAddress) {
+      console.log("Returning to property view:", returnAddress);
+
+      // Clear the stored address
+      localStorage.removeItem('returnToProperty');
+
+      // Wait for DOM to be fully loaded
+      setTimeout(function () {
+        // Set the address in the search input
+        const addressInput = document.getElementById('addressInput');
+        if (addressInput) {
+          addressInput.value = returnAddress;
+
+          // Trigger search
+          const searchButton = document.querySelector('#search-box-bar .button');
+          if (searchButton) {
+            searchButton.click();
+          }
+        }
+      }, 500);
+    }
+  });
+
   // Add Bulma event listener for the navbar
   // from https://bulma.io/documentation/components/navbar/
   document.addEventListener('DOMContentLoaded', () => {

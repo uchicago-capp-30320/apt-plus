@@ -1,6 +1,9 @@
 import { mapState } from "./map_state.js";
 import { placeAddress } from "./map_modifications.js"
 
+// Initialize cache for property status button
+const propertyStatusCache = {};
+
 export async function getApartment() {
   /**
     * Makes a GET request for the apartment and then updates the entire 
@@ -174,10 +177,13 @@ function initialSearchViewUpdate() {
     const subtitle = createElement('p', null, ['is-size-7', 'is-skeleton'], 'search-box-subtitle')
     searchBox.insertBefore(subtitle, searchBar)
 
-    // Add control elements
-    const saveButtonContainer = createElement('div', searchBox, ['mb-4']);
-    const saveButton = createElement('button', saveButtonContainer, ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
-    saveButton.textContent = 'Save';
+    // Add save button elements
+    const saveButtonContainer = createElement('div', searchBox, ['mb-4', 'slide-it'], 'save-button-container');
+    const placeholderButton = createElement('button', saveButtonContainer, 
+      ['button', 'is-rounded', 'is-loading'], 'placeholder-button');
+    placeholderButton.textContent = 'Checking status...';
+    
+    // Update filters section
     const filtersTemplate = document.getElementById("filters-template").innerHTML;
     const filters = createElement('div', searchBox, ['media', 'mb-4']);
     filters.innerHTML = filtersTemplate;
@@ -226,12 +232,52 @@ function updateSearchView(data) {
 
   const subtitle = document.getElementById("search-box-subtitle");
   subtitle.innerText = toTitleCase(address_parts[1]);
-  subtitle.classList.remove("is-skeleton")
+  subtitle.classList.remove("is-skeleton");
 
   // Collect buttons and add loading
   document.querySelectorAll('#filter-buttons .button').forEach(button => {
     button.classList.add('is-loading');
   });
+
+  // Check if the property is already saved
+  checkPropertyStatus(data["cleaned_address"]);
+}
+
+// Add this new function to check property status and update the button accordingly
+async function checkPropertyStatus(propertyAddress) {
+  // Only proceed if container exists
+  const saveButtonContainer = document.getElementById("save-button-container");
+  if (!saveButtonContainer) return;
+
+  try {
+    // Check cache first
+    if (propertyStatusCache[propertyAddress] !== undefined) {
+      console.log("Using cached property status");
+      updateButtonBasedOnStatus(
+        propertyAddress, 
+        propertyStatusCache[propertyAddress], 
+        saveButtonContainer
+      );
+      return;
+    }
+
+    // Make request to check if property is saved
+    const url = new URL('/check_property_status/', window.location.origin);
+    url.searchParams.append('property_address', propertyAddress);
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    // Store in cache
+    propertyStatusCache[propertyAddress] = data.is_saved;
+
+    // Update the button
+    updateButtonBasedOnStatus(propertyAddress, data.is_saved, saveButtonContainer);
+  } catch (error) {
+    console.error("Error checking property status:", error);
+    // Show default save button on error
+    updateButtonBasedOnStatus(propertyAddress, false, saveButtonContainer);
+  }
 }
 
 async function updateViolations(response) {
@@ -270,6 +316,56 @@ async function updateViolations(response) {
     }
   } else {
     violationsIssues.classList.add('is-hidden');
+  }
+}
+
+// Extract button creation to a separate function
+function updateButtonBasedOnStatus(propertyAddress, isSaved, container) {
+  // Clear the container
+  container.innerHTML = '';
+  if (isSaved) {
+    // Add status notification 
+    const statusNote = createElement('div', container, ['notification', 'is-info', 'is-light', 'py-2', 'px-3', 'mb-2'], 'saved-status');
+    statusNote.innerHTML = '<span class="icon-text"><span class="icon"><i class="fas fa-bookmark"></i></span> <span>This property is in your saved list</span></span>';
+
+    // Property is saved - show delete button
+    const deleteButton = createElement('button', container, 
+      ['button', 'is-danger', 'is-outlined', 'is-rounded'], 'delete-button');
+    // Add icon and text as children
+    const iconSpan = createElement('span', deleteButton, ['icon', 'is-small']);
+    const icon = createElement('i', iconSpan, ['fas', 'fa-trash']);
+    const textSpan = createElement('span', deleteButton);
+    textSpan.textContent = 'Remove';
+
+    // Add HTMX attributes for delete
+    deleteButton.setAttribute('hx-post', '/delete_property/');
+    deleteButton.setAttribute('hx-vals', `js:{property_address: "${propertyAddress}"}`);
+    deleteButton.setAttribute('hx-target', '#save-button-container');
+    deleteButton.setAttribute('hx-trigger', 'click');
+    deleteButton.setAttribute('hx-swap', 'outerHTML transition:true');
+
+    // Tell HTMX to process the button
+    htmx.process(deleteButton);
+  } else {
+    // Property is not saved - show save button
+    const saveButton = createElement('button', container, 
+      ['button', 'is-rounded', 'has-text-white', 'has-background-black'], 'save-button');
+
+    // Add icon and text as children
+    const iconSpan = createElement('span', saveButton, ['icon', 'is-small']);
+    const icon = createElement('i', iconSpan, ['fas', 'fa-bookmark']);
+    const textSpan = createElement('span', saveButton);
+    textSpan.textContent = 'Save to my list';
+
+    // Add HTMX attributes for save
+    saveButton.setAttribute('hx-get', '/save_property/');
+    saveButton.setAttribute('hx-vals', `js:{propertyAddress: "${propertyAddress}"}`);
+    saveButton.setAttribute('hx-target', '#save-button-container');
+    saveButton.setAttribute('hx-trigger', 'click'); 
+    saveButton.setAttribute('hx-swap', 'outerHTML transition:true');
+
+    // Tell HTMX to process the button
+    htmx.process(saveButton);
   }
 }
 
