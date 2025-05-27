@@ -52,7 +52,7 @@ export async function getApartment() {
     // Parse data and place on map, assuming appropriate format from endpoint
     const data = await response.json();
     const coord = data.address_geojson.features[0].geometry.coordinates;
-    groceriesPromise = sendRequest('/fetch_groceries/', [coord]); // start fetch_* requests ASAP
+    groceriesPromise = sendRequest('/fetch_groceries/', [coord, data['property_id']]); // start fetch_* requests ASAP
     busStopsPromise = sendRequest('/fetch_bus_stops/', [coord, data['property_id']]); 
     inspectionsPromise = sendRequest('/fetch_inspections/', data["cleaned_address"]);
     // let routesPromise = make_requests(data); // placeholder for routes endpoint
@@ -121,14 +121,9 @@ async function sendRequest(endpoint, body) {
   } else if (endpoint==='/fetch_bus_routes/') {
     url.searchParams.append('bus_route', body);
   } else {
-    if (body[1]) { // fetch_bus_stops needs two params, TODO: request change
       url.searchParams.append('geocode', body[0]);
       url.searchParams.append('property_id', body[1]); 
       url.searchParams.append('walking_time', 15);
-    } else {
-      url.searchParams.append('geocode', body[0]);
-      url.searchParams.append('walking_time', 15);
-    }
   }
 
   // Send the request and then store it as a variable so we can operate on the DOM
