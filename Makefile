@@ -6,13 +6,18 @@ install: ## Install the virtual environment and install the pre-commit hooks
 	@uv sync
 	@uv run pre-commit install
 
-.PHONY: run
-run: ## Launch the server
-	@uv run manage.py runserver
 
 .PHONY: cs
 cs: ## Collect static files
 	@uv run manage.py collectstatic --noinput
+
+.PHONY: run
+run: cs ## Launch the server
+	@uv run manage.py runserver
+
+.PHONY: format
+format: ## Format the code with ruff
+	@uvx ruff format
 
 .PHONY: act
 act: ## Run Github Actions workflow locally
