@@ -3,7 +3,7 @@
 
 Tenants struggle to navigate scattered information when searching for a new apartment. Without a centralized solution to aggregate key information, renters must take significant time to research or risk unforeseen downsides. This is exacerbated by popular commercial platforms' incentive to hide negative aspects of their listings. As generalist platforms, they also lack granularity in neighborhood details, for example, a distance to grocery stores known to local residents.
 
-Apartments Plus aggregates data that mainstream rental sites often do not display, such as building defects and landlord reputations. Apartments Plus currently has data on Chicago, with a special focus fr tenants in a university neighborhood like Hyde Park which welcome a steady influx of new tenants every year.
+Apartments Plus aggregates data that mainstream rental sites often do not display, such as building defects and landlord reputations. Apartments Plus currently has data on Chicago, with a special focus on tenants in university neighborhoods like Hyde Park, which welcome a steady influx of new tenants every year.
 
 We're online at [aptpl.us](https://www.aptpl.us).
 
@@ -69,7 +69,7 @@ Contributors are listed, with no significance to the order of names:
 | Miguel Perez | Backend / GIS specialist & Backend / Data engineer |
 | Zewei (Whiskey) Liao | Lead QA Engineer & Backend Engineer |
 | Rodrigo Rivarola | Front & Backend GIS Specialist |
-| Magdalena Barros | Frontend Lead |
+| Magdalena Barros | Frontend Lead – Engineering & Design |
 | Fuyuki Tani | Data Engineer |
 | Keling Yue | Lead Backend Engineer & Data Engineer|
 
