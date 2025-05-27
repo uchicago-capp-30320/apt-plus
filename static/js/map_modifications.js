@@ -15,6 +15,7 @@ export async function placeAddress(response) {
   // Start by clearing the map (for when the user does another search)
   clearMap();
   resetButtons()
+  clearBusRoutes(mapState.map);
 
   // Handle both string and object inputs
   const data = typeof response === 'string' ? JSON.parse(response) : response;
@@ -62,7 +63,7 @@ function enableMapInteraction() {
   map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 }
 
-// Helper function to remove address marker
+// Helper function to remove address and amenities markers
 function clearMap() {
   if (currentMarker) {
     currentMarker.remove();
@@ -70,16 +71,20 @@ function clearMap() {
   }
   groceryMarkers = removeMarkers(groceryMarkers);
   busStopMarkers = removeMarkers(busStopMarkers);
+
 }
 
 // Helper function to deselect buttons
 function resetButtons() {
   mapState.groceriesOn = false;
   mapState.busStopsOn = false;
+  mapState.busRoutesOn = false;
   const groceriesBtn = document.getElementById('groceriesButton');
   const busStopsBtn = document.getElementById('busStopsButton');
+  const busRoutesBtn = document.getElementById('busRoutesButton');
   if (groceriesBtn) groceriesBtn.classList.remove('is-info');
   if (busStopsBtn) busStopsBtn.classList.remove('is-info');
+  if (busRoutesBtn) busRoutesBtn.classList.remove('is-info');
 }
 
 function getDistanceFilter() {
@@ -107,7 +112,7 @@ function loadMarkersToMap(geojson, filterDistance, color, getPopupHTML) {
     // Apply filter
     if (props.distance_min > filterDistance) return;
     // Popup
-    let popup = new maplibregl.Popup({ offset: 25 }).setHTML(getPopupHTML(props));
+    let popup = new maplibregl.Popup({ offset: 25, closeButton: false }).setHTML(getPopupHTML(props));
     let marker = new maplibregl.Marker({ color: color }).setLngLat(coords).addTo(map);
     marker.getElement().addEventListener('mouseenter', () => popup.setLngLat(coords).addTo(map));
     marker.getElement().addEventListener('mouseleave', () => popup.remove());
@@ -167,5 +172,90 @@ export function toggleBusStops() {
   } else {
     console.log("BusStops button turned OFF");
     busStopMarkers = removeMarkers(busStopMarkers);
+  }
+}
+
+// Bus routes
+mapState.routes = {};
+
+export function displayBusRoute(map, geojsonFeature) {
+  /**
+   * Function to display a bus route on the map
+   * @param {maplibregl.Map} map - MapLibre map object
+   * @param {object} geojsonFeature - GeoJSON MultiLineString Feature
+   */
+  const routeId = geojsonFeature.properties.route_id;
+  if (!routeId || mapState.routes[routeId]) return;
+
+  const sourceId = `bus-route-source-${routeId}`;
+  const layerId = `bus-route-layer-${routeId}`;
+
+  map.addSource(sourceId, {
+      type: "geojson",
+      data: {
+          type: "FeatureCollection",
+          features: [geojsonFeature]
+      }
+  });
+
+  map.addLayer({
+      id: layerId,
+      type: "line",
+      source: sourceId,
+      paint: {
+          "line-color": geojsonFeature.properties.color,
+          "line-width": 4
+      }
+  });
+
+  // Popups
+  map.on('click', layerId, (e) => {
+    const props = e.features[0].properties;
+    new maplibregl.Popup({ closeButton: false, closeOnClick: true })
+      .setLngLat(e.lngLat)
+      .setHTML(`<strong>Route ${props.route_id}</strong>`)
+      .addTo(map);
+  });
+
+  mapState.routes[routeId] = {sourceId, layerId};
+}
+
+export function removeBusRoute(map, routeId) {
+  /** Function to remove a bus route from the map
+   * @param {maplibregl.Map} map - MapLibre map object
+   * @param {string} routeId - route identifier
+   */
+  const route = mapState.routes[routeId];
+  if (!route) return;
+
+  if (map.getLayer(route.layerId)) {
+      map.removeLayer(route.layerId);
+  }
+  if (map.getSource(route.sourceId)) {
+      map.removeSource(route.sourceId);
+  }
+
+  delete mapState.routes[routeId];
+}
+
+export function clearBusRoutes(map) {
+  /** Function to clear all bus routes from the map (after button is toggled off)
+   * @param {maplibregl.Map} map - MapLibre map object
+   */
+  Object.keys(mapState.routes).forEach(routeId => {
+      removeBusRoute(map, routeId);
+  });
+  // Reset tracked routes
+  mapState.routes = {};
+}
+
+export function toggleBusRoute(map, geojsonFeature) {
+  const routeId = geojsonFeature.route_id;
+  if (!routeId) return;
+
+  if (mapState.routes[routeId]) {
+      removeBusRoute(map, routeId);
+  } else {
+      displayBusRoute(map, geojsonFeature);
   }
 }
