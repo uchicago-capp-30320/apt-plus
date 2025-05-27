@@ -315,6 +315,7 @@ class InspectionSummary(models.Model):
     # property = models.ForeignKey(Property, on_delete=models.CASCADE)
     address = models.CharField(max_length=255)
     summary = models.JSONField()
+    # last_updated_at = models.DateTimeField(auto_now=True)
 
 
 class CrimeType(models.TextChoices):
