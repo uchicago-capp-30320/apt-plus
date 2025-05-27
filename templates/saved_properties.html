@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Saved Properties | apt-plus{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title is-2 has-text-centered">My Saved Properties</h1>
+
+        <!-- If the user has any saved properties, we will display cards -->
+        {% if saved_properties %}
+        <div class="columns is-multiline mb-4">
+            {% for saved_property in saved_properties %}
+            <div class="column is-4-desktop is-6-tablet" id="property-card-{{ forloop.counter }}">
+                <div class="card h-100">
+                    <div class="card-content">
+                        <!-- Header with property name -->
+                        <p class="title is-5 mb-2">
+                            {{ saved_property.address|title }}
+                        </p>
+
+                        <!-- Address (if custom name is set) -->
+                        {% if saved_property.custom_name %}
+                        <p class="subtitle is-6 has-text-grey mb-3">{{ saved_property.custom_name }}</p>
+                        {% endif %}
+
+                        <!-- Property details -->
+                        <div class="content">
+
+                            <!-- Rent price if available -->
+                            {% if saved_property.rent_price %}
+                            <p class="has-text-weight-bold mb-3">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fas fa-dollar-sign"></i></span>
+                                    <span>{{ saved_property.rent_price }}/month</span>
+                                </span>
+                            </p>
+                            {% endif %}
+
+                            <!-- Remarks/notes -->
+                            {% if saved_property.remarks %}
+                            <div class="block mt-3 mb-3">
+                                <p class="is-size-10 has-text-weight-bold mb-1">Notes:</p>
+                                <p>{{ saved_property.remarks }}</p>
+                            </div>
+                            {% endif %}
+
+                            <!-- Transit information -->
+                            {% with routes_by_time=saved_property.bus_routes_by_time %}
+                            <!-- 5 min routes -->
+                            {% if routes_by_time.within_5_min %}
+                            <div class="mt-2">
+                                <span class="tag is-success is-light"
+                                    style="height: auto; white-space: normal; padding-top: 0.25em; padding-bottom: 0.25em;">
+                                    <span class="icon-text">
+                                        <span class="icon"><i class="fas fa-route"></i></span>
+                                        <span>{{ routes_by_time.within_5_min|length }} routes within 5 min:
+                                            <span
+                                                class="has-text-weight-bold">{{ routes_by_time.within_5_min|join:", " }}</span>
+                                        </span>
+                                    </span>
+                                </span>
+                            </div>
+                            {% endif %}
+
+                            <!-- 10 min routes (only show if different from 5 min) -->
+                            {% if routes_by_time.within_10_min|length > routes_by_time.within_5_min|length %}
+                            <div class="mt-2">
+                                <span class="tag is-success is-light"
+                                    style="height: auto; white-space: normal; padding-top: 0.25em; padding-bottom: 0.25em;">
+                                    <span class="icon-text">
+                                        <span class="icon"><i class="fas fa-route"></i></span>
+                                        <span>{{ routes_by_time.within_10_min|length }} routes within 10 min:
+                                            <span
+                                                class="has-text-weight-bold">{{ routes_by_time.within_10_min|join:", " }}</span>
+                                        </span>
+                                    </span>
+                                </span>
+                            </div>
+                            {% endif %}
+
+                            <!-- 15 min routes (only show if different from 10 min) -->
+                            {% if routes_by_time.within_15_min|length > routes_by_time.within_10_min|length %}
+                            <div class="mt-2">
+                                <span class="tag is-success is-light"
+                                    style="height: auto; white-space: normal; padding-top: 0.25em; padding-bottom: 0.25em;">
+                                    <span class="icon-text">
+                                        <span class="icon"><i class="fas fa-route"></i></span>
+                                        <span>{{ routes_by_time.within_15_min|length }} routes within 15 min:
+                                            <span
+                                                class="has-text-weight-bold">{{ routes_by_time.within_15_min|join:", " }}</span>
+                                        </span>
+                                    </span>
+                                </span>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+
+                            <!-- Ideally have inspections information also be present here -->
+
+                            <!-- Date saved -->
+                            <p class="is-size-7 has-text-grey mt-4">
+                                Saved on {{ saved_property.date_saved|date:"M j, Y" }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card footer with actions -->
+                    <footer class="card-footer">
+                        <a href="/?address={{ saved_property.address|urlencode }}" class="card-footer-item">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fas fa-map"></i></span>
+                                <span>View on Map</span>
+                            </span>
+                        </a>
+                        <button class="card-footer-item button is-white has-text-danger" hx-post="/delete_property/"
+                            hx-vals='{"property_address": "{{ saved_property.address }}", "source": "saved_properties"}'
+                            hx-target="#property-card-{{ forloop.counter }}" hx-swap="innerHTML fade-out"
+                            hx-confirm="Remove this property from your saved list?">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fas fa-trash"></i></span>
+                                <span>Remove</span>
+                            </span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <!-- No saved properties message -->
+        <div class="notification is-info is-light mt-5">
+            <p class="has-text-centered p-5">
+                <span class="icon mb-3">
+                    <i class="fas fa-bookmark fa-2x"></i>
+                </span>
+                <br>
+                You don't have any saved properties yet.
+                <br>
+                <a href="/" class="button is-info is-outlined mt-4">Search for Properties</a>
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

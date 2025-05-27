@@ -34,7 +34,7 @@
       {% if user.is_authenticated %}
       <a href="{% url 'home' %}">Home</a><br>
       <a href="{% url 'about' %}">About</a><br>
-      <a href="temp">Saved Properties</a><br>
+      <a href="{% url 'saved_properties' %}">Saved Properties</a><br>
       <a href="https://github.com/uchicago-capp-30320/apt-plus">Contribute on GitHub</a>
       {% else %}
       <a href="{% url 'home' %}">Home</a><br>

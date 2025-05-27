@@ -3,18 +3,20 @@ from django.views.decorators.http import require_GET
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.views.decorators.csrf import csrf_exempt
-from apt_app.models import Amenity, AmenityType
+from apt_app.models import Amenity, AmenityType, Property
 from config import load_constants
 
 CONSTANTS = load_constants()
 WALKING_METERS_PER_MIN = CONSTANTS["WALKING_METERS_PER_MIN"]
 
 
-def _fetch_groceries(geocode, walking_time=5) -> JsonResponse:
-    try:
-        # NOTE:
-        # _ = request.GET.get("property_id")  # placeholder for future caching
+def _fetch_groceries(geocode: str, property_id: str, walking_time: int = 15) -> JsonResponse:
+    if not property_id:
+        return JsonResponse({"error": "property_id is required"}, status=400)
+    if not geocode:
+        return JsonResponse({"error": "geocode is required"}, status=400)
 
+    try:
         # Convert geocode to Point
         lat_str, lng_str = geocode.split(",")
         property_location = Point(float(lng_str), float(lat_str), srid=4326)
@@ -59,6 +61,18 @@ def _fetch_groceries(geocode, walking_time=5) -> JsonResponse:
             "walking_time": walking_time,
             "grocery_geojson": geojson,
         }
+
+        # cache to Property
+        try:
+            prop = Property.objects.get(id=property_id)
+            response["address"] = prop.address
+            if not prop.groceries:
+                prop.groceries = response
+                prop.save()
+        except Property.DoesNotExist:
+            return JsonResponse({"error": "Property not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": f"Failed to update Property: {str(e)}"}, status=400)
 
         return JsonResponse(response)
 

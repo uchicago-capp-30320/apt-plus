@@ -20,6 +20,7 @@ from .delete_property import _delete_property
 from .check_property_status import _check_property_status
 from .handle_post_login import _handle_post_login
 from .fetch_bus_routes import _fetch_bus_routes
+from .saved_properties import _saved_properties
 
 
 def home(request):
@@ -41,8 +42,9 @@ def fetch_all_data(request):
 def fetch_groceries(request):
     # extract parameters from request
     geocode = request.GET.get("geocode")
+    property_id = request.GET.get("property_id")
     walking_time = int(request.GET.get("walking_time", 5))
-    return _fetch_groceries(geocode, walking_time)
+    return _fetch_groceries(geocode, property_id, walking_time)
 
 
 @require_GET
@@ -112,3 +114,8 @@ def delete_property(request):
 def check_property_status(request):
     """Helper view to check if the property is saved"""
     return _check_property_status(request)
+
+
+def saved_properties(request):
+    """View for the user to see all their saved properties"""
+    return _saved_properties(request)
