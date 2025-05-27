@@ -224,3 +224,6 @@ pyrightconfig.json
 
 
 # End of https://www.toptal.com/developers/gitignore/api/python,osx,django,jupyternotebooks
+
+# Airflow
+airflow/config/airflow.cfg
