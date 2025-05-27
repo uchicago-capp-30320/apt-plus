@@ -338,7 +338,7 @@ services:
       dockerfile: Dockerfile
     command: gunicorn config.wsgi --bind 0.0.0.0:9000
     ports:
-      - "9000:9000"
+      - "8023:9000" # External : Internal
     depends_on:
       - postgres
     env_file:

@@ -64,8 +64,16 @@ ANYMAIL = {
 BREVO_API_URL = "https://api.brevo.com/v3/"
 
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0", ".unnamed.computer"]
-# "0.0.0.0" for Docker, ".unnamed.computer" for prod
+ALLOWED_HOSTS = [
+    "127.0.0.1",              # Local development
+    "localhost",              # Localhost access
+    "0.0.0.0",                # For Docker binding
+    "aptpl.us",               # Root domain
+    ".aptpl.us",              # All subdomains
+    "turing.unnamed.computer",# server hostname (for development, will be deleted)
+    ".unnamed.computer",      # All subdomains  (for development, will be deleted)
+    "138.201.16.221",         # Direct IP access (for development, will be deleted)
+]
 INTERNAL_IPS = ["127.0.0.1"]
 
 # Debug Toolbar
