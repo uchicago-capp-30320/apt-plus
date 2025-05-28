@@ -75,6 +75,7 @@ ALLOWED_HOSTS = [
     "138.201.16.221",         # Direct IP access (for development, will be deleted)
 ]
 INTERNAL_IPS = ["127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = ["https://aptpl.us"] # for Login function
 
 # Debug Toolbar
 IS_TESTING = "test" in sys.argv or "pytest" in sys.argv
