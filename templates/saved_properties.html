@@ -18,7 +18,7 @@
                     <div class="card-content">
                         <!-- Header with property name -->
                         <p class="title is-5 mb-2">
-                            {{ saved_property.address|title }}
+                            {{ saved_property.address }}
                         </p>
 
                         <!-- Address (if custom name is set) -->
@@ -47,53 +47,45 @@
                             </div>
                             {% endif %}
 
-                            <!-- Transit information -->
-                            {% with routes_by_time=saved_property.bus_routes_by_time %}
-                            <!-- 5 min routes -->
-                            {% if routes_by_time.within_5_min %}
+                            <!-- Compact amenities info with all names for shortest time -->
+                            {% with routes_by_time=saved_property.bus_routes_by_time grocery_by_time=saved_property.groceries_by_time %}
+                            {% if routes_by_time.within_15_min or grocery_by_time.within_15_min %}
                             <div class="mt-2">
-                                <span class="tag is-success is-light"
-                                    style="height: auto; white-space: normal; padding-top: 0.25em; padding-bottom: 0.25em;">
-                                    <span class="icon-text">
-                                        <span class="icon"><i class="fas fa-route"></i></span>
-                                        <span>{{ routes_by_time.within_5_min|length }} routes within 5 min:
-                                            <span
-                                                class="has-text-weight-bold">{{ routes_by_time.within_5_min|join:", " }}</span>
+                                <div class="tags">
+                                    {% if routes_by_time.within_5_min %}
+                                        <span class="tag is-success is-light" 
+                                            style="height: auto; white-space: normal; word-wrap: break-word; max-width: 100%;">
+                                            <i class="fas fa-route mr-1"></i>{{ routes_by_time.within_5_min|length }} transit (5min): {{ routes_by_time.within_5_min|join:", " }}
                                         </span>
-                                    </span>
-                                </span>
-                            </div>
-                            {% endif %}
-
-                            <!-- 10 min routes (only show if different from 5 min) -->
-                            {% if routes_by_time.within_10_min|length > routes_by_time.within_5_min|length %}
-                            <div class="mt-2">
-                                <span class="tag is-success is-light"
-                                    style="height: auto; white-space: normal; padding-top: 0.25em; padding-bottom: 0.25em;">
-                                    <span class="icon-text">
-                                        <span class="icon"><i class="fas fa-route"></i></span>
-                                        <span>{{ routes_by_time.within_10_min|length }} routes within 10 min:
-                                            <span
-                                                class="has-text-weight-bold">{{ routes_by_time.within_10_min|join:", " }}</span>
+                                    {% elif routes_by_time.within_10_min %}
+                                        <span class="tag is-success is-light" 
+                                            style="height: auto; white-space: normal; word-wrap: break-word; max-width: 100%;">
+                                            <i class="fas fa-route mr-1"></i>{{ routes_by_time.within_10_min|length }} transit (10min): {{ routes_by_time.within_10_min|join:", " }}
                                         </span>
-                                    </span>
-                                </span>
-                            </div>
-                            {% endif %}
-
-                            <!-- 15 min routes (only show if different from 10 min) -->
-                            {% if routes_by_time.within_15_min|length > routes_by_time.within_10_min|length %}
-                            <div class="mt-2">
-                                <span class="tag is-success is-light"
-                                    style="height: auto; white-space: normal; padding-top: 0.25em; padding-bottom: 0.25em;">
-                                    <span class="icon-text">
-                                        <span class="icon"><i class="fas fa-route"></i></span>
-                                        <span>{{ routes_by_time.within_15_min|length }} routes within 15 min:
-                                            <span
-                                                class="has-text-weight-bold">{{ routes_by_time.within_15_min|join:", " }}</span>
+                                    {% elif routes_by_time.within_15_min %}
+                                        <span class="tag is-success is-light" 
+                                            style="height: auto; white-space: normal; word-wrap: break-word; max-width: 100%;">
+                                            <i class="fas fa-route mr-1"></i>{{ routes_by_time.within_15_min|length }} transit (15min): {{ routes_by_time.within_15_min|join:", " }}
                                         </span>
-                                    </span>
-                                </span>
+                                    {% endif %}
+                                    
+                                    {% if grocery_by_time.within_5_min %}
+                                        <span class="tag is-primary is-light" 
+                                            style="height: auto; white-space: normal; word-wrap: break-word; max-width: 100%;">
+                                            <i class="fas fa-shopping-cart mr-1"></i>{{ grocery_by_time.within_5_min|length }} grocery (5min): {{ grocery_by_time.within_5_min|join:", " }}
+                                        </span>
+                                    {% elif grocery_by_time.within_10_min %}
+                                        <span class="tag is-primary is-light" 
+                                            style="height: auto; white-space: normal; word-wrap: break-word; max-width: 100%;">
+                                            <i class="fas fa-shopping-cart mr-1"></i>{{ grocery_by_time.within_10_min|length }} grocery (10min): {{ grocery_by_time.within_10_min|join:", " }}
+                                        </span>
+                                    {% elif grocery_by_time.within_15_min %}
+                                        <span class="tag is-primary is-light" 
+                                            style="height: auto; white-space: normal; word-wrap: break-word; max-width: 100%;">
+                                            <i class="fas fa-shopping-cart mr-1"></i>{{ grocery_by_time.within_15_min|length }} grocery (15min): {{ grocery_by_time.within_15_min|join:", " }}
+                                        </span>
+                                    {% endif %}
+                                </div>
                             </div>
                             {% endif %}
                             {% endwith %}
@@ -109,12 +101,13 @@
 
                     <!-- Card footer with actions -->
                     <footer class="card-footer">
+                        <!-- Temporarily disabled                        
                         <a href="/?address={{ saved_property.address|urlencode }}" class="card-footer-item">
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-map"></i></span>
                                 <span>View on Map</span>
                             </span>
-                        </a>
+                        </a> -->
                         <button class="card-footer-item button is-white has-text-danger" hx-post="/delete_property/"
                             hx-vals='{"property_address": "{{ saved_property.address }}", "source": "saved_properties"}'
                             hx-target="#property-card-{{ forloop.counter }}" hx-swap="innerHTML fade-out"

@@ -38,13 +38,16 @@ export async function placeAddress(response) {
   // Move to the address
   map.flyTo({
     center: [lon, lat],
-    zoom: 15
+    zoom: 14
   });
 
   // Add marker
-  currentMarker = new maplibregl.Marker({ color: 'yellow' })
+  currentMarker = new maplibregl.Marker({ color: 'tomato' })
     .setLngLat([lon, lat])
     .addTo(map);
+
+    // Add a fixed maroon marker with popup for University of Chicago
+    markUChicago();
 }
 
 function enableMapInteraction() {
@@ -60,7 +63,11 @@ function enableMapInteraction() {
   if (!map.keyboard.isEnabled()) map.keyboard.enable();
   if (!map.doubleClickZoom.isEnabled()) map.doubleClickZoom.enable();
   if (!map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
-  map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+  // Avoid controls duplication after new search
+  if (!mapState.navControls) {
+    map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+    mapState.navControls = true;
+  }
 }
 
 // Helper function to remove address and amenities markers
@@ -82,12 +89,12 @@ function resetButtons() {
   const groceriesBtn = document.getElementById('groceriesButton');
   const busStopsBtn = document.getElementById('busStopsButton');
   const busRoutesBtn = document.getElementById('busRoutesButton');
-  if (groceriesBtn) groceriesBtn.classList.remove('is-info');
+  if (groceriesBtn) groceriesBtn.classList.remove('is-success');
   if (busStopsBtn) busStopsBtn.classList.remove('is-info');
-  if (busRoutesBtn) busRoutesBtn.classList.remove('is-info');
+  if (busRoutesBtn) busRoutesBtn.classList.remove('is-warning');
 }
 
-function getDistanceFilter() {
+export function getDistanceFilter() {
   let filterSelect = document.getElementById("distanceFilter");
   return filterSelect ? parseInt(filterSelect.value) : 5;
 }
@@ -133,7 +140,7 @@ export function updateGroceries() {
   groceryMarkers = loadMarkersToMap(
     mapState.groceryData.grocery_geojson,
     distanceMin,
-    'green',
+    'seagreen',
     props => `<strong>${props.name}</strong><br>${props.address}`
   );
 }
@@ -144,7 +151,7 @@ export function updateBusStops() {
   busStopMarkers = loadMarkersToMap(
     mapState.busStopData.bus_stops_geojson,
     distanceMin,
-    'blue',
+    'deepskyblue',
     props => `<strong>${props.stop_name}</strong><br>Routes: ${props.routes.join(", ")}`
   );
 }
@@ -152,7 +159,7 @@ export function updateBusStops() {
 export function toggleGroceries() {
   const groceriesBtn = document.getElementById('groceriesButton');
   mapState.groceriesOn = !mapState.groceriesOn;
-  groceriesBtn.classList.toggle('is-info', mapState.groceriesOn);
+  groceriesBtn.classList.toggle('is-success', mapState.groceriesOn);
   if (mapState.groceriesOn) {
     console.log("Groceries button turned ON");
     updateGroceries();
@@ -258,4 +265,29 @@ export function toggleBusRoute(map, geojsonFeature) {
   } else {
       displayBusRoute(map, geojsonFeature);
   }
+}
+
+/**
+ * Marks the University of Chicago on the map with a maroon pin
+ * and displays a fixed popup showing the name.
+ */
+function markUChicago() {
+  const uchicagoCoords = [-87.5997, 41.7897]; 
+
+  // Create a fixed popup with the name "University of Chicago"
+  const popup = new maplibregl.Popup({
+    closeButton: false,
+    closeOnClick: false,
+    offset: 40   
+  })
+    .setText("University of Chicago");
+
+    // Add a maroon pin at UChicago coordinates and attach the popup
+    new maplibregl.Marker({ color: '#800000' })  
+    .setLngLat(uchicagoCoords)
+    .setPopup(popup)
+    .addTo(mapState.map);
+
+    // Ensure the popup is visible immediately  
+    popup.addTo(mapState.map);  
 }

@@ -27,6 +27,12 @@ def create_stop_from_row(row):
     """
     Convert a row from SQL database apt_app_stops into a TransitStop
     instance (not saved yet).
+
+    Inputs:
+        row (pandas Series): row from a pandas dataframe related to the SQL
+            database apt_app_stops.
+
+    Returns: a TransitStop instance.
     """
     single_stop = TransitStop()
 
@@ -48,6 +54,12 @@ def create_route_from_row(row):
     """
     Convert a row from SQL database apt_app_routes into a TransitRoute
     instance (not saved yet).
+
+    Inputs:
+        row (pandas Series): row from a pandas dataframe related to the SQL
+            database apt_app_routes.
+
+    Returns: a TransitRoute instance.
     """
     single_route = TransitRoute()
 
@@ -69,6 +81,14 @@ def create_route_from_row(row):
 def create_route_stop_relationship_from_row(row, stop_dict, route_dict):
     """
     Create relationship between a route and a stop (for each row, not saved yet).
+
+    Inputs:
+        row (pandas Series): row from a pandas dataframe related to the SQL
+            database apt_app_stops.
+        stop_dict (dict): dictionary of available stops in the data.
+        route_dict (dict): dictionary of available routes in the data.
+
+    Returns: a relationship instance between the TransitRoute and TransitStop tables.
     """
     # Access to table of relationships
     route_stop_db = TransitRoute.stops.through
@@ -102,11 +122,25 @@ def run_bulk_import(
     batch_size=1000,
 ):
     """
-    Build and insert TransitStop or TransitRoutes objects in bulk to Django.
-    For TransitStop, use the function "create_stop_from_row".
-    For TransitRoute, use the function "create_route_from_row".
-    For generating relationships, use the function "create_route_stop_relationship_from_row"
-    and provide the corresponding dictionaries of stops and routes as an input.
+    Build and insert TransitStop and TransitRoutes objects or relationships
+    between them in bulk to Django data model. Particularly:
+        - For upload TransitStop objects, use the function "create_stop_from_row".
+        - For upload TransitRoute objects, use the function "create_route_from_row".
+        - For generating relationships between TransitStop and TransitRoute, use the
+            function "create_route_stop_relationship_from_row" and provide the corresponding
+            dictionaries of stops and routes as an input.
+
+    Inputs:
+        df (Pandas dataframe): dataframe that contains the data that is going to be used
+            by the function to be called.
+        function_to_use (function): function to be used to upload data.
+        stop_dict (dict): dictionary of available stops in the data, only used in
+            "create_route_stop_relationship_from_row" function, None by default.
+        route_dict (dict): dictionary of available routes in the data, only used in
+            "create_route_stop_relationship_from_row" function, None by default.
+        batch_size (int): batch size to use, 1000 by default.
+
+    Returns: None
     """
     # Add new data
     print(f"Building objects for {len(df)} rows...")

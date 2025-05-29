@@ -36,7 +36,7 @@ logger = logging.getLogger("")
 def check_general_data():
     """
     Helper function that check generally that the data from cta stops is in the
-    Django dataset. It print those checks, returns None.
+    Django dataset. It prints (or log) those checks, returns None.
     """
     # Start time
     start_time = time.perf_counter()
@@ -70,7 +70,7 @@ def check_general_data():
 
 def stops_near_a_point(latitude_input, longitude_input, walking_time_input):
     """
-    Function that print the bus stops within walking time related to a reference point.
+    Function that print (log) the bus stops within walking time related to a reference point.
     Returns None.
     """
     # Start time
@@ -130,7 +130,7 @@ def stops_near_a_point(latitude_input, longitude_input, walking_time_input):
 
 def get_route_line(route_ids_list):
     """
-    Function that print the route MultiLineString related to the list route_ids_list.
+    Function that print (log) the route MultiLineString related to the list route_ids_list.
     Returns None.
     """
     # Start time
