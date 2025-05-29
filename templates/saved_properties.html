@@ -101,12 +101,13 @@
 
                     <!-- Card footer with actions -->
                     <footer class="card-footer">
+                        <!-- Temporarily disabled                        
                         <a href="/?address={{ saved_property.address|urlencode }}" class="card-footer-item">
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-map"></i></span>
                                 <span>View on Map</span>
                             </span>
-                        </a>
+                        </a> -->
                         <button class="card-footer-item button is-white has-text-danger" hx-post="/delete_property/"
                             hx-vals='{"property_address": "{{ saved_property.address }}", "source": "saved_properties"}'
                             hx-target="#property-card-{{ forloop.counter }}" hx-swap="innerHTML fade-out"
