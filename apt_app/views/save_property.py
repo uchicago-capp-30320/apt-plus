@@ -6,8 +6,11 @@ from apt_app.models import Property, SavedProperty
 
 def _save_property(request):
     """Core logic for saving a property."""
+    if request.method != "POST":
+        return HttpResponse("Method not allowed", status=405)
+
     # Get the address from the request
-    property_address = request.GET.get("propertyAddress", "Unknown Address")
+    property_address = request.POST.get("propertyAddress", "Unknown Address")
 
     # Check authentication
     # If the user is not authenticated, and still click on the save button,

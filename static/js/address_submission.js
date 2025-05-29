@@ -390,7 +390,7 @@ function updateButtonBasedOnStatus(propertyAddress, isSaved, container) {
     textSpan.textContent = 'Save to my list';
 
     // Add HTMX attributes for save
-    saveButton.setAttribute('hx-get', '/save_property/');
+    saveButton.setAttribute('hx-post', '/save_property/');
     saveButton.setAttribute('hx-vals', `js:{propertyAddress: "${propertyAddress}"}`);
     saveButton.setAttribute('hx-target', '#save-button-container');
     saveButton.setAttribute('hx-trigger', 'click'); 
