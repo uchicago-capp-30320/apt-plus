@@ -157,8 +157,8 @@
 <script src="{% static 'js/utils.js' %}"></script>
 <script type="module">
   import { mapState } from '{% static "js/map_state.js" %}';
-  import { getApartment } from '{% static "js/address_submission.js" %}';
-  import { updateBusStops, updateGroceries, toggleBusStops, toggleGroceries, toggleBusRoute, displayBusRoute, clearBusRoutes } from '{% static "js/map_modifications.js" %}';
+  import { getApartment, parse_busroutes } from '{% static "js/address_submission.js" %}';
+  import { updateBusStops, updateGroceries, toggleBusStops, toggleGroceries, toggleBusRoute, displayBusRoute, clearBusRoutes, getDistanceFilter } from '{% static "js/map_modifications.js" %}';
 
   // Initialize MapLibre map (STATIC at first)
   mapState.map = new maplibregl.Map({
@@ -188,19 +188,23 @@
     }
 
     if (busRoutesBtn) {
-      mapState.busRoutesOn = !mapState.busRoutesOn;
-      busRoutesBtn.classList.toggle('is-info', mapState.busRoutesOn);
+      const filterSelect = getDistanceFilter();
+      console.log(mapState);
+      parse_busroutes(mapState.busStopData, filterSelect).then(closeRoutes => {
+        // Manage button
+        mapState.busRoutesOn = !mapState.busRoutesOn;
+        busRoutesBtn.classList.toggle('is-info', mapState.busRoutesOn);
 
-      if (mapState.busRoutesOn) {
-      // Turn ON/OFF all routes (for now)
-        for (const busRoute of mapState.busRoutesData.features) {
-          // console.log(`Plotting: ${busRoute.properties.route_id}`)
-          // console.log(busRoute)
-          displayBusRoute(mapState.map, busRoute);
+        if (mapState.busRoutesOn) {
+          for (const busRoute of mapState.busRoutesData.features) {
+            if (closeRoutes.includes(busRoute.properties.route_id)) {
+              displayBusRoute(mapState.map, busRoute);
+            }
+          }
+        } else {
+          clearBusRoutes(mapState.map);
         }
-      } else {
-          clearBusRoutes(mapState.map)
-        }
+      });
     }
   });
 

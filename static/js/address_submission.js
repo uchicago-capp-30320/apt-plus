@@ -130,14 +130,17 @@ async function sendRequest(endpoint, body) {
   return fetch(url, { method: 'GET' });
 }
 
-async function parse_busroutes(data) {
+export async function parse_busroutes(data, dist=15) {
   /** Takes the fetch_routes output and produces a list of unique routes.
    *  @param {Object} data - a JSON formatted list of responses.
+   *  @param {int} dist - the distance to parse routes from 
    *  @returns {array} routes - a list of unique bus routes to request 
   */
   let routes = []; 
   for (const elem of data.bus_stops_geojson.features) {
-    routes = routes.concat(elem.properties.routes); // ['171', '55']
+    if (elem.properties.distance_min <= dist) {
+      routes = routes.concat(elem.properties.routes); // ['171', '55']
+    }
   } 
   return [...new Set(routes)]; // ref: https://stackoverflow.com/a/9229821
 }

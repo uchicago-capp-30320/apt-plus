@@ -90,7 +90,7 @@ function resetButtons() {
   if (busRoutesBtn) busRoutesBtn.classList.remove('is-warning');
 }
 
-function getDistanceFilter() {
+export function getDistanceFilter() {
   let filterSelect = document.getElementById("distanceFilter");
   return filterSelect ? parseInt(filterSelect.value) : 5;
 }
@@ -287,7 +287,3 @@ function markUChicago() {
     // Ensure the popup is visible immediately  
     popup.addTo(mapState.map);  
 }
-
-
-
-
