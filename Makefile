@@ -35,6 +35,18 @@ test: ## Test the code with pytest
 	@echo "🚀 Testing code: Running pytest"
 	@uv run pytest --cov --cov-config=pyproject.toml # --cov-report=xml
 
+.PHONY: makemig
+makemig: ## Make migrations
+	@uv run manage.py makemigrations
+
+.PHONY: mig
+mig: ## Run migrations
+	@uv run manage.py migrate
+
+.PHONY: mm
+mm: ## Make migrations and run migrations
+	@make makemig
+	@make mig
 
 .PHONY: help
 help:

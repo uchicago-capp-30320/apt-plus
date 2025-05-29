@@ -92,13 +92,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class SavedProperty(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="saved_properties"
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_properties")
     property_obj = models.ForeignKey("Property", on_delete=models.CASCADE)
-    address = models.CharField(
-        max_length=512, null=False, blank=False, default="Unknown Address"
-    )
+    address = models.CharField(max_length=512, null=False, blank=False, default="Unknown Address")
     custom_name = models.CharField(max_length=512, null=True, blank=True)
     date_saved = models.DateTimeField(auto_now_add=True)
     remarks = models.TextField(null=True, blank=True)
@@ -312,10 +308,12 @@ class Inspection(models.Model):
 
 
 class InspectionSummary(models.Model):
-    # property = models.ForeignKey(Property, on_delete=models.CASCADE)
     address = models.CharField(max_length=255)
     summary = models.JSONField()
-    # last_updated_at = models.DateTimeField(auto_now=True)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, null=True, blank=True)
+    version = models.CharField(max_length=50, blank=True, null=True, default="")
+    last_updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class CrimeType(models.TextChoices):
@@ -404,9 +402,7 @@ class AmenityType(models.TextChoices):
 
 
 class Amenity(LocationBasedFacilities):
-    type = models.CharField(
-        max_length=50, choices=AmenityType.choices, default=AmenityType.OTHER
-    )
+    type = models.CharField(max_length=50, choices=AmenityType.choices, default=AmenityType.OTHER)
     address = models.CharField(max_length=255, blank=True, default="")
 
     class Meta:
@@ -424,17 +420,13 @@ class TransitType(models.TextChoices):
 
 
 class TransitStop(LocationBasedFacilities):
-    type = models.CharField(
-        max_length=50, choices=TransitType.choices, default=TransitType.OTHER
-    )
+    type = models.CharField(max_length=50, choices=TransitType.choices, default=TransitType.OTHER)
 
 
 class TransitRoute(models.Model):
     route_id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255)
-    type = models.CharField(
-        max_length=50, choices=TransitType.choices, default=TransitType.OTHER
-    )
+    type = models.CharField(max_length=50, choices=TransitType.choices, default=TransitType.OTHER)
     geometry = gis_models.MultiLineStringField()
     created_at = models.DateTimeField(auto_now_add=True)
 
