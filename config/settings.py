@@ -105,6 +105,7 @@ INSTALLED_APPS = [
     # "allauth.mfa",
     "django_structlog",
     "django_typer",
+    "django_extensions", # Added for creating ERD
     "apt_app",
 ]
 
