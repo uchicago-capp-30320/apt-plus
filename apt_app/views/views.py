@@ -31,7 +31,6 @@ def about(request):
     return render(request, "about.html")
 
 
-@csrf_exempt
 @require_GET
 def fetch_all_data(request):
     address = request.GET.get("address")

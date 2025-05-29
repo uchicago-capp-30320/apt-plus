@@ -4,7 +4,6 @@ from django.views.decorators.csrf import csrf_exempt
 from apt_app.models import SavedProperty
 
 
-@csrf_exempt
 def _update_property(request):
     """Handle saving property details."""
 
