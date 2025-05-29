@@ -52,7 +52,7 @@ def test_address_inside_chicago(address_inside_chicago):
     )
 
 
-# address inside illinois but not in chicago
+# address inside IL but not in chicago
 inside_illinois_not_chicago_lst = ["1010 E Edwards St, Springfield, IL 62703"]
 
 
@@ -70,15 +70,36 @@ def test_address_outside_chicago(address_outside_chicago):
     )
 
 
+FULL_MATCHED_ADDRESSES = [
+    "5496 S HYDE PARK BLVD, CHICAGO, IL, 60615",
+    "5514 S BLACKSTONE AVE, CHICAGO, IL, 60637",
+]
+
+
 @pytest.mark.django_db
-def test_match_address_in_chicago():
+@pytest.mark.parametrize(
+    "input_address, expected_address",
+    [
+        ("5496 S Hyde Park Blvd", FULL_MATCHED_ADDRESSES[0]),
+        ("5496 South Hyde Park Blvd", FULL_MATCHED_ADDRESSES[0]),
+        ("5496 South Hyde Park Boulevard", FULL_MATCHED_ADDRESSES[0]),
+        ("5496 SOUTH HYDE PARK BLVD", FULL_MATCHED_ADDRESSES[0]),
+        ("5514 s blackstone ave", FULL_MATCHED_ADDRESSES[1]),
+        ("5514 S BLACKSTONE AVE", FULL_MATCHED_ADDRESSES[1]),
+        ("5514 South Blackstone", FULL_MATCHED_ADDRESSES[1]),
+        ("5514 South Blackstone Ave", FULL_MATCHED_ADDRESSES[1]),
+        ("5514 South Blackstone Avenue", FULL_MATCHED_ADDRESSES[1]),
+        ("5514 South Blackstone Avenue, Chicago", FULL_MATCHED_ADDRESSES[1]),
+        ("5514 South Blackstone Avenue, Chicago, IL", FULL_MATCHED_ADDRESSES[1]),
+        ("5514 South Blackstone Avenue, Chicago, IL, 60637", FULL_MATCHED_ADDRESSES[1]),
+    ],
+)
+def test_match_address_in_chicago(input_address, expected_address):
     """
     Test that match_address_in_chicago() function is working properly.
     """
-    matched_address, _, _ = match_address_in_chicago("5496 S Hyde Park Blvd")
-    assert matched_address == "5496 S HYDE PARK BLVD, CHICAGO, IL, 60615", (
-        "Address matching not succesful"
-    )
+    matched_address, _, _ = match_address_in_chicago(input_address)
+    assert matched_address == expected_address, "Address matching not succesful"
 
 
 @pytest.mark.django_db
