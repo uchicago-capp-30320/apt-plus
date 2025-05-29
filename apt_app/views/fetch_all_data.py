@@ -1,8 +1,5 @@
 import os
-import sys
 import censusgeocode as cg
-import json
-from dotenv import load_dotenv
 import django  # noqa: E402
 from django.core.exceptions import ValidationError  # noqa: E402
 from django.http import JsonResponse  # noqa: E402
@@ -19,10 +16,6 @@ EAST = CONSTANTS["HP_BOUNDS"]["east"]
 WEST = CONSTANTS["HP_BOUNDS"]["west"]
 
 
-# sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
-# Load environment variables
-# load_dotenv()
-
 # Setup Django environment
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
@@ -32,11 +25,18 @@ def _fetch_all_data(user_address) -> JsonResponse:
     """
     Function that takes the user_address string, and does the following:
     (i) Check that user_address is matched with an address from censusgeocode
-    and get its coordinates
-    (ii) Check if the address is inside Hyde Park or Chicago
-    (iii) Add the address to the Django database if it didn't exist previously
+    and get its coordinates.
+    (ii) Check if the address is inside Hyde Park or Chicago.
+    (iii) Add the address to the Django database if it didn't exist previously.
     (iv) Returns Response with JSON with cleaned_address, property_id, coordinates,
-    and original user_address
+    and original user_address.
+
+    Inputs:
+        user_address (str): address provided by the user in the frontend.
+
+    Returns (JsonResponse): JsonResponse with information related to the original
+        user address, the matched address and its coordinates, and if this address
+        is inside Hyde Park.
     """
     # See if some address was provided by the user
     if not user_address or not isinstance(user_address, str):
@@ -97,16 +97,15 @@ def _fetch_all_data(user_address) -> JsonResponse:
 def match_address_in_chicago(address_input):
     """
     Helper function that takes a raw address as an input and returns the
-    matched address, its coordinates, and if its in Chicago.
+    matched address and its coordinates.
 
     Inputs:
-        - address_input: Raw address.
+        - address_input (str): Raw address.
 
     Returns (tuple): tuple with four variables:
-        - matched_address (str): address which the raw address was matched with
-        - longitude (float): longitude of the matched address
-        - latitude (float): latitude of the matched address
-        - urban_area (bool): urban area is Chicago or not
+        - matched_address (str): address which the raw address was matched with.
+        - longitude (float): longitude of the matched address.
+        - latitude (float): latitude of the matched address.
     """
     # Try to match the address using censusgeocode
     try:
@@ -143,8 +142,14 @@ def match_address_in_chicago(address_input):
 
 def coordinates_in_hyde_park(latitude, longitude):
     """
-    Check if an area is inside the boundaries defined for Hyde Park. Returns
-    a string message with the result.
+    Check if coordinates provided are inside the boundaries defined for Hyde Park. Returns
+    a boolean.
+
+    Inputs:
+        latitude (float): latitude of the address.
+        longitude (float): longitude of the address.
+
+    Returns (bool): boolean regarding if the coordinates are inside Hyde Park.
     """
     north_limit_latitude = NORTH
     south_limit_latitude = SOUTH
@@ -161,6 +166,13 @@ def coordinates_in_hyde_park(latitude, longitude):
 def save_property_in_django(address_input, latitude, longitude):
     """
     Helper function that generates a TransitStop instance and saves it.
+
+    Inputs:
+        address_input (str): matched address from censusgeocode package.
+        latitude (float): latitude of the address.
+        longitude (float): longitude of the address.
+
+    Returns (int): id of the address in the Django data model.
     """
     property = Property()
 
