@@ -145,8 +145,20 @@ class SavedProperty(models.Model):
             return result
 
         try:
+            # Access the features array from the bus_stops_geojson structure
+            bus_data = self.property_obj.bus_stops
+
+            # Handle the case where bus stops might be stored as bus_stops_geojson
+            if isinstance(bus_data, dict) and "bus_stops_geojson" in bus_data:
+                features = bus_data["bus_stops_geojson"].get("features", [])
+            elif isinstance(bus_data, dict) and "features" in bus_data:
+                features = bus_data["features"]
+            else:
+                # Assume it's already the features array
+                features = bus_data if isinstance(bus_data, list) else []
+
             # Count stops by time buckets
-            for stop in self.property_obj.bus_stops:
+            for stop in features:
                 # Skip invalid entries
                 if not isinstance(stop, dict) or "properties" not in stop:
                     continue
@@ -178,12 +190,22 @@ class SavedProperty(models.Model):
         Returns:
             list: Sorted list of unique bus route numbers/names
         """
+        # Error case handling
         if not self.property_obj or not self.property_obj.bus_stops:
             return []
 
         try:
+            bus_data = self.property_obj.bus_stops
+
+            if isinstance(bus_data, dict) and "bus_stops_geojson" in bus_data:
+                features = bus_data["bus_stops_geojson"].get("features", [])
+            elif isinstance(bus_data, dict) and "features" in bus_data:
+                features = bus_data["features"]
+            else:
+                features = bus_data if isinstance(bus_data, list) else []
+
             routes = set()
-            for stop in self.property_obj.bus_stops:
+            for stop in features:
                 if (
                     isinstance(stop, dict)
                     and "properties" in stop
@@ -217,18 +239,27 @@ class SavedProperty(models.Model):
             "within_15_min": [],
         }
 
-        # Check if property and bus_stops exist
+        # Check for existence
         if not self.property_obj or not self.property_obj.bus_stops:
             return result
 
         try:
+            bus_data = self.property_obj.bus_stops
+            # Accounting for geojson data structure
+            if isinstance(bus_data, dict) and "bus_stops_geojson" in bus_data:
+                features = bus_data["bus_stops_geojson"].get("features", [])
+            elif isinstance(bus_data, dict) and "features" in bus_data:
+                features = bus_data["features"]
+            else:
+                features = bus_data if isinstance(bus_data, list) else []
+
             # Initialize sets to collect unique routes in each time bucket
             routes_5min = set()
             routes_10min = set()
             routes_15min = set()
 
             # Extract routes by time buckets
-            for stop in self.property_obj.bus_stops:
+            for stop in features:
                 # Skip invalid entries
                 if not isinstance(stop, dict) or "properties" not in stop:
                     continue
@@ -252,9 +283,73 @@ class SavedProperty(models.Model):
 
             return result
 
-        except (TypeError, AttributeError) as e:
+        except (TypeError, AttributeError, KeyError) as e:
             # Log the error if needed
             print(f"Error processing bus routes by time: {e}")
+            return result
+
+    @property
+    def groceries_by_time(self):
+        """
+        Return a dictionary with grocery stores within different walking time ranges.
+        Returns:
+            dict: Contains stores within 5, 10, and 15 minutes
+        """
+        result = {
+            "within_5_min": [],
+            "within_10_min": [],
+            "within_15_min": [],
+        }
+
+        # Check if property and groceries exist
+        if not self.property_obj or not self.property_obj.groceries:
+            return result
+
+        try:
+            grocery_data = self.property_obj.groceries
+
+            # Handling geojson data structure
+            if isinstance(grocery_data, dict) and "grocery_geojson" in grocery_data:
+                features = grocery_data["grocery_geojson"].get("features", [])
+            elif isinstance(grocery_data, dict) and "features" in grocery_data:
+                features = grocery_data["features"]
+            else:
+                # Assuming that it is aleady in an array
+                features = grocery_data if isinstance(grocery_data, list) else []
+
+            # Initialize lists to collect stores in each time bucket
+            stores_5min = []
+            stores_10min = []
+            stores_15min = []
+
+            # Extract stores by time buckets
+            for store in features:
+                # Skip invalid entries
+                if not isinstance(store, dict) or "properties" not in store:
+                    continue
+
+                # Get distance in minutes and store name
+                minutes = store.get("properties", {}).get("distance_min", 999)
+                store_name = store.get("properties", {}).get("name", "Unknown Store")
+
+                # Add stores to appropriate time buckets
+                if minutes <= 5:
+                    stores_5min.append(store_name)
+                if minutes <= 10:
+                    stores_10min.append(store_name)
+                if minutes <= 15:
+                    stores_15min.append(store_name)
+
+            # Convert to sorted lists (remove duplicates if any)
+            result["within_5_min"] = sorted(list(set(stores_5min)))
+            result["within_10_min"] = sorted(list(set(stores_10min)))
+            result["within_15_min"] = sorted(list(set(stores_15min)))
+
+            return result
+
+        except (TypeError, AttributeError, KeyError) as e:
+            # Log the error if needed
+            print(f"Error processing grocery stores by time: {e}")
             return result
 
 
