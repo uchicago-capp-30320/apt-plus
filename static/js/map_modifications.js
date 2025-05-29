@@ -63,7 +63,11 @@ function enableMapInteraction() {
   if (!map.keyboard.isEnabled()) map.keyboard.enable();
   if (!map.doubleClickZoom.isEnabled()) map.doubleClickZoom.enable();
   if (!map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
-  map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+  // Avoid controls duplication after new search
+  if (!mapState.navControls) {
+    map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+    mapState.navControls = true;
+  }
 }
 
 // Helper function to remove address and amenities markers

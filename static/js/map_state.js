@@ -9,4 +9,5 @@ export const mapState = {
     groceriesOn: false,
     busStopsOn: false,
     busRoutesOn: false,
+    navControls: false,
   };
