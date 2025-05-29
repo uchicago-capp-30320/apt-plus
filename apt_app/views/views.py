@@ -67,32 +67,8 @@ def fetch_bus_routes(request):
     return _fetch_bus_routes(route_id)
 
 
-# TODO: this should be moved elsewhere since it is a hard-coded mock
-# -- maybe should be in tests but not sure
-def fetch_all_data_mock(request):
-    address = request.GET.get("address", "")
-
-    print(address)
-
-    # Generating a sample geojson response with a point lying inside
-    # Hyde Park, Chicago
-    geojson = {
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "geometry": {"type": "Point", "coordinates": [-87.591848, 41.801696]},
-                "properties": {"name": "Hyde Park, Chicago"},
-            }
-        ],
-    }
-    # Convert the dictionary to a JSON string before returning
-    return HttpResponse(json.dumps(geojson), content_type="application/json")
-
-
 def save_property(request):
     """Save a property and return HTML to replace the button."""
-    print("Save property endpoint triggered")
     return _save_property(request)
 
 
