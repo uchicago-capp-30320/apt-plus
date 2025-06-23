@@ -37,11 +37,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev
 
+      - name: Install playwright
+        run: uv run playwright install
+
       - name: Collect static files
         run: uv run manage.py collectstatic --noinput
 
       - name: Run tests
-        run: uv run pytest # tests/ci.py
+        run: uv run pytest
 
       - name: Run Ruff linter
         run: uvx ruff check .
