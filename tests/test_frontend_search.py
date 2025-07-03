@@ -55,12 +55,17 @@ def test_search_responses(page: Page, live_server, input_address, warning, plot)
         expect(page.locator(".map-apt")).to_have_count(0)
 
 
-# def test_multiple_search(page: Page):
-#    '''
-#    Includes a test that only one element of search is available
-#    '''
-#
-# def test_map_moves(page: Page):
-#    '''
-#    Tests that map is frozen prior to search and moveable after search
-#    '''
+def test_multiple_search(page: Page, live_server):
+    """
+    Includes a test that only one element of search is available
+    """
+    # Search 1
+    page.goto(live_server.url)
+    page.locator("#addressInput").fill("1606 E Hyde Park Blvd")
+    page.locator("#searchButton").click()
+    expect(page.locator(".map-apt")).to_have_count(1)
+
+    # Search 2
+    page.locator("#addressInput").fill("5432 S Harper Ave")
+    page.locator("#searchButton").click()
+    expect(page.locator(".map-apt")).to_have_count(1)
