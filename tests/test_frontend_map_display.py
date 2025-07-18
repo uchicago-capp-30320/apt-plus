@@ -2,6 +2,7 @@ import pytest
 from playwright.sync_api import expect, Page
 
 
+@pytest.mark.playwright
 @pytest.fixture(scope="function", autouse=True)
 def test_address(page: Page, live_server):
     """
@@ -15,6 +16,7 @@ def test_address(page: Page, live_server):
     yield page
 
 
+@pytest.mark.playwright
 @pytest.mark.parametrize(
     ("button_id", "icon_class"),
     [
@@ -43,6 +45,7 @@ def test_display_elements(page: Page, button_id, icon_class):
     expect(page.locator(icon_class)).to_have_count(0)
 
 
+@pytest.mark.playwright
 @pytest.mark.parametrize(
     ("button_id", "icon_class", "num_count"),
     [
@@ -64,6 +67,7 @@ def test_correct_num_elements(page: Page, button_id, icon_class, num_count):
     expect(page.locator(icon_class)).to_have_count(num_count)
 
 
+@pytest.mark.playwright
 def test_mouse_over(page: Page):
     """
     Check that the pop-up exists and includes expected text
@@ -83,6 +87,7 @@ def test_mouse_over(page: Page):
     expect(popup_content).to_contain_text("Whole Foods Market")
 
 
+@pytest.mark.playwright
 def test_dist_change_works(page: Page):
     """
     Modifies the distances, checks if that works

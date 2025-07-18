@@ -6,6 +6,7 @@ from playwright.sync_api import expect, Page
 # All tests use pytest-django's live_server object to launch a server.
 
 
+@pytest.mark.playwright
 def test_search_load(page: Page, live_server):
     """
     Home page loads with a visible search bar
@@ -15,6 +16,7 @@ def test_search_load(page: Page, live_server):
     expect(page.locator("#addressInput")).to_be_visible()
 
 
+@pytest.mark.playwright
 def test_text_input(page: Page, live_server):
     """
     Search bar allows text input
@@ -25,6 +27,7 @@ def test_text_input(page: Page, live_server):
     expect(input).to_have_value("Test search")
 
 
+@pytest.mark.playwright
 @pytest.mark.parametrize(
     "input_address, warning, plot",
     [
@@ -55,6 +58,7 @@ def test_search_responses(page: Page, live_server, input_address, warning, plot)
         expect(page.locator(".map-apt")).to_have_count(0)
 
 
+@pytest.mark.playwright
 def test_multiple_search(page: Page, live_server):
     """
     Includes a test that only one element of search is available
