@@ -33,8 +33,17 @@ You're good to go to start editing code! If you want to run the project locally,
 $ uv run manage.py runserver
 ```
 
+And finally, we use playwright for frontend testing. Therefore, you'll need to install playwright locally:
+
+6. Install playwright
+```bash
+$ uv run playwright install
+```
+
 ### Tech Stack
-This is a [Django](https://www.djangoproject.com/) application that uses plain [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) and some [HTMX](https://htmx.org/) to handle frontend functionality. Our site is styled with [Bulma](https://bulma.io/). We use [Airflow](https://airflow.apache.org/) and [Python >3.10](https://www.python.org/downloads/) for data updates. Our data is stored on a [postgreSQL](https://www.postgresql.org/) server with [postGIS](https://postgis.net/) for geospatial support. 
+This is a [Django](https://www.djangoproject.com/) application that uses plain [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) and some [HTMX](https://htmx.org/) to handle frontend functionality. Our site is styled with [Bulma](https://bulma.io/). We use [Airflow](https://airflow.apache.org/) and [Python >3.10](https://www.python.org/downloads/) for data updates. Our data is stored on a [postgreSQL](https://www.postgresql.org/) server with [postGIS](https://postgis.net/) for geospatial support.
+
+We use [pytest](https://docs.pytest.org/en/stable/) and [playwright](https://playwright.dev/) for testing.
 
 
 ### Folder Structure
@@ -107,7 +116,7 @@ DYLD_LIBRARY_PATH=/opt/homebrew/lib
 
 1. **Install GDAL**
 
-[OSGeo4W](https://www.osgeo.org/projects/osgeo4w/)'s default installation for Windows will include the relevant packages. 
+[OSGeo4W](https://www.osgeo.org/projects/osgeo4w/)'s default installation for Windows will include the relevant packages.
 
 2. **Add GDAL to your PATH variable**
 
