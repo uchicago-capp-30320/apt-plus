@@ -11,12 +11,13 @@
     <!-- Stylesheet info-->
     <link rel="stylesheet" href="{% static 'css/bulma.css' %}">
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/map.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/htmx-transition.css' %}">
 
     <!-- mapLibre info-->
-    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
-    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.js"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   </head>
 
@@ -39,8 +40,8 @@
       });
     </script>
 
-  <!-- Initialize map if #map is present -->
-  <script type="module" src="{% static 'js/init_map.js' %}"></script>
+    <!-- Initialize map if #map is present -->
+    <script type="module" src="{% static 'js/init_map.js' %}"></script>
 
   </body>
 

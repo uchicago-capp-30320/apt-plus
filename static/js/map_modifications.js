@@ -5,9 +5,9 @@ let currentMarker = null; // To store the marker
 export async function placeAddress(response) {
   /**
   * Places the submitted address on the map.
-  * 
+  *
   * @param {response} - JSON response from `/fetch_all_data` with lat, lon
-  * @returns {void} - Modifies the map in place by adding a marker 
+  * @returns {void} - Modifies the map in place by adding a marker
   */
   // Input error handling
   if (!response) return;
@@ -32,6 +32,7 @@ export async function placeAddress(response) {
   const lon = parseFloat(coords[1]);
 
   // Enable map interaction
+  console.log(mapState.map);
   const map = mapState.map;
   enableMapInteraction(map);
 
@@ -44,7 +45,8 @@ export async function placeAddress(response) {
   // Add marker
   currentMarker = new maplibregl.Marker({ color: 'tomato' })
     .setLngLat([lon, lat])
-    .addTo(map);
+    .addTo(map)
+    .addClassName('map-apt');
 
     // Add a fixed maroon marker with popup for University of Chicago
     markUChicago();
@@ -102,13 +104,14 @@ export function getDistanceFilter() {
 let groceryMarkers = [];
 let busStopMarkers = [];
 
-function loadMarkersToMap(geojson, filterDistance, color, getPopupHTML) {
+function loadMarkersToMap(geojson, filterDistance, color, getPopupHTML, className) {
   /** Function to add markers to map given input data
    * @param {object} geojson - data stored as geoJSON
    * @param {int} filterDistance - distance to filter the map from
    * @param {string} color - strng color to implement
    * @param {string} getPopupHTML - HTML input for the pop-up hover
-   * @returns {void} none - modifies object on map, not return 
+   * @param {string} className - Classname for tracking
+   * @returns {void} none - modifies object on map, not return
    */
   const map = mapState.map;
   const markers = [];
@@ -121,6 +124,7 @@ function loadMarkersToMap(geojson, filterDistance, color, getPopupHTML) {
     // Popup
     let popup = new maplibregl.Popup({ offset: 25, closeButton: false }).setHTML(getPopupHTML(props));
     let marker = new maplibregl.Marker({ color: color }).setLngLat(coords).addTo(map);
+    marker.addClassName(className);
     marker.getElement().addEventListener('mouseenter', () => popup.setLngLat(coords).addTo(map));
     marker.getElement().addEventListener('mouseleave', () => popup.remove());
     markers.push(marker);
@@ -141,7 +145,8 @@ export function updateGroceries() {
     mapState.groceryData.grocery_geojson,
     distanceMin,
     'seagreen',
-    props => `<strong>${props.name}</strong><br>${props.address}`
+    props => `<strong>${props.name}</strong><br>${props.address}`,
+    'map-grocery'
   );
 }
 
@@ -152,7 +157,8 @@ export function updateBusStops() {
     mapState.busStopData.bus_stops_geojson,
     distanceMin,
     'deepskyblue',
-    props => `<strong>${props.stop_name}</strong><br>Routes: ${props.routes.join(", ")}`
+    props => `<strong>${props.stop_name}</strong><br>Routes: ${props.routes.join(", ")}`,
+    'map-busstop'
   );
 }
 
@@ -272,22 +278,22 @@ export function toggleBusRoute(map, geojsonFeature) {
  * and displays a fixed popup showing the name.
  */
 function markUChicago() {
-  const uchicagoCoords = [-87.5997, 41.7897]; 
+  const uchicagoCoords = [-87.5997, 41.7897];
 
   // Create a fixed popup with the name "University of Chicago"
   const popup = new maplibregl.Popup({
     closeButton: false,
     closeOnClick: false,
-    offset: 40   
+    offset: 40
   })
     .setText("University of Chicago");
 
     // Add a maroon pin at UChicago coordinates and attach the popup
-    new maplibregl.Marker({ color: '#800000' })  
+    new maplibregl.Marker({ color: '#800000' })
     .setLngLat(uchicagoCoords)
     .setPopup(popup)
     .addTo(mapState.map);
 
-    // Ensure the popup is visible immediately  
-    popup.addTo(mapState.map);  
+    // Ensure the popup is visible immediately
+    popup.addTo(mapState.map);
 }

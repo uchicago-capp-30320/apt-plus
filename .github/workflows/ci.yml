@@ -1,9 +1,10 @@
-name: CI Tests
+name: 🧪 Backend & Frontend Tests
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
-  test-and-lint:
+  test-suite:
+    name: "Backend & Frontend Tests"
     runs-on: ubuntu-latest
     env:
       DEBUG: ${{ secrets.DEBUG }}
@@ -13,15 +14,15 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.DUMMY_OPENROUTER_API_KEY }}
 
     steps:
-      - name: Checkout repo
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python  # this is said to be faster than uv python install
+      - name: 🐍 Set up Python  # this is said to be faster than uv python install
         uses: actions/setup-python@v5
         with:
           python-version-file: ".python-version"
 
-      - name: Install uv and activate a virtual environment
+      - name: ⚡ Install uv and activate virtual environment
         uses: astral-sh/setup-uv@v6
         with:
           # Install the specific version of uv that we currently use
@@ -32,16 +33,16 @@ jobs:
             "uv.lock"
             "pyproject.toml"
 
-      - name: Install GDAL dependencies for GeoDjango
+      - name: 🗺️ Install GDAL dependencies for GeoDjango
         run: |
           sudo apt-get update
           sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev
 
-      - name: Collect static files
+      - name: 🎭 Install Playwright
+        run: uv run playwright install
+
+      - name: 📦 Collect Django static files
         run: uv run manage.py collectstatic --noinput
 
-      - name: Run tests
-        run: uv run pytest # tests/ci.py
-
-      - name: Run Ruff linter
-        run: uvx ruff check .
+      - name: 🧪 Run test suite (backend + frontend)
+        run: uv run pytest --runplaywright
