@@ -67,5 +67,5 @@ ignore = [
 DJANGO_SETTINGS_MODULE = "config.settings"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 markers = [
-  "playwright: mark a test as needing playwright they are slower"
+  "playwright: mark a test as needing playwright as they are slower to run"
 ]
