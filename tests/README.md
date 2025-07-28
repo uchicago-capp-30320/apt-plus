@@ -12,3 +12,9 @@ https://github.com/AutomationPanda/playwright-python-tutorial/tree/main
 **Docs**
 https://betterstack.com/community/guides/testing/playwright-python-intro/
 https://playwrightqa.blogspot.com/2024/10/how-to-automate-single-page.html
+
+**Authentication**
+https://playwright.dev/python/docs/auth
+https://lewi.dev/blog/basic-http-auth-playwright/
+https://medium.com/@anubhavsanyal/efficient-testing-playwrights-authentication-solution-ee858302e6b1
+https://www.checklyhq.com/learn/playwright/authentication/

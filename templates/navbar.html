@@ -24,22 +24,22 @@
     <div class="navbar-end mr-6">
       {% if user.is_authenticated %}
       <div class="navbar-item">
-        <a class="navbar-item" href="{% url 'about' %}">
+        <a class="navbar-item" href="{% url 'about' %}" id="nav-about">
           <strong>About</strong>
         </a>
-        <a class="navbar-item" href="{% url 'saved_properties' %}">
+        <a class="navbar-item" href="{% url 'saved_properties' %}" id="nav-saved">
           <strong>Saved Properties</strong>
         </a>
-        <a class="navbar-item" href="{% url 'account_logout' %}">
+        <a class="navbar-item" href="{% url 'account_logout' %}" id="nav-log-out">
           <strong>Sign out</strong>
         </a>
       </div>
       {% else %}
       <div class="navbar-item">
-        <a class="navbar-item" href="{% url 'about' %}">
+        <a class="navbar-item" href="{% url 'about' %}" id="nav-about">
           <strong>About</strong>
         </a>
-        <a class="navbar-item" href="{% url 'account_login' %}">
+        <a class="navbar-item" href="{% url 'account_login' %}" id="nav-log-in">
           <strong>Sign in</strong>
         </a>
       </div>
