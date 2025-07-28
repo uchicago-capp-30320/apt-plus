@@ -34,7 +34,7 @@ def pytest_configure(config):
 
 
 def pytest_collection_modifyitems(config, items):
-    """This skips the tests if --runslow is not present"""
+    """This skips the tests if --runplaywright is not present"""
     if config.getoption("--runplaywright"):
         return
     skip_slow = pytest.mark.skip(reason="need --runplaywright option to run")

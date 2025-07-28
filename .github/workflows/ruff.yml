@@ -1,10 +1,11 @@
-name: Lint (ruff)
+name: 🔧 Code Quality (Ruff)
 
 on: [ push, pull_request ]
 
 # From ruff documentation: https://docs.astral.sh/ruff/integrations/#github-actions
 jobs:
-  ruff:
+  lint-and-format:
+    name: "Lint & Auto-format Code"
     runs-on: ubuntu-latest
 
     # Needed for commiting changes: https://github.com/stefanzweifel/git-auto-commit-action
@@ -12,16 +13,16 @@ jobs:
         contents: write
 
     steps:
-      - name: Checkout the repo
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Lint and fix issues
+      - name: 🔧 Lint and fix code issues
         uses: astral-sh/ruff-action@v3
         with:
             args: check --fix
         continue-on-error: true
 
-      - name: Commit Ruff fixes
+      - name: 💾 Commit formatting changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
             commit_message: 'chore: apply ruff linting fixes'
