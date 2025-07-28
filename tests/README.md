@@ -18,3 +18,10 @@ https://playwright.dev/python/docs/auth
 https://lewi.dev/blog/basic-http-auth-playwright/
 https://medium.com/@anubhavsanyal/efficient-testing-playwrights-authentication-solution-ee858302e6b1
 https://www.checklyhq.com/learn/playwright/authentication/
+
+**To-do**
+test_bus_routes -> add in bus_routes fixtures
+test_bus_stops -> add in bus_stops fixtures (for frontend hits to that one)
+test_frontend_map_display -> add in groceries / routes / bus stops / inspections(?) as fixtures
+test_inspections -> add in inspections to fixtures
+refactor: standardize what's being tested?
