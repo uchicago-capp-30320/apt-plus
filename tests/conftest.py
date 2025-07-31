@@ -51,36 +51,11 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(skip_slow)
 
 
-# Helper code for authentication
-def get_verification_code_from_email() -> str:
-    """
-    Returns the first 6-digit code from the body of the most recent email.
-    Raises an error if no emails exist or no code is found.
-
-    Inputs:
-        - None
-
-    Returns: (str) The verification code for email validation
-    """
-    start = time.time()
-    while time.time() - start < 5:
-        if mail.outbox:
-            latest_email = mail.outbox[-1]
-            match = re.search(r"\b(\d{6})\b", latest_email.body)
-            if match:
-                return match.group(1)
-        time.sleep(1)
-    raise RuntimeError("No email with 6-digit code found after waiting")
-
-
-def authenticate_email(page: Page, live_server):
+def authenticate_email(page: Page, live_server, mailoutbox):
     """
     Function to authenticate Aptpl.us and then save the cookie into local
     storage that is git ignored
     """
-    # TODO: Try sign-up flow, not log-in flow as user not in database
-    # Alt: Add user to data base as:
-
     storage_path = os.path.join("tests", ".auth", "cookies.json")
     page.goto(live_server.url)
     page.wait_for_load_state()
@@ -91,26 +66,26 @@ def authenticate_email(page: Page, live_server):
             page.locator("#djHideToolBarButton").click()
         page.locator("#nav-log-in").click()
         page.wait_for_load_state()
-        page.locator("#id_login").fill("test_email@aptpl.us")
-        page.locator("#id_remember").click()  # Select remember me to save cookie
-        page.get_by_role("button", name="Sign In").click()
+        page.locator('a:has-text("Sign up")').click()
+        page.wait_for_load_state()
+        page.locator("#id_email").fill("test_email0@aptpl.us")
+        page.get_by_role("button", name="Sign Up").click()
 
         # Grab verification code and complete
         page.wait_for_load_state("networkidle")  # To send email
         print("=" * 40)
-        print("mail.outbox length:", len(mail.outbox))
+        print("mailoutbox length:", len(mailoutbox))
 
-        if mail.outbox:
-            latest = mail.outbox[-1]
-            print("Subject:", latest.subject)
-            print("To:", latest.to)
-            print("Body:", latest.body)
+        if mailoutbox:
+            latest_email = mailoutbox[-1]
         else:
-            print("mail.outbox is empty")
-
-        print("=" * 40)
-
-        code = get_verification_code_from_email()
+            raise ValueError(f"Expected mailoutbox to have content. It does not")
+        
+        match = re.search(r"\b([A-Z0-9]{6})\b", latest_email.body)
+        if match:
+            code = match.group(1)
+        else:
+            raise ValueError(f"Could not extract code from email. See: {latest_email.body}")
         page.locator("#id_code").fill(code)
         page.get_by_role("button", name="Confirm").click()
 
@@ -145,7 +120,7 @@ def check_auth_dir():
 
 
 @pytest.fixture()
-def authenticated(page: Page, live_server):
+def authenticated(page: Page, live_server, mailoutbox):
     """
     Fixture to use authentication.
 
@@ -155,13 +130,13 @@ def authenticated(page: Page, live_server):
     # First check the auth directory exists
     if not check_auth_dir():
         # Fill email
-        authenticate_email(page, live_server)
+        authenticate_email(page, live_server, mailoutbox)
 
     # THen grab cookie file
-    cookie = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".auth", "authenticated.json")
+    cookie = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".auth", "cookies.json")
 
     # Else use cookie
     with open(cookie, "r") as f:
-        cookie = json.load(f)
-    page.context.add_cookies(cookie)
+        storage = json.load(f)
+    page.context.add_cookies(storage["cookies"])
     return page
