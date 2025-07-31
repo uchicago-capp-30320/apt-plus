@@ -79,8 +79,8 @@ def authenticate_email(page: Page, live_server, mailoutbox):
         if mailoutbox:
             latest_email = mailoutbox[-1]
         else:
-            raise ValueError(f"Expected mailoutbox to have content. It does not")
-        
+            raise ValueError("Expected mailoutbox to have content. It does not")
+
         match = re.search(r"\b([A-Z0-9]{6})\b", latest_email.body)
         if match:
             code = match.group(1)
