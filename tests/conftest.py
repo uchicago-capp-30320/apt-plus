@@ -10,8 +10,14 @@ from django.core.management import call_command
 # From: https://pytest-django.readthedocs.io/en/latest/database.html
 @pytest.fixture(scope="session")
 def django_db_setup(django_db_setup, django_db_blocker):
+    files = []
+    fixture_dir = "tests/fixtures/"
+    for file in os.listdir(fixture_dir):
+        files.append(file)
+
     with django_db_blocker.unblock():
-        call_command("loaddata", "tests/fixtures/test_properties.json")
+        for file in files:
+            call_command("loaddata", f"{fixture_dir}/{file}")
 
 
 #######################################

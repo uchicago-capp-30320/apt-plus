@@ -1889,4 +1889,310 @@
     ],
     "groceries": null
   }
+},
+{
+  "model": "apt_app.property",
+  "pk": 35,
+  "fields": {
+    "address": "1451 E 55TH ST, CHICAGO, IL, 60615",
+    "location": "SRID=4326;POINT (-87.590115956094 41.795466862668)",
+    "created_at": "2025-05-22T20:26:56.130Z",
+    "bus_stops": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591858,
+            41.79472
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10561,
+          "stop_name": "55th Street & Dorchester",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.592962,
+            41.795036
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 17563,
+          "stop_name": "55th Street & Kenwood",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587858,
+            41.795109
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10563,
+          "stop_name": "55th Street & Lake Park",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591593,
+            41.79557
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10569,
+          "stop_name": "55th Street & Dorchester",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.593707,
+            41.795188
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10570,
+          "stop_name": "55th Street & Kenwood",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588097,
+            41.795307
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10567,
+          "stop_name": "55th Street & Lake Park",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587452,
+            41.795053
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7132,
+          "stop_name": "Lake Park & 55th Street",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587768,
+            41.793604
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7131,
+          "stop_name": "Lake Park & 56th Street",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587638,
+            41.795387
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7179,
+          "stop_name": "Lake Park & 55th Street",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588,
+            41.793527
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7180,
+          "stop_name": "Lake Park & 56th Street",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.590448,
+            41.794798
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10562,
+          "stop_name": "55th Street & Blackstone",
+          "distance_min": 1
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.59021,
+            41.795585
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10568,
+          "stop_name": "55th Street & Blackstone",
+          "distance_min": 0
+        }
+      }
+    ],
+    "groceries": {
+      "address": "1451 E 55TH ST, CHICAGO, IL, 60615",
+      "walking_time": 15,
+      "grocery_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.588351,
+                41.795263
+              ]
+            },
+            "properties": {
+              "name": "Trader Joe's",
+              "address": "1528 E 55TH ST",
+              "distance_min": 2.1
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.593095,
+                41.799527
+              ]
+            },
+            "properties": {
+              "name": "Target",
+              "address": "1346 E 53rd St",
+              "distance_min": 7.4
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.595593,
+                41.799496
+              ]
+            },
+            "properties": {
+              "name": "Hyde Park Produce",
+              "address": "1226 E 53RD ST",
+              "distance_min": 9.1
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.587718,
+                41.80173500000001
+              ]
+            },
+            "properties": {
+              "name": "Whole Foods Market",
+              "address": "5118 S Lake Park Ave",
+              "distance_min": 10.4
+            }
+          }
+        ]
+      }
+    }
+  }
 }]
