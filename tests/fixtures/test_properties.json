@@ -1,0 +1,2198 @@
+[{
+  "model": "apt_app.property",
+  "pk": 7,
+  "fields": {
+    "address": "5496 S HYDE PARK BLVD, CHICAGO, IL, 60615",
+    "location": "SRID=4326;POINT (-87.5840282382 41.795339915023)",
+    "created_at": "2025-05-06T01:09:14.394Z",
+    "bus_stops": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587638,
+            41.795387
+          ]
+        },
+        "properties": {
+          "routes": "15",
+          "stop_id": 103,
+          "distance_min": 5
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591593,
+            41.79557
+          ]
+        },
+        "properties": {
+          "routes": "171",
+          "stop_id": 17,
+          "distance_min": 0
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587638,
+            41.795387
+          ]
+        },
+        "properties": {
+          "routes": "28",
+          "stop_id": 299,
+          "distance_min": 5
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591593,
+            41.79557
+          ]
+        },
+        "properties": {
+          "routes": "55",
+          "stop_id": 397,
+          "distance_min": 0
+        }
+      }
+    ],
+    "groceries": {
+      "address": "5496 S HYDE PARK BLVD, CHICAGO, IL, 60615",
+      "walking_time": 15,
+      "grocery_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.588351,
+                41.795263
+              ]
+            },
+            "properties": {
+              "name": "Trader Joe's",
+              "address": "1528 E 55TH ST",
+              "distance_min": 5.1
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.587718,
+                41.80173500000001
+              ]
+            },
+            "properties": {
+              "name": "Whole Foods Market",
+              "address": "5118 S Lake Park Ave",
+              "distance_min": 11.1
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.593095,
+                41.799527
+              ]
+            },
+            "properties": {
+              "name": "Target",
+              "address": "1346 E 53rd St",
+              "distance_min": 12.6
+            }
+          }
+        ]
+      }
+    }
+  }
+},
+{
+  "model": "apt_app.property",
+  "pk": 33,
+  "fields": {
+    "address": "5514 S BLACKSTONE AVE, CHICAGO, IL, 60637",
+    "location": "SRID=4326;POINT (-87.590399051332 41.794544688393)",
+    "created_at": "2025-05-22T16:10:00.155Z",
+    "bus_stops": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591858,
+            41.79472
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10561,
+          "stop_name": "55th Street & Dorchester",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.592962,
+            41.795036
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 17563,
+          "stop_name": "55th Street & Kenwood",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587858,
+            41.795109
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10563,
+          "stop_name": "55th Street & Lake Park",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591593,
+            41.79557
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10569,
+          "stop_name": "55th Street & Dorchester",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.593707,
+            41.795188
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10570,
+          "stop_name": "55th Street & Kenwood",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588097,
+            41.795307
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10567,
+          "stop_name": "55th Street & Lake Park",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587452,
+            41.795053
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7132,
+          "stop_name": "Lake Park & 55th Street",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587768,
+            41.793604
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7131,
+          "stop_name": "Lake Park & 56th Street",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587638,
+            41.795387
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7179,
+          "stop_name": "Lake Park & 55th Street",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588,
+            41.793527
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7180,
+          "stop_name": "Lake Park & 56th Street",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.590448,
+            41.794798
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10562,
+          "stop_name": "55th Street & Blackstone",
+          "distance_min": 0
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.59021,
+            41.795585
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10568,
+          "stop_name": "55th Street & Blackstone",
+          "distance_min": 2
+        }
+      }
+    ],
+    "groceries": {
+      "address": "5514 S BLACKSTONE AVE, CHICAGO, IL, 60637",
+      "walking_time": 15,
+      "grocery_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.588351,
+                41.795263
+              ]
+            },
+            "properties": {
+              "name": "Trader Joe's",
+              "address": "1528 E 55TH ST",
+              "distance_min": 2.7
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.593095,
+                41.799527
+              ]
+            },
+            "properties": {
+              "name": "Target",
+              "address": "1346 E 53rd St",
+              "distance_min": 8.5
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.595593,
+                41.799496
+              ]
+            },
+            "properties": {
+              "name": "Hyde Park Produce",
+              "address": "1226 E 53RD ST",
+              "distance_min": 10.0
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.587718,
+                41.80173500000001
+              ]
+            },
+            "properties": {
+              "name": "Whole Foods Market",
+              "address": "5118 S Lake Park Ave",
+              "distance_min": 11.9
+            }
+          }
+        ]
+      }
+    }
+  }
+},
+{
+  "model": "apt_app.property",
+  "pk": 9,
+  "fields": {
+    "address": "1401 E 55TH ST, CHICAGO, IL, 60615",
+    "location": "SRID=4326;POINT (-87.59161306112 41.795451479126)",
+    "created_at": "2025-05-08T16:44:47.441Z",
+    "bus_stops": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591858,
+            41.79472
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10561,
+          "stop_name": "55th Street & Dorchester",
+          "distance_min": 1
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.592962,
+            41.795036
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 17563,
+          "stop_name": "55th Street & Kenwood",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587858,
+            41.795109
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10563,
+          "stop_name": "55th Street & Lake Park",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591593,
+            41.79557
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10569,
+          "stop_name": "55th Street & Dorchester",
+          "distance_min": 0
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.593707,
+            41.795188
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10570,
+          "stop_name": "55th Street & Kenwood",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588097,
+            41.795307
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10567,
+          "stop_name": "55th Street & Lake Park",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587452,
+            41.795053
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7132,
+          "stop_name": "Lake Park & 55th Street",
+          "distance_min": 5
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587638,
+            41.795387
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7179,
+          "stop_name": "Lake Park & 55th Street",
+          "distance_min": 5
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.590448,
+            41.794798
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10562,
+          "stop_name": "55th Street & Blackstone",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.595058,
+            41.795053
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10559,
+          "stop_name": "55th Street & Kimbark",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.59021,
+            41.795585
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10568,
+          "stop_name": "55th Street & Blackstone",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.594803,
+            41.79518
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10571,
+          "stop_name": "55th Street & Kimbark",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587451,
+            41.795064
+          ]
+        },
+        "properties": {
+          "routes": [
+            "53rd Street Express"
+          ],
+          "stop_id": 8626000,
+          "stop_name": "Lake Park & 55th St. (SE Corner)",
+          "distance_min": 5
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587745,
+            41.795096
+          ]
+        },
+        "properties": {
+          "routes": [
+            "Friend Center/Metra"
+          ],
+          "stop_id": 8645000,
+          "stop_name": "Hyde Park Shopping Center (S)",
+          "distance_min": 5
+        }
+      }
+    ],
+    "groceries": {
+      "address": "1401 E 55TH ST, CHICAGO, IL, 60615",
+      "walking_time": 15,
+      "grocery_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.588351,
+                41.795263
+              ]
+            },
+            "properties": {
+              "name": "Trader Joe's",
+              "address": "1528 E 55TH ST",
+              "distance_min": 3.9
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.593095,
+                41.799527
+              ]
+            },
+            "properties": {
+              "name": "Target",
+              "address": "1346 E 53rd St",
+              "distance_min": 6.7
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.595593,
+                41.799496
+              ]
+            },
+            "properties": {
+              "name": "Hyde Park Produce",
+              "address": "1226 E 53RD ST",
+              "distance_min": 8.0
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.587718,
+                41.80173500000001
+              ]
+            },
+            "properties": {
+              "name": "Whole Foods Market",
+              "address": "5118 S Lake Park Ave",
+              "distance_min": 11.0
+            }
+          }
+        ]
+      }
+    }
+  }
+},
+{
+  "model": "apt_app.property",
+  "pk": 36,
+  "fields": {
+    "address": "211 W WACKER DR, CHICAGO, IL, 60606",
+    "location": "SRID=4326;POINT (-87.634105105806 41.886816849431)",
+    "created_at": "2025-05-23T02:52:40.902Z",
+    "bus_stops": null,
+    "groceries": null
+  }
+},
+{
+  "model": "apt_app.property",
+  "pk": 28,
+  "fields": {
+    "address": "1606 E HYDE PARK BLVD, CHICAGO, IL, 60615",
+    "location": "SRID=4326;POINT (-87.586304875448 41.802553501971)",
+    "created_at": "2025-05-13T03:51:08.312Z",
+    "bus_stops": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.58639,
+            41.802727
+          ]
+        },
+        "properties": {
+          "routes": [
+            "172"
+          ],
+          "stop_id": 16124,
+          "stop_name": "Cornell & Hyde Park",
+          "distance_min": 0
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.590126,
+            41.802406
+          ]
+        },
+        "properties": {
+          "routes": [
+            "172",
+            "15",
+            "2"
+          ],
+          "stop_id": 1646,
+          "stop_name": "E Hyde Park & Blackstone",
+          "distance_min": 5
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588071,
+            41.802407
+          ]
+        },
+        "properties": {
+          "routes": [
+            "172",
+            "15"
+          ],
+          "stop_id": 1647,
+          "stop_name": "E Hyde Park & Lake Park",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.58398,
+            41.802618
+          ]
+        },
+        "properties": {
+          "routes": [
+            "172"
+          ],
+          "stop_id": 16116,
+          "stop_name": "E Hyde Park & Lake Shore Drive",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.5858,
+            41.802544
+          ]
+        },
+        "properties": {
+          "routes": [
+            "172",
+            "6",
+            "28"
+          ],
+          "stop_id": 1523,
+          "stop_name": "E Hyde Park & East End",
+          "distance_min": 1
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588365,
+            41.802551
+          ]
+        },
+        "properties": {
+          "routes": [
+            "172",
+            "15",
+            "2"
+          ],
+          "stop_id": 1525,
+          "stop_name": "E Hyde Park & Lake Park",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.590295,
+            41.802501
+          ]
+        },
+        "properties": {
+          "routes": [
+            "172",
+            "15",
+            "2"
+          ],
+          "stop_id": 15671,
+          "stop_name": "East Hyde Park & Blackstone",
+          "distance_min": 5
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.58741,
+            41.801122
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7135,
+          "stop_name": "Lake Park & 52nd Street",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587666,
+            41.801165
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7176,
+          "stop_name": "Lake Park & 52nd Street",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588525,
+            41.804303
+          ]
+        },
+        "properties": {
+          "routes": [
+            "6",
+            "2",
+            "28"
+          ],
+          "stop_id": 7137,
+          "stop_name": "5000 S Lake Park",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.584557,
+            41.800987
+          ]
+        },
+        "properties": {
+          "routes": [
+            "6",
+            "28"
+          ],
+          "stop_id": 1522,
+          "stop_name": "5200 S S Hyde Park",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.586803,
+            41.802539
+          ]
+        },
+        "properties": {
+          "routes": [
+            "6",
+            "28"
+          ],
+          "stop_id": 1524,
+          "stop_name": "E Hyde Park & Cornell",
+          "distance_min": 1
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587936,
+            41.802914
+          ]
+        },
+        "properties": {
+          "routes": [
+            "6",
+            "2",
+            "28"
+          ],
+          "stop_id": 5037,
+          "stop_name": "Lake Park & E. Hyde Park Blvd",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588672,
+            41.804206
+          ]
+        },
+        "properties": {
+          "routes": [
+            "6",
+            "2",
+            "28"
+          ],
+          "stop_id": 7175,
+          "stop_name": "5000 S Lake Park",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.584567,
+            41.80095
+          ]
+        },
+        "properties": {
+          "routes": [
+            "6",
+            "28"
+          ],
+          "stop_id": 1650,
+          "stop_name": "5200 S S Hyde Park",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.586213,
+            41.802449
+          ]
+        },
+        "properties": {
+          "routes": [
+            "6",
+            "28"
+          ],
+          "stop_id": 1648,
+          "stop_name": "E Hyde Park & Cornell",
+          "distance_min": 0
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588173,
+            41.803211
+          ]
+        },
+        "properties": {
+          "routes": [
+            "6",
+            "2",
+            "28"
+          ],
+          "stop_id": 5036,
+          "stop_name": "Lake Park & E. Hyde Park Blvd",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.585045,
+            41.802265
+          ]
+        },
+        "properties": {
+          "routes": [
+            "6",
+            "28"
+          ],
+          "stop_id": 1649,
+          "stop_name": "S Hyde Park & E. Hyde Park Blvd.",
+          "distance_min": 2
+        }
+      }
+    ],
+    "groceries": {
+      "address": "1606 E HYDE PARK BLVD, CHICAGO, IL, 60615",
+      "walking_time": 15,
+      "grocery_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.587718,
+                41.80173500000001
+              ]
+            },
+            "properties": {
+              "name": "Whole Foods Market",
+              "address": "5118 S Lake Park Ave",
+              "distance_min": 2.1
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.593095,
+                41.799527
+              ]
+            },
+            "properties": {
+              "name": "Target",
+              "address": "1346 E 53rd St",
+              "distance_min": 9.4
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.588351,
+                41.795263
+              ]
+            },
+            "properties": {
+              "name": "Trader Joe's",
+              "address": "1528 E 55TH ST",
+              "distance_min": 11.8
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.595593,
+                41.799496
+              ]
+            },
+            "properties": {
+              "name": "Hyde Park Produce",
+              "address": "1226 E 53RD ST",
+              "distance_min": 12.0
+            }
+          }
+        ]
+      }
+    }
+  }
+},
+{
+  "model": "apt_app.property",
+  "pk": 699,
+  "fields": {
+    "address": "233 S WACKER DR, CHICAGO, IL, 60606",
+    "location": "SRID=4326;POINT (-87.636595465397 41.878516998901)",
+    "created_at": "2025-06-23T18:07:46.146Z",
+    "bus_stops": {
+      "address": "233 S WACKER DR, CHICAGO, IL, 60606",
+      "walking_time": 15,
+      "bus_stops_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.636527,
+                41.879421
+              ]
+            },
+            "properties": {
+              "routes": [
+                "156",
+                "134",
+                "135",
+                "136",
+                "28",
+                "1",
+                "126",
+                "130",
+                "7"
+              ],
+              "stop_id": "1108",
+              "stop_name": "Adams & S. Wacker",
+              "distance_min": 1
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.635449,
+                41.87808
+              ]
+            },
+            "properties": {
+              "routes": [
+                "156",
+                "151",
+                "28",
+                "1",
+                "126",
+                "130",
+                "7"
+              ],
+              "stop_id": "68",
+              "stop_name": "Jackson & Franklin",
+              "distance_min": 2
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.63705,
+                41.879487
+              ]
+            },
+            "properties": {
+              "routes": [
+                "Downtown Connector"
+              ],
+              "stop_id": "151793000",
+              "stop_name": "S (Upper) Wacker Dr & W Adams St",
+              "distance_min": 2
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.63703,
+                41.879511
+              ]
+            },
+            "properties": {
+              "routes": [
+                "121"
+              ],
+              "stop_id": "16038",
+              "stop_name": "Wacker (Upper) & Adams",
+              "distance_min": 2
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.635143,
+                41.879228
+              ]
+            },
+            "properties": {
+              "routes": [
+                "37"
+              ],
+              "stop_id": "4619",
+              "stop_name": "Franklin & Adams",
+              "distance_min": 2
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.632593,
+                41.876916
+              ]
+            },
+            "properties": {
+              "routes": [
+                "36"
+              ],
+              "stop_id": "15063",
+              "stop_name": "Van Buren & Financial Place",
+              "distance_min": 5
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.64109,
+                41.878017
+              ]
+            },
+            "properties": {
+              "routes": [
+                "157",
+                "60",
+                "126",
+                "7"
+              ],
+              "stop_id": "6361",
+              "stop_name": "Clinton & Jackson",
+              "distance_min": 5
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.641192,
+                41.87885
+              ]
+            },
+            "properties": {
+              "routes": [
+                "192",
+                "1",
+                "124",
+                "125",
+                "130"
+              ],
+              "stop_id": "4992",
+              "stop_name": "Clinton & Adams/Quincy",
+              "distance_min": 5
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.635887,
+                41.881984
+              ]
+            },
+            "properties": {
+              "routes": [
+                "157",
+                "60",
+                "56",
+                "19",
+                "20",
+                "124",
+                "J14"
+              ],
+              "stop_id": "18124",
+              "stop_name": "Madison & Franklin",
+              "distance_min": 6
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.630768,
+                41.878986
+              ]
+            },
+            "properties": {
+              "routes": [
+                "22",
+                "24"
+              ],
+              "stop_id": "1869",
+              "stop_name": "Clark & Adams",
+              "distance_min": 7
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.639796,
+                41.883489
+              ]
+            },
+            "properties": {
+              "routes": [
+                "120"
+              ],
+              "stop_id": "6579",
+              "stop_name": "Canal & Randolph/Washington",
+              "distance_min": 9
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.629217,
+                41.878018
+              ]
+            },
+            "properties": {
+              "routes": [
+                "62",
+                "22",
+                "24",
+                "36"
+              ],
+              "stop_id": "14508",
+              "stop_name": "Dearborn & Jackson",
+              "distance_min": 9
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.627757,
+                41.878394
+              ]
+            },
+            "properties": {
+              "routes": [
+                "148",
+                "6",
+                "62",
+                "2",
+                "29",
+                "36",
+                "10",
+                "146"
+              ],
+              "stop_id": "1429",
+              "stop_name": "State & Jackson",
+              "distance_min": 10
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.627637,
+                41.879373
+              ]
+            },
+            "properties": {
+              "routes": [
+                "147",
+                "148",
+                "2",
+                "29",
+                "10",
+                "146"
+              ],
+              "stop_id": "1115",
+              "stop_name": "State & Adams",
+              "distance_min": 11
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.647175,
+                41.87832
+              ]
+            },
+            "properties": {
+              "routes": [
+                "8"
+              ],
+              "stop_id": "18009",
+              "stop_name": "Halsted & Jackson",
+              "distance_min": 13
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.627769,
+                41.88307
+              ]
+            },
+            "properties": {
+              "routes": [
+                "66",
+                "4"
+              ],
+              "stop_id": "18154",
+              "stop_name": "State & Washington",
+              "distance_min": 13
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.624474,
+                41.87847
+              ]
+            },
+            "properties": {
+              "routes": [
+                "147",
+                "3",
+                "26",
+                "4",
+                "143",
+                "J14",
+                "X4"
+              ],
+              "stop_id": "1110",
+              "stop_name": "Michigan & Jackson",
+              "distance_min": 14
+            }
+          }
+        ]
+      }
+    },
+    "groceries": {
+      "address": "233 S WACKER DR, CHICAGO, IL, 60606",
+      "walking_time": 15,
+      "grocery_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.644687,
+                41.87801
+              ]
+            },
+            "properties": {
+              "name": "H Mart",
+              "address": "711 W JACKSON BLVD",
+              "distance_min": 9.6
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.62773100000001,
+                41.881754
+              ]
+            },
+            "properties": {
+              "name": "Target",
+              "address": "1 S State St",
+              "distance_min": 11.7
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.647384,
+                41.880557
+              ]
+            },
+            "properties": {
+              "name": "Mariano's Fresh Market",
+              "address": "40 S Halsted St",
+              "distance_min": 13.2
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.647331,
+                41.882501
+              ]
+            },
+            "properties": {
+              "name": "Whole Foods Market",
+              "address": "1 N Halsted St",
+              "distance_min": 14.2
+            }
+          }
+        ]
+      }
+    }
+  }
+},
+{
+  "model": "apt_app.property",
+  "pk": 29,
+  "fields": {
+    "address": "5432 S HARPER AVE, CHICAGO, IL, 60615",
+    "location": "SRID=4326;POINT (-87.589117749413 41.79710850037)",
+    "created_at": "2025-05-13T03:57:25.079Z",
+    "bus_stops": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591858,
+            41.79472
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10561,
+          "stop_name": "55th Street & Dorchester",
+          "distance_min": 5
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587858,
+            41.795109
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10563,
+          "stop_name": "55th Street & Lake Park",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591593,
+            41.79557
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10569,
+          "stop_name": "55th Street & Dorchester",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588097,
+            41.795307
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10567,
+          "stop_name": "55th Street & Lake Park",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587176,
+            41.799408
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7134,
+          "stop_name": "Lake Park & 53rd Street",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587142,
+            41.798142
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7133,
+          "stop_name": "Lake Park & 54th Street",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587452,
+            41.795053
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7132,
+          "stop_name": "Lake Park & 55th Street",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587412,
+            41.799207
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "192",
+            "28"
+          ],
+          "stop_id": 17646,
+          "stop_name": "Lake Park & 53rd Street",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587378,
+            41.798204
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7178,
+          "stop_name": "Lake Park & 54th Street",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587638,
+            41.795387
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7179,
+          "stop_name": "Lake Park & 55th Street",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.590448,
+            41.794798
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10562,
+          "stop_name": "55th Street & Blackstone",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.59021,
+            41.795585
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10568,
+          "stop_name": "55th Street & Blackstone",
+          "distance_min": 3
+        }
+      }
+    ],
+    "groceries": null
+  }
+},
+{
+  "model": "apt_app.property",
+  "pk": 35,
+  "fields": {
+    "address": "1451 E 55TH ST, CHICAGO, IL, 60615",
+    "location": "SRID=4326;POINT (-87.590115956094 41.795466862668)",
+    "created_at": "2025-05-22T20:26:56.130Z",
+    "bus_stops": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591858,
+            41.79472
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10561,
+          "stop_name": "55th Street & Dorchester",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.592962,
+            41.795036
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 17563,
+          "stop_name": "55th Street & Kenwood",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587858,
+            41.795109
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10563,
+          "stop_name": "55th Street & Lake Park",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.591593,
+            41.79557
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10569,
+          "stop_name": "55th Street & Dorchester",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.593707,
+            41.795188
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10570,
+          "stop_name": "55th Street & Kenwood",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588097,
+            41.795307
+          ]
+        },
+        "properties": {
+          "routes": [
+            "171",
+            "55"
+          ],
+          "stop_id": 10567,
+          "stop_name": "55th Street & Lake Park",
+          "distance_min": 2
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587452,
+            41.795053
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7132,
+          "stop_name": "Lake Park & 55th Street",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587768,
+            41.793604
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7131,
+          "stop_name": "Lake Park & 56th Street",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.587638,
+            41.795387
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7179,
+          "stop_name": "Lake Park & 55th Street",
+          "distance_min": 3
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.588,
+            41.793527
+          ]
+        },
+        "properties": {
+          "routes": [
+            "15",
+            "28"
+          ],
+          "stop_id": 7180,
+          "stop_name": "Lake Park & 56th Street",
+          "distance_min": 4
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.590448,
+            41.794798
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10562,
+          "stop_name": "55th Street & Blackstone",
+          "distance_min": 1
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.59021,
+            41.795585
+          ]
+        },
+        "properties": {
+          "routes": [
+            "55"
+          ],
+          "stop_id": 10568,
+          "stop_name": "55th Street & Blackstone",
+          "distance_min": 0
+        }
+      }
+    ],
+    "groceries": {
+      "address": "1451 E 55TH ST, CHICAGO, IL, 60615",
+      "walking_time": 15,
+      "grocery_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.588351,
+                41.795263
+              ]
+            },
+            "properties": {
+              "name": "Trader Joe's",
+              "address": "1528 E 55TH ST",
+              "distance_min": 2.1
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.593095,
+                41.799527
+              ]
+            },
+            "properties": {
+              "name": "Target",
+              "address": "1346 E 53rd St",
+              "distance_min": 7.4
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.595593,
+                41.799496
+              ]
+            },
+            "properties": {
+              "name": "Hyde Park Produce",
+              "address": "1226 E 53RD ST",
+              "distance_min": 9.1
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -87.587718,
+                41.80173500000001
+              ]
+            },
+            "properties": {
+              "name": "Whole Foods Market",
+              "address": "5118 S Lake Park Ave",
+              "distance_min": 10.4
+            }
+          }
+        ]
+      }
+    }
+  }
+}]

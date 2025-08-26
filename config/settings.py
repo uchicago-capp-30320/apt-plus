@@ -51,8 +51,6 @@ else:
     _DEFAULT_DB = env.db()
     EMAIL_CONFIG = env.email()
 _DEFAULT_DB["ENGINE"] = "django.contrib.gis.db.backends.postgis"  # Added engine for PostGIS
-# ref: https://stackoverflow.com/a/79522985
-_DEFAULT_DB["TEST"] = {"MIRROR": "default"}
 
 DATABASES = {"default": _DEFAULT_DB}
 
@@ -65,17 +63,17 @@ BREVO_API_URL = "https://api.brevo.com/v3/"
 
 
 ALLOWED_HOSTS = [
-    "127.0.0.1",              # Local development
-    "localhost",              # Localhost access
-    "0.0.0.0",                # For Docker binding
-    "aptpl.us",               # Root domain
-    ".aptpl.us",              # All subdomains
-    "turing.unnamed.computer",# server hostname (for development, will be deleted)
-    ".unnamed.computer",      # All subdomains  (for development, will be deleted)
-    "138.201.16.221",         # Direct IP access (for development, will be deleted)
+    "127.0.0.1",  # Local development
+    "localhost",  # Localhost access
+    "0.0.0.0",  # For Docker binding
+    "aptpl.us",  # Root domain
+    ".aptpl.us",  # All subdomains
+    "turing.unnamed.computer",  # server hostname (for development, will be deleted)
+    ".unnamed.computer",  # All subdomains  (for development, will be deleted)
+    "138.201.16.221",  # Direct IP access (for development, will be deleted)
 ]
 INTERNAL_IPS = ["127.0.0.1"]
-CSRF_TRUSTED_ORIGINS = ["https://aptpl.us"] # for Login function
+CSRF_TRUSTED_ORIGINS = ["https://aptpl.us"]  # for Login function
 
 # Debug Toolbar
 IS_TESTING = "test" in sys.argv or "pytest" in sys.argv
@@ -105,7 +103,7 @@ INSTALLED_APPS = [
     # "allauth.mfa",
     "django_structlog",
     "django_typer",
-    "django_extensions", # Added for creating ERD
+    "django_extensions",  # Added for creating ERD
     "apt_app",
 ]
 
