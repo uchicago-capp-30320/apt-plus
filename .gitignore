@@ -227,3 +227,4 @@ pyrightconfig.json
 
 # Airflow
 airflow/config/airflow.cfg
+airflow/logs/
