@@ -263,14 +263,16 @@ services:
       - postgres
     env_file:
       - .env
-# Commenting out healthcheck below until we can get more robust monitoring up.
-#    healthcheck:
-#      test: ["CMD", "curl", "--fail", "http://localhost:9000/about"]
-#      interval: 1m
-#      timeout: 10s
-#      start_period: 30s
-#      retries: 3
+    # Automatically restart on failure to ensure service availability
     restart: always
+
+    # Commenting out healthcheck below until we can get more robust monitoring up.
+    # healthcheck:
+    #   test: ["CMD", "curl", "--fail", "http://localhost:9000/about"]
+    #   interval: 1m
+    #   timeout: 10s
+    #   start_period: 30s
+    #   retries: 3
 
 volumes:
   postgres-db-volume:
