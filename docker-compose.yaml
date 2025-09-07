@@ -264,7 +264,7 @@ services:
     env_file:
       - .env
     # Automatically restart on failure to ensure service availability
-    restart: always
+    restart: unless-stopped
 
     # Commenting out healthcheck below until we can get more robust monitoring up.
     # healthcheck:
