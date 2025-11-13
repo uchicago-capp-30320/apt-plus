@@ -1,0 +1,177 @@
+[
+{
+  "model": "apt_app.inspectionsummary",
+  "pk": 160,
+  "fields": {
+    "address": "5514 S BLACKSTONE AVE",
+    "summary": {
+      "summary": "This building was cited recently for alleged violations around safety and common area concerns, including inadequate heating in at least one unit and issues with elevator safety and general maintenance.",
+      "summarized_issues": [
+        {
+          "date": "Jan 02, 2025",
+          "issues": [
+            {
+              "emoji": "🛗",
+              "description": "Elevator safety issues, including needing Category 1 tests, missing smoke detectors, and outdated fire extinguishers in machine rooms."
+            }
+          ]
+        },
+        {
+          "date": "Jan 16, 2024",
+          "issues": [
+            {
+              "emoji": "🔥",
+              "description": "Insufficient heating (temperatures as low as 43°F) and residents using space heaters due to the heating system being off (Units 102, 103, 104)."
+            },
+            {
+              "emoji": "🚿",
+              "description": "Low hot water temperature (45-59°F) and low pressure (Units 102, 103, 104)."
+            },
+            {
+              "emoji": "💨",
+              "description": "Drafty windows with air seepage (Units 102, 103, 104)."
+            },
+            {
+              "emoji": "🗣️",
+              "description": "Out-of-service smoke detectors (Units 102, 103, 104)."
+            },
+            {
+              "emoji": "🚧",
+              "description": "Hole in the ceiling in the 1st floor/mail box area."
+            }
+          ]
+        },
+        {
+          "date": "Oct 13, 2023",
+          "issues": [
+            {
+              "emoji": "🌿",
+              "description": "Overgrown weeds in the rear yard."
+            },
+            {
+              "emoji": "🪜",
+              "description": "Broken guardrail on the 2nd floor (East Elevation)."
+            },
+            {
+              "emoji": "🎨",
+              "description": "Graffiti on the West Elevation and overflowing trash cans with bags on the floor (Rear)."
+            },
+            {
+              "emoji": "🧱",
+              "description": "Loose paint on the exterior wall (North Elevation, 1st Fl) and open mortar joints on window sills (East Elevation)."
+            }
+          ]
+        }
+      ]
+    },
+    "property": null,
+    "version": "",
+    "last_updated_at": "2025-05-29T02:41:58.909Z",
+    "created_at": "2025-05-29T02:41:58.638Z"
+  }
+},
+{
+  "model": "apt_app.inspectionsummary",
+  "pk": 137,
+  "fields": {
+    "address": "1401 E 55TH ST",
+    "summary": {
+      "summary": "This building was cited recently for alleged violations around structural integrity and maintenance concerns, including issues with the parking garage's ceiling and walls, several water leaks, and general disrepair in common areas.",
+      "summarized_issues": [
+        {
+          "date": "May 08, 2024",
+          "issues": [
+            {
+              "emoji": "♨️",
+              "description": "Defective and leaking drain and safety valves on the hot water tank (Boiler NB#12312)."
+            }
+          ]
+        },
+        {
+          "date": "Apr 18, 2024",
+          "issues": [
+            {
+              "emoji": "⚠️",
+              "description": "Structural issues in the parking garage including spalled concrete, exposed rebar, and water leaks from above-ground planters and fountain. An engineering report is required for stability assessment."
+            },
+            {
+              "emoji": "🧱",
+              "description": "Cracked and separated concrete block wall in the garage, and a fractured wall near the trash compactor (up to 1 inch wide crack)."
+            },
+            {
+              "emoji": "🚪",
+              "description": "Damaged fire door near the trash compactors that does not close properly."
+            },
+            {
+              "emoji": "⚡",
+              "description": "Damaged, loose, and hanging electrical conduit with exposed live wires in the parking garage."
+            }
+          ]
+        },
+        {
+          "date": "Jul 06, 2023",
+          "issues": [
+            {
+              "emoji": "🔥",
+              "description": "Gas can stored in the basement hot water heater room, creating a dangerous condition."
+            },
+            {
+              "emoji": "🪜",
+              "description": "Chipped and broken floor tiles in the 3rd-floor hallway (near Stairwell 3B)."
+            },
+            {
+              "emoji": "💡",
+              "description": "Non-functioning emergency lights in stairwells (10C, 4C) and 5th-floor hallway (near Stairwell 5C)."
+            },
+            {
+              "emoji": "💧",
+              "description": "Severe water damage and ongoing leaks from the ceiling in the basement breakroom (#1451), with plastic sheeting used to catch water."
+            },
+            {
+              "emoji": "📦",
+              "description": "Obstruction (box) stored at the top of Stairwell 4B."
+            },
+            {
+              "emoji": "🏗️",
+              "description": "Broken, spalling, and cracked concrete ceiling throughout the basement parking area, with plastic covering hung to prevent concrete from falling on vehicles."
+            },
+            {
+              "emoji": "🎨",
+              "description": "Bubbling paint on the ceiling (near Stairwell 3B) and cracks/peeling paint throughout the 2nd and 3rd-floor hallways."
+            },
+            {
+              "emoji": "🕳️",
+              "description": "Cracks in the wall near an emergency light in the 5th-floor hallway (near Stairwell 5B)."
+            },
+            {
+              "emoji": "📡",
+              "description": "Missing cover on a cable box in Stairwell 7C."
+            },
+            {
+              "emoji": "💨",
+              "description": "Non-functioning carbon monoxide detector in the basement laundry room (#1401)."
+            },
+            {
+              "emoji": "📛",
+              "description": "Missing fire-rating tags on door frames and hinge sides for stairwell and hallway doors on all levels."
+            }
+          ]
+        },
+        {
+          "date": "Jan 08, 2022",
+          "issues": [
+            {
+              "emoji": "🌡️",
+              "description": "Inadequate heating in Unit #502N (bedroom temperature was 63-64°F), leading to the use of a space heater."
+            }
+          ]
+        }
+      ]
+    },
+    "property": null,
+    "version": "",
+    "last_updated_at": "2025-05-29T02:41:58.909Z",
+    "created_at": "2025-05-29T02:41:58.638Z"
+  }
+}
+]

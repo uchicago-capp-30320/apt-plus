@@ -2,7 +2,6 @@ import pytest
 from playwright.sync_api import expect, Page
 
 
-@pytest.mark.playwright
 @pytest.fixture(scope="function", autouse=True)
 def test_address(page: Page, live_server):
     """

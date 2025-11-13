@@ -1,0 +1,40 @@
+[{
+  "model": "apt_app.amenity",
+  "pk": 159,
+  "fields": {
+    "name": "Whole Foods Market",
+    "location": "SRID=4326;POINT (-87.587718 41.80173500000001)",
+    "type": "grocery",
+    "address": "5118 S Lake Park Ave"
+  }
+},
+{
+  "model": "apt_app.amenity",
+  "pk": 193,
+  "fields": {
+    "name": "Target",
+    "location": "SRID=4326;POINT (-87.593095 41.799527)",
+    "type": "grocery",
+    "address": "1346 E 53rd St"
+  }
+},
+{
+  "model": "apt_app.amenity",
+  "pk": 257,
+  "fields": {
+    "name": "Trader Joe's",
+    "location": "SRID=4326;POINT (-87.588351 41.795263)",
+    "type": "grocery",
+    "address": "1528 E 55TH ST"
+  }
+},
+{
+  "model": "apt_app.amenity",
+  "pk": 189,
+  "fields": {
+    "name": "Hyde Park Produce",
+    "location": "SRID=4326;POINT (-87.595593 41.799496)",
+    "type": "grocery",
+    "address": "1226 E 53RD ST"
+  }
+}]

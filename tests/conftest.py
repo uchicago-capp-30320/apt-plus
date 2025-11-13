@@ -1,7 +1,28 @@
 import os
 import pytest
+from django.core.management import call_command
 
 
+#######################################
+# 0. Test DB
+#######################################
+# From: https://docs.djangoproject.com/en/5.2/ref/django-admin/
+# From: https://pytest-django.readthedocs.io/en/latest/database.html
+@pytest.fixture(scope="session")
+def django_db_setup(django_db_setup, django_db_blocker):
+    files = []
+    fixture_dir = "tests/fixtures/"
+    for file in os.listdir(fixture_dir):
+        files.append(file)
+
+    with django_db_blocker.unblock():
+        for file in files:
+            call_command("loaddata", f"{fixture_dir}/{file}")
+
+
+#######################################
+# 1. Playwright Fixtures
+#######################################
 @pytest.fixture(autouse=True)
 def override_staticfiles_storage(settings):
     """
